@@ -1,0 +1,19 @@
+{
+  "identifier": "migrated",
+  "description": "permissions that were migrated from v1",
+  "local": true,
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "shell:allow-open",
+    "shell:default",
+    "notification:default",
+    "notification:default",
+    "dialog:default",
+    "clipboard-manager:default",
+    "clipboard-manager:allow-read-text",
+    "log:default"
+  ]
+}

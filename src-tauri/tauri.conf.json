@@ -1,0 +1,38 @@
+{
+  "build": {
+    "beforeDevCommand": "yarn dev",
+    "beforeBuildCommand": "yarn build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources":["./libxml2.dll", "./liblzma.dll", "./zlib1.dll", "./iconv-2.dll"]
+  },
+  "productName": "chaski",
+  "mainBinaryName": "chaski",
+  "version": "0.1.0",
+  "identifier": "com.chaski.app",
+  "plugins": {},
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "chaski",
+        "width": 1200,
+        "height": 720
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}

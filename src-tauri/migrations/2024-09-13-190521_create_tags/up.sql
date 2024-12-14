@@ -1,0 +1,6 @@
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    value TEXT NOT NULL,
+    article_id INTEGER NOT NULL REFERENCES article(id)
+);
+

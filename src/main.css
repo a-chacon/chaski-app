@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --letter-spacing: 0em;
+  --font-size-base: 16px;
+}
+
+html {
+  font-size: var(--font-size-base);
+}
+
+body {
+  letter-spacing: var(--letter-spacing);
+}
+
+@layer base {
+  @font-face {
+    font-family: "OpenSans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url(./assets/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf)
+      format("woff2");
+  }
+
+  @font-face {
+    font-family: "Arial";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url(./assets/arial-font/arial.ttf) format("woff2");
+  }
+
+  @font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url(./assets/Roboto/Roboto-Regular.ttf) format("woff2");
+  }
+
+  @font-face {
+    font-family: "Tisa";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url(./assets/tisa-sans-pro-cufonfonts/Tisa Sans Pro Regular.ttf)
+      format("woff2");
+  }
+
+  @font-face {
+    font-family: "Garamond";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url(./assets/EB_Garamond/static/EBGaramond-Regular.ttf) format("woff2");
+  }
+}

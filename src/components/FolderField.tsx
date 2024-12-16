@@ -34,7 +34,7 @@ export default function FolderField({ feed }: FolderFieldInterface) {
       menuTrigger="input"
       allowsCustomValue
       label="Folder"
-      items={availableFolders}
+      defaultItems={availableFolders}
       defaultSelectedKey={feed.folder}
       onInputChange={onInputChange}
       variant="underlined"

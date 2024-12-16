@@ -57,6 +57,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       className="bg-default-950"
+      scrollBehavior="inside"
     >
       <ModalContent>
         {(onCloseModal) => (

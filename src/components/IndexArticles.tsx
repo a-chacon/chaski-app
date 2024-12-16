@@ -22,10 +22,9 @@ function IndexArticles({
 
   const GiphyEmbed = () => {
     return (
-      <div className="w-80 mx-auto">
-        <img src="/chaski.png" className="" alt="Tauri logo" />
-        <div className="pb-6">
-          <h5 className="text-2xl font-semibold text-center pb-2">
+      <div className="mx-auto col-span-3">
+        <div className="pb-6 text-center">
+          <h5 className="text-2xl font-semibold pb-2">
             We've reached the end of the road…
           </h5>
           <p>But don’t fret, our Chasquis are already off to bring more!</p>

@@ -38,7 +38,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "chaski",
+        "title": "Chaski",
         "width": 1200,
         "height": 720
       }

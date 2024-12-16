@@ -57,7 +57,7 @@ export default function App() {
         <div className="flex border-b border-default-500 py-4 justify-between items-start">
           <div>
             <h1 className="text-3xl pt-2 font-bold">All</h1>
-            <h2 className="pt-1 pb-4">The insights you need to keep ahead</h2>
+            <h2 className="pt-1 pb-4">Explore the latest articles and updates from your favorite sources, all in one place.</h2>
           </div>
           <div>
             <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>

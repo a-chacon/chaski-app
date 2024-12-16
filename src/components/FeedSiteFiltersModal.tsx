@@ -74,6 +74,7 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="lg"
+      className="bg-default-950"
     >
       <ModalContent>
         {(onCloseModal) => (

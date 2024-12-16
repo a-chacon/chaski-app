@@ -1,7 +1,7 @@
 [package]
 name = "chaski"
-version = "0.1.1"
-description = "A Tauri App"
+version = "0.1.0"
+description = "A beautifully designed, privacy-focused feed reader that keeps you updated."
 authors = ["a-chacon"]
 edition = "2021"
 

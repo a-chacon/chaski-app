@@ -53,6 +53,9 @@ function SideBar({ hidden }: SideBarProps) {
           aria-label="Actions"
           className="py-6"
           onAction={() => { }}
+          itemClasses={{
+            base: "data-[hover=true]:bg-primary-500/50",
+          }}
         >
           <ListboxItem key="today">
             <Link

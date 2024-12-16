@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   RiAddCircleLine,
   RiHomeWifiLine,
@@ -9,15 +9,22 @@ import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import SearchModal from "./SearchModal";
 import UserMenu from "./UserMenu";
+import updater from "../helpers/updater";
+import { useNotification } from "../NotificationContext";
 
-interface VerticalHeaderProps {}
+interface VerticalHeaderProps { }
 
-const VerticalHeader: React.FC<VerticalHeaderProps> = ({}) => {
+const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
+  const { addNotification } = useNotification();
   const { setSideBarOpen, sideBarOpen } = useAppContext();
   const toggleSidebar = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     setSideBarOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    updater(addNotification);
+  }, []);
 
   return (
     <div className="flex flex-row md:flex-col items-center md:h-full justify-between m-2 md:m-0 md:mr-2">

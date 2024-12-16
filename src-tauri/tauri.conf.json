@@ -15,13 +15,25 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources":["./libxml2.dll", "./liblzma.dll", "./zlib1.dll", "./iconv-2.dll"]
+    "resources": [
+      "./liblzma.dll",
+      "./zlib1.dll",
+      "./iconv-2.dll"
+    ],
+    "createUpdaterArtifacts": true
   },
   "productName": "chaski",
   "mainBinaryName": "chaski",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.chaski.app",
-  "plugins": {},
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDZDRTA5MDFCRUZGNzE2REIKUldUYkZ2ZnZHNURnYkFOMCtnZFNuNmhzQjRhakFTTlJCSEJxdWMzRnpBQmE3djNpM2w2ZXpFL3gK",
+      "endpoints": [
+        "https://github.com/a-chacon/chaski-app/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "app": {
     "withGlobalTauri": true,
     "windows": [

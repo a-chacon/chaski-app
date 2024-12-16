@@ -55,7 +55,6 @@ export default function UserMenu() {
           <DropdownItem key="configurations">
             <Link to="/configurations">Configurations</Link>
           </DropdownItem>
-          {/* <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>
     </>

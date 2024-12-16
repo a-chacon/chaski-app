@@ -1,6 +1,6 @@
 {
-  "identifier": "migrated",
-  "description": "permissions that were migrated from v1",
+  "identifier": "default",
+  "description": "default permissions",
   "local": true,
   "windows": [
     "main"
@@ -14,6 +14,7 @@
     "dialog:default",
     "clipboard-manager:default",
     "clipboard-manager:allow-read-text",
-    "log:default"
+    "log:default",
+    "process:default"
   ]
 }

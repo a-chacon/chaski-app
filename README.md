@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="http://chaskiapp.a-chacon.com"><img src="https://raw.githubusercontent.com/amitmerchant1990/electron-markdownify/master/app/img/markdownify.png" alt="Chaski App Logo" width="200"></a>
+  <a href="https://chaski.a-chacon.com"><img src="http://chaski.a-chacon.com/chaski.png" alt="Chaski App Logo" width="200"></a>
   <br>
   Chaski
   <br>
@@ -12,7 +12,7 @@
 </h4>
 
 <p align="center">
-
+  <a href="https://chaski.a-chacon.com"><img src="http://chaski.a-chacon.com/chaski.gif" alt="Chaski App Demo"></a>
 </p>
 
 <p align="center">
@@ -21,8 +21,6 @@
   <a href="#contributing">Contribute</a> •
   <a href="#license">License</a>
 </p>
-
-![screenshot](https://raw.githubusercontent.com/amitmerchant1990/electron-markdownify/master/app/img/markdownify.gif)
 
 ## Support
 

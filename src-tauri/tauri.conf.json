@@ -15,11 +15,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [
-      "./liblzma.dll",
-      "./zlib1.dll",
-      "./iconv-2.dll"
-    ],
+    "resources": [],
     "createUpdaterArtifacts": true
   },
   "productName": "Chaski",

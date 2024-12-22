@@ -67,7 +67,7 @@ pub fn run() {
 
             db::init(app.handle());
             let handler_clone = app.handle().clone();
-            feeds::spawn_feed_update_loops(handler_clone);
+            feeds::spawn_feeds_update_loop(handler_clone);
             Ok(())
         })
         .on_window_event(|window, event| match event {

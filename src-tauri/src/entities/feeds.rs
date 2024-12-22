@@ -5,6 +5,7 @@ use crate::schema::articles;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
 use chrono::Utc;
+use diesel::dsl::{now, sql};
 use diesel::prelude::*;
 use diesel::sql_query;
 use tokio::time::{sleep, Duration};
@@ -53,7 +54,6 @@ pub fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Feed {
 
     tauri::async_runtime::spawn(async move {
         let _ = collect_feed_content(&created_feed_clone, cloned_app_handle).await;
-        let _ = feed_update_loop(created_feed_clone, app_handle).await;
     });
 
     created_feed
@@ -110,46 +110,39 @@ pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec
         .collect()
 }
 
-pub fn spawn_feed_update_loops(app_handle: tauri::AppHandle) {
-    let feed_list = index(app_handle.clone());
-    for feed in feed_list {
-        log::debug!(target: "chaski:entities","Spawn feed update loop. feed_id: {:?}, feed_title: {:?}", feed.id, feed.title);
-
-        let clone_app_handle = app_handle.clone();
-        tauri::async_runtime::spawn(async move {
-            let _ = feed_update_loop(feed, clone_app_handle).await;
-        });
-    }
+pub fn spawn_feeds_update_loop(app_handle: tauri::AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        let _ = feeds_update_loop(app_handle).await;
+    });
 }
 
-async fn feed_update_loop(mut feed: Feed, app_handle: tauri::AppHandle) {
+async fn feeds_update_loop(app_handle: tauri::AppHandle) {
     loop {
-        let current_time = Utc::now().naive_utc();
-        let next_update_time = feed
-            .last_fetch
-            .map(|last_fetch_time| {
-                last_fetch_time + Duration::from_secs((feed.update_interval_minutes * 60) as u64)
-            })
-            .unwrap_or_else(|| Utc::now().naive_utc());
+        let conn = &mut establish_connection(&app_handle);
 
-        let wait_time_seconds = next_update_time - current_time;
+        let feeds_to_update: Vec<Feed> = feeds
+            .filter(
+                sql::<diesel::sql_types::Timestamp>(
+                    "datetime(feeds.last_fetch, '+' || feeds.update_interval_minutes || ' minutes')",
+                )
+                    .lt(now)
+                    .or(last_fetch.is_null()),
+            )
+            .load::<Feed>(conn)
+            .expect("Error loading feeds that need to be updated");
 
-        if wait_time_seconds.num_seconds() > 0 {
-            log::info!(target: "chaski:entities","Next update: feed: {:?}, minutes: {:?}", feed.title, wait_time_seconds.num_minutes());
-
-            sleep(Duration::from_secs(wait_time_seconds.num_seconds() as u64)).await;
-        }
-
-        let cloned_app_handle = app_handle.clone();
-
-        match collect_feed_content(&feed, cloned_app_handle).await {
-            Ok(_) => {
-                log::debug!(target: "chaski:entities","Feed Updated Successfully. feed_id: {:?}", feed.id);
-                feed = show(feed.id, app_handle.clone()).unwrap();
-            }
-            Err(err) => {
-                log::error!(target: "chaski:entities","Error Updating feed {:?}: {err:?}", feed.id);
+        for feed in feeds_to_update {
+            let cloned_app_handle = app_handle.clone();
+            match collect_feed_content(&feed, cloned_app_handle).await {
+                Ok(_) => {
+                    log::debug!(target: "chaski:entities","Feed Updated Successfully. feed_id: {:?}", feed.id);
+                }
+                Err(err) => {
+                    log::error!(target: "chaski:entities","Error Updating feed {:?}: {err:?}", feed.id);
+                }
             }
         }
+
+        sleep(Duration::from_secs(61)).await;
     }
 }

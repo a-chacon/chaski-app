@@ -22,7 +22,7 @@
     ],
     "createUpdaterArtifacts": true
   },
-  "productName": "chaski",
+  "productName": "Chaski",
   "mainBinaryName": "chaski",
   "version": "0.1.0",
   "identifier": "com.chaski.app",

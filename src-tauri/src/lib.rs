@@ -88,6 +88,8 @@ pub fn run() {
             commands::update_article,
             commands::update_feed,
             commands::update_articles_as_read,
+            commands::update_articles_as_read_by_folder,
+            commands::update_articles_as_read_by_feed_id,
             commands::collect_feed_content,
             commands::full_text_search,
             commands::create_filter,

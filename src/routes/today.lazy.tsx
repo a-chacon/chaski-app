@@ -1,19 +1,22 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import { Button } from "@nextui-org/react";
-import { RiRefreshLine } from "@remixicon/react";
+import { Button, Tooltip } from "@nextui-org/react";
+import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
 import { useEffect } from "react";
 import { ArticleInterface } from "../interfaces";
 import { invoke } from "@tauri-apps/api/core";
 import IndexArticles from "../components/IndexArticles";
 import moment from "moment";
 import { useArticles } from "../IndexArticlesContext";
+import { updateAllArticlesAsRead } from "../helpers/feedsData";
+import { useNotification } from "../NotificationContext";
 
 export const Route = createLazyFileRoute("/today")({
   component: Today,
 });
 
 export default function Today() {
+  const { addNotification } = useNotification();
   const { articles, setArticles, page, setPage, hasMore, setHasMore } = useArticles("/today");
 
   useEffect(() => {
@@ -52,6 +55,18 @@ export default function Today() {
     setArticles([]);
   }
 
+  const handleUpdateArticlesAsRead = async () => {
+    await updateAllArticlesAsRead();
+    resetArticleList();
+
+    addNotification("Updated", 'All entries were updated as read!', 'primary');
+  };
+
+  const resetArticleList = () => {
+    setArticles([]);
+    setPage(1);
+  };
+
   return (
     <MainSectionLayout>
       <div className="flex flex-col p-4 max-w-screen-md mx-auto">
@@ -60,10 +75,22 @@ export default function Today() {
             <h1 className="text-3xl pt-2 font-bold">Today</h1>
             <h2 className="pt-1 pb-4">The insights you need to keep ahead</h2>
           </div>
-          <div>
-            <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
-              <RiRefreshLine></RiRefreshLine>
-            </Button>
+          <div className="flex flex-row items-center gap-2">
+            <Tooltip content="Update All Articles As Read">
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                onClick={handleUpdateArticlesAsRead}
+              >
+                <RiCheckDoubleLine></RiCheckDoubleLine>
+              </Button>
+            </Tooltip>
+            <Tooltip content="Reload The Page's Articles">
+              <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
+                <RiRefreshLine></RiRefreshLine>
+              </Button>
+            </Tooltip>
           </div>
         </div>
         <IndexArticles

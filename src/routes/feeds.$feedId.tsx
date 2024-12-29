@@ -6,9 +6,9 @@ import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import IndexArticles from "../components/IndexArticles";
 import FeedSiteActions from "../components/FeedSiteActions";
-import { Button, Spinner, Snippet } from "@nextui-org/react";
+import { Button, Spinner, Snippet, Tooltip } from "@nextui-org/react";
 import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
-import { updateAllArticlesAsRead, refreshArticles } from "../helpers/feedsData";
+import { updateArticlesAsReadByFeedId, refreshArticles } from "../helpers/feedsData";
 import { getFeed } from "../helpers/feedsData";
 import { useArticles } from "../IndexArticlesContext";
 import { useNotification } from "../NotificationContext";
@@ -63,7 +63,7 @@ export default function Feed() {
   };
 
   const handleUpdateAllArticlesAsRead = async () => {
-    await updateAllArticlesAsRead(parseInt(feed?.id || "1"));
+    await updateArticlesAsReadByFeedId(parseInt(feed?.id || "1"));
     resetArticleList();
 
     addNotification("Updated", 'All entries were updated as read!', 'primary');
@@ -97,26 +97,31 @@ export default function Feed() {
               <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
             </div>
             <div className="flex flex-row items-center gap-2">
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                onClick={handleUpdateAllArticlesAsRead}
-              >
-                <RiCheckDoubleLine></RiCheckDoubleLine>
-              </Button>
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                onClick={handleRefreshArticles}
-              >
-                {refreshLoading ? (
-                  <Spinner color="default" size="sm" />
-                ) : (
-                  <RiRefreshLine></RiRefreshLine>
-                )}
-              </Button>
+              <Tooltip content="Update All Articles of The Feed As Read">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onClick={handleUpdateAllArticlesAsRead}
+                >
+                  <RiCheckDoubleLine></RiCheckDoubleLine>
+                </Button>
+              </Tooltip>
+              <Tooltip content="Fetch New Entries">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onClick={handleRefreshArticles}
+                >
+                  {refreshLoading ? (
+                    <Spinner color="default" size="sm" />
+                  ) : (
+                    <RiRefreshLine></RiRefreshLine>
+                  )}
+                </Button>
+              </Tooltip >
+
               {feed && <FeedSiteActions feed={feed} setFeed={setFeed} />}
             </div>
           </div>

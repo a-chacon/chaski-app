@@ -2,6 +2,7 @@ use super::schema::{article_tags, articles, configurations, feeds, filters, tags
 use crate::core::common::{calculate_default_fetch_interval, parse_rfc822_to_naive_datetime};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
+use diesel::sql_types::{BigInt, Integer, Text};
 use serde::{Deserialize, Serialize};
 
 #[derive(
@@ -34,6 +35,20 @@ pub struct Feed {
     pub notifications_enabled: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+#[derive(QueryableByName, Queryable, Debug, Serialize)]
+pub struct IndexFeed {
+    #[diesel(sql_type = Integer)]
+    pub id: i32,
+    #[diesel(sql_type = Text)]
+    pub title: String,
+    #[diesel(sql_type = Text)]
+    pub folder: String,
+    #[diesel(sql_type = Text)]
+    pub icon: String,
+    #[diesel(sql_type = BigInt)]
+    pub unread_count: i64,
 }
 
 #[derive(Insertable, Debug, Serialize, Deserialize)]

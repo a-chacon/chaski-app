@@ -112,19 +112,53 @@ pub fn update(article_id: i32, article: Article, app_handle: tauri::AppHandle) -
         .expect("Update article")
 }
 
-pub fn update_all_as_read(feed_id_eq: Option<i32>, app_handle: tauri::AppHandle) -> usize {
+pub fn update_all_as_read(app_handle: tauri::AppHandle) {
     let conn = &mut establish_connection(&app_handle);
-    let mut query = diesel::update(articles).set(read.eq(1)).into_boxed();
 
-    if let Some(feed_id_eq) = feed_id_eq {
-        query = query.filter(articles::feed_id.eq(feed_id_eq));
-    }
+    let result = diesel::update(articles).set(read.eq(1)).execute(conn);
 
-    match query.execute(conn) {
-        Ok(rows_updated) => rows_updated,
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","All articles updated as read, {:?}", count);
+        }
         Err(e) => {
-            eprintln!("Error updating articles: {:?}", e);
-            0
+            log::error!(target: "chaski:articles","Error updating all articles as read: {:?}", e);
+        }
+    }
+}
+
+pub fn update_all_as_read_by_feed_id(feed_id_eq: i32, app_handle: tauri::AppHandle) {
+    let conn = &mut establish_connection(&app_handle);
+    let result = diesel::update(articles)
+        .set(read.eq(1))
+        .filter(articles::feed_id.eq(feed_id_eq))
+        .execute(conn);
+
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","All articles by feed updated as read, {:?}", count);
+        }
+        Err(e) => {
+            log::error!(target: "chaski:articles","Error updating all articles by feed as read: {:?}", e);
+        }
+    }
+}
+
+pub fn update_all_as_read_by_folder(folder_eq: String, app_handle: tauri::AppHandle) {
+    let conn = &mut establish_connection(&app_handle);
+    let query = format!(
+        "UPDATE articles SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?});",
+        folder_eq
+    );
+
+    let result = sql_query(query).execute(conn);
+
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","All articles by folder updated as read, {:?}", count);
+        }
+        Err(e) => {
+            log::error!(target: "chaski:articles","Error updating all articles by folder as read: {:?}", e);
         }
     }
 }

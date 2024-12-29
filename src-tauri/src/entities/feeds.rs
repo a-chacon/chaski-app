@@ -1,6 +1,6 @@
 use crate::core::jobs::collect_feed_content;
 use crate::db::establish_connection;
-use crate::models::{Feed, NewFeed};
+use crate::models::{Feed, IndexFeed, NewFeed};
 use crate::schema::articles;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
@@ -95,13 +95,30 @@ pub fn destroy(feed_id: i32, app_handle: tauri::AppHandle) {
     let _ = diesel::delete(feeds.filter(id.eq(feed_id))).execute(conn);
 }
 
-pub fn index(app_handle: tauri::AppHandle) -> Vec<Feed> {
+pub fn index(app_handle: tauri::AppHandle) -> Vec<IndexFeed> {
     let conn = &mut establish_connection(&app_handle);
 
-    feeds
-        .select(Feed::as_select())
-        .load(conn)
-        .expect("Error loading posts")
+    let query = r#"
+        SELECT 
+            feeds.id, 
+            feeds.title, 
+            feeds.folder, 
+            feeds.icon,
+            COALESCE(COUNT(articles.id), 0) AS unread_count
+        FROM 
+            feeds
+        LEFT JOIN 
+            articles 
+        ON 
+            articles.feed_id = feeds.id 
+            AND articles.read = 0
+        GROUP BY 
+            feeds.id, feeds.title, feeds.folder, feeds.icon
+    "#;
+
+    sql_query(query)
+        .load::<IndexFeed>(conn)
+        .expect("Error loading feeds with unread count")
 }
 
 pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec<Feed> {

@@ -128,18 +128,30 @@ pub async fn update_feed(
 }
 
 #[command]
-pub async fn update_articles_as_read(
-    feed_id: Option<i32>,
+pub async fn update_articles_as_read(app_handle: tauri::AppHandle) -> Result<(), ()> {
+    log::info!(target: "chaski:commands","Command update_articles_as_read.");
+    crate::entities::articles::update_all_as_read(app_handle);
+    Ok(())
+}
+
+#[command]
+pub async fn update_articles_as_read_by_feed_id(
+    feed_id: i32,
     app_handle: tauri::AppHandle,
-) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command update_articles_as_read. feed_id: {feed_id:?}");
+) -> Result<(), ()> {
+    log::info!(target: "chaski:commands","Command update_articles_as_read_by_feed. feed_id: {feed_id:?}");
+    crate::entities::articles::update_all_as_read_by_feed_id(feed_id, app_handle);
+    Ok(())
+}
 
-    let result = crate::entities::articles::update_all_as_read(feed_id, app_handle);
-
-    match serde_json::to_string(&result) {
-        Ok(json_string) => Ok(json_string),
-        Err(_) => Err(()),
-    }
+#[command]
+pub async fn update_articles_as_read_by_folder(
+    folder: String,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
+    log::info!(target: "chaski:commands","Command update_articles_as_read_by_folder. folder: {folder:?}");
+    crate::entities::articles::update_all_as_read_by_folder(folder, app_handle);
+    Ok(())
 }
 
 #[command]

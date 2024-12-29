@@ -1,9 +1,27 @@
 import { invoke } from "@tauri-apps/api/core";
 import { FeedInterface } from "../interfaces";
 
-export const updateAllArticlesAsRead = async (feed_id: number) => {
+export const updateAllArticlesAsRead = async () => {
   try {
-    await invoke<string>("update_articles_as_read", {
+    await invoke<string>("update_articles_as_read");
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+  }
+};
+
+export const updateArticlesAsReadByFolder = async (folder: string) => {
+  try {
+    await invoke<string>("update_articles_as_read_by_folder", {
+      folder: folder,
+    });
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+  }
+};
+
+export const updateArticlesAsReadByFeedId = async (feed_id: number) => {
+  try {
+    await invoke<string>("update_articles_as_read_by_feed_id", {
       feedId: feed_id,
     });
   } catch (error) {

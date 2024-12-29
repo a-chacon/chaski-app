@@ -12,20 +12,23 @@ use diesel::prelude::*;
 pub async fn complete_article(article: Article, app_handle: tauri::AppHandle) {
     use crate::schema::articles::dsl::*;
 
-    let conn = &mut establish_connection(&app_handle);
-
     let result = scrape_article_data(&article.link).await;
 
     match result {
         Ok(article_page_data) => {
+            let conn = &mut establish_connection(&app_handle);
             let _ = diesel::update(articles)
                 .filter(id.eq(article.id))
                 .set((
-                    title.eq(article_page_data.title.unwrap_or(article.title.unwrap())),
+                    title.eq(article_page_data
+                        .title
+                        .unwrap_or(article.title.unwrap_or_default())),
                     description.eq(article_page_data
                         .description
-                        .unwrap_or(article.description.unwrap())),
-                    image.eq(article_page_data.image.unwrap_or(article.image.unwrap())),
+                        .unwrap_or(article.description.unwrap_or_default())),
+                    image.eq(article_page_data
+                        .image
+                        .unwrap_or(article.image.unwrap_or_default())),
                     content.eq(article_page_data.content),
                 ))
                 .execute(conn);
@@ -40,6 +43,7 @@ pub async fn collect_feed_content(
     feed: &Feed,
     app_handle: tauri::AppHandle,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    log::info!(target: "chaski:jobs","Collecting feed content for {:?}", feed.link);
     let response_found_articles = scrape_feed_articles(feed).await;
     let mut updated_feed = feed.clone();
 
@@ -55,7 +59,18 @@ pub async fn collect_feed_content(
         let limit = feed.entry_limit.max(0) as usize;
         let limited_articles = final_articles.into_iter().take(limit).collect::<Vec<_>>();
 
-        updated_feed.latest_entry = limited_articles.first().unwrap().pub_date;
+        if let Some(first_article) = limited_articles.first() {
+            updated_feed.latest_entry = first_article.pub_date;
+        } else {
+            log::error!(
+                "No articles found in limited_articles for feed {:?}",
+                updated_feed.link
+            );
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "No articles available to update feed's latest entry",
+            )));
+        }
 
         let created_articles = articles::create_list(limited_articles, app_handle.clone());
 

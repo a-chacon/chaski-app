@@ -243,7 +243,7 @@ impl NewArticle {
         NewArticle {
             feed_id: feed.id,
             title: item.title,
-            link: item.link.unwrap(),
+            link: item.link.unwrap_or(feed.link.clone()),
             image: Some(String::from("")),
             pub_date: parse_rfc822_to_naive_datetime(item.pub_date),
             description: crate::core::common::remove_html_tags(item.description),

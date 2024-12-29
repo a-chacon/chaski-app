@@ -15,10 +15,16 @@ pub async fn opml_file_to_new_feeds(
     for outline in document.body.outlines.iter() {
         if let Some(xml_url) = &outline.xml_url {
             let url = xml_url.clone();
-            let mut found_feeds = crate::utils::scrape::scrape_site_feeds(url).await?;
 
-            if let Some(first_feed) = found_feeds.pop() {
-                new_feeds.push(first_feed);
+            match crate::utils::scrape::scrape_site_feeds(url).await {
+                Ok(mut found_feeds) => {
+                    if let Some(first_feed) = found_feeds.pop() {
+                        new_feeds.push(first_feed);
+                    }
+                }
+                Err(e) => {
+                    log::error!(target: "chaski:opml","opml_file_to_new_feeds. Url: {:?} Error: {:?}", xml_url, e);
+                }
             }
         } else {
             let folder = &outline.text;
@@ -35,7 +41,7 @@ pub async fn opml_file_to_new_feeds(
                             }
                         }
                         Err(e) => {
-                            eprintln!("Error scraping feeds for URL {}: {:?}", xml_url, e);
+                            log::error!(target: "chaski:opml","opml_file_to_new_feeds. Url: {:?} Error: {:?}", xml_url, e);
                         }
                     }
                 }

@@ -6,7 +6,7 @@ use tauri::command;
 
 #[command]
 pub async fn fetch_site_feeds(site_url: String) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command fetch_site_feeds. Params: {site_url:?}");
+    log::debug!(target: "chaski:commands","Command fetch_site_feeds. Params: {site_url:?}");
 
     let result = crate::utils::scrape::scrape_site_feeds(site_url).await;
 
@@ -24,9 +24,9 @@ pub async fn fetch_site_feeds(site_url: String) -> Result<String, ()> {
 
 #[command]
 pub async fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command created_feed. Params: {new_feed:?}");
+    log::debug!(target: "chaski:commands","Command created_feed. Params: {new_feed:?}");
 
-    let created_feed = crate::entities::feeds::create_feed(new_feed, app_handle);
+    let created_feed = crate::entities::feeds::create_feed(new_feed, true, app_handle);
 
     match serde_json::to_string(&created_feed) {
         Ok(json_string) => Ok(json_string),
@@ -36,14 +36,14 @@ pub async fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Res
 
 #[command]
 pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) {
-    log::info!(target: "chaski:commands", "Command destroy_feed. Params: {feed_id:?}");
+    log::debug!(target: "chaski:commands", "Command destroy_feed. Params: {feed_id:?}");
 
     crate::entities::feeds::destroy(feed_id, app_handle);
 }
 
 #[command]
 pub async fn list_feeds(app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command list_feeds.");
+    log::debug!(target: "chaski:commands","Command list_feeds.");
 
     let results = crate::entities::feeds::index(app_handle);
 
@@ -60,7 +60,7 @@ pub async fn list_articles(
     filters: Option<ArticlesFilters>,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command list_articles. Page: {page:?}, Items: {items:?}, Filters: {filters:?}");
+    log::debug!(target: "chaski:commands","Command list_articles. Page: {page:?}, Items: {items:?}, Filters: {filters:?}");
 
     let result =
         crate::entities::articles::get_articles_with_feed(page, items, filters, app_handle);
@@ -73,7 +73,7 @@ pub async fn list_articles(
 
 #[command]
 pub async fn list_folders(app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command list_folders.");
+    log::debug!(target: "chaski:commands","Command list_folders.");
 
     let result = crate::entities::feeds::get_folders(app_handle);
 
@@ -85,7 +85,7 @@ pub async fn list_folders(app_handle: tauri::AppHandle) -> Result<String, ()> {
 
 #[command]
 pub async fn show_article(article_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command show_article. article_id: {article_id:?}");
+    log::debug!(target: "chaski:commands","Command show_article. article_id: {article_id:?}");
 
     let result = crate::entities::articles::show(article_id, app_handle);
 
@@ -101,7 +101,7 @@ pub async fn update_article(
     article: Article,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command update_article. article_id: {article_id:?}");
+    log::debug!(target: "chaski:commands","Command update_article. article_id: {article_id:?}");
 
     let result = crate::entities::articles::update(article_id, article, app_handle);
 
@@ -117,7 +117,7 @@ pub async fn update_feed(
     feed: Feed,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command update_feed. feed_id: {feed_id:?}, feed: {feed:?}");
+    log::debug!(target: "chaski:commands","Command update_feed. feed_id: {feed_id:?}, feed: {feed:?}");
 
     let result = crate::entities::feeds::update(feed_id, feed, app_handle);
 
@@ -129,7 +129,7 @@ pub async fn update_feed(
 
 #[command]
 pub async fn update_articles_as_read(app_handle: tauri::AppHandle) -> Result<(), ()> {
-    log::info!(target: "chaski:commands","Command update_articles_as_read.");
+    log::debug!(target: "chaski:commands","Command update_articles_as_read.");
     crate::entities::articles::update_all_as_read(app_handle);
     Ok(())
 }
@@ -139,7 +139,7 @@ pub async fn update_articles_as_read_by_feed_id(
     feed_id: i32,
     app_handle: tauri::AppHandle,
 ) -> Result<(), ()> {
-    log::info!(target: "chaski:commands","Command update_articles_as_read_by_feed. feed_id: {feed_id:?}");
+    log::debug!(target: "chaski:commands","Command update_articles_as_read_by_feed. feed_id: {feed_id:?}");
     crate::entities::articles::update_all_as_read_by_feed_id(feed_id, app_handle);
     Ok(())
 }
@@ -149,7 +149,7 @@ pub async fn update_articles_as_read_by_folder(
     folder: String,
     app_handle: tauri::AppHandle,
 ) -> Result<(), ()> {
-    log::info!(target: "chaski:commands","Command update_articles_as_read_by_folder. folder: {folder:?}");
+    log::debug!(target: "chaski:commands","Command update_articles_as_read_by_folder. folder: {folder:?}");
     crate::entities::articles::update_all_as_read_by_folder(folder, app_handle);
     Ok(())
 }
@@ -159,7 +159,7 @@ pub async fn collect_feed_content(
     feed_id: i32,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command collect_feed_content. feed_id: {feed_id:?}");
+    log::debug!(target: "chaski:commands","Command collect_feed_content. feed_id: {feed_id:?}");
 
     let feed = crate::entities::feeds::show(feed_id, app_handle.clone()).unwrap();
 
@@ -174,7 +174,7 @@ pub async fn collect_feed_content(
 
 #[command]
 pub async fn full_text_search(text: String, app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command full_text_search. text: {text:?}");
+    log::debug!(target: "chaski:commands","Command full_text_search. text: {text:?}");
 
     let articles = crate::entities::articles::full_text_search(&text, app_handle.clone()).await;
     let feeds = crate::entities::feeds::full_text_search(&text, app_handle.clone()).await;
@@ -195,7 +195,7 @@ pub async fn index_filters(
     filter_filters: Option<crate::entities::filters::FilterFilters>,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command list_filters. filter_filters: {filter_filters:?}");
+    log::debug!(target: "chaski:commands","Command list_filters. filter_filters: {filter_filters:?}");
 
     let filters = crate::entities::filters::index(filter_filters, app_handle);
 
@@ -210,7 +210,7 @@ pub async fn create_filter(
     new_filter: NewFilter,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command create_filter. new_filter: {new_filter:?}");
+    log::debug!(target: "chaski:commands","Command create_filter. new_filter: {new_filter:?}");
 
     let created_filter = crate::entities::filters::create(new_filter, app_handle);
 
@@ -226,7 +226,7 @@ pub async fn update_filter(
     filter: Filter,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command update_filter. filter_id: {filter_id:?}, filter: {filter:?}");
+    log::debug!(target: "chaski:commands","Command update_filter. filter_id: {filter_id:?}, filter: {filter:?}");
 
     let updated_filter = crate::entities::filters::update(filter_id, filter, app_handle);
 
@@ -238,14 +238,14 @@ pub async fn update_filter(
 
 #[command]
 pub async fn destroy_filter(filter_id: i32, app_handle: tauri::AppHandle) {
-    log::info!(target: "chaski:commands","Command destroy_filter. filter_id: {filter_id:?}");
+    log::debug!(target: "chaski:commands","Command destroy_filter. filter_id: {filter_id:?}");
 
     crate::entities::filters::destroy(filter_id, app_handle)
 }
 
 #[command]
 pub async fn show_feed(feed_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command show_feed. feed_id: {feed_id:?}");
+    log::debug!(target: "chaski:commands","Command show_feed. feed_id: {feed_id:?}");
 
     let result = crate::entities::feeds::show(feed_id, app_handle);
 
@@ -257,7 +257,7 @@ pub async fn show_feed(feed_id: i32, app_handle: tauri::AppHandle) -> Result<Str
 
 #[command]
 pub async fn import_opml(app_handle: tauri::AppHandle, file_path: String) -> Result<(), ()> {
-    log::info!(target: "chaski:commands","Command import_opml. file_path: {file_path:?}");
+    log::debug!(target: "chaski:commands","Command import_opml. file_path: {file_path:?}");
 
     send_notification(
         &app_handle,
@@ -292,7 +292,7 @@ pub async fn export_opml(
     file_path: String,
     feed_ids: Vec<i32>,
 ) -> Result<(), ()> {
-    log::info!(target: "chaski:commands", "Command export_opml. file_path: {file_path:?}");
+    log::debug!(target: "chaski:commands", "Command export_opml. file_path: {file_path:?}");
 
     let final_file_path = crate::utils::opml_utils::ensure_opml_extension(file_path.as_str());
     let result = crate::utils::opml_utils::feed_ids_to_opml(
@@ -320,7 +320,7 @@ pub async fn export_opml(
 
 #[command]
 pub async fn list_configurations(app_handle: tauri::AppHandle) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command list_configurations.");
+    log::debug!(target: "chaski:commands","Command list_configurations.");
 
     let results = crate::entities::configurations::index(app_handle);
 
@@ -336,7 +336,7 @@ pub async fn update_configuration(
     configuration: Configuration,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::info!(target: "chaski:commands","Command update_configuration. configuration_id: {configuration_id:?}");
+    log::debug!(target: "chaski:commands","Command update_configuration. configuration_id: {configuration_id:?}");
 
     let result =
         crate::entities::configurations::update(configuration_id, configuration, app_handle);
@@ -344,5 +344,27 @@ pub async fn update_configuration(
     match serde_json::to_string(&result) {
         Ok(json_string) => Ok(json_string),
         Err(_) => Err(()),
+    }
+}
+
+#[command]
+pub async fn rename_folder(
+    current_name: String,
+    new_name: String,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
+    log::debug!(target: "chaski:commands","Command rename folder. Current name: {current_name:?}. New: {new_name:?}");
+    crate::entities::folders::rename(current_name, new_name, app_handle);
+    Ok(())
+}
+
+#[command]
+pub async fn delete_folder(folder: String, app_handle: tauri::AppHandle) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command delete folder. Folder: {folder:?}");
+    let result = crate::entities::folders::delete(folder, app_handle);
+    if result {
+        Ok(String::from("true"))
+    } else {
+        Ok(String::from("false"))
     }
 }

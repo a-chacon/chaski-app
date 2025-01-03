@@ -37,13 +37,21 @@ pub fn get_folders(app_handle: tauri::AppHandle) -> Vec<String> {
         .collect()
 }
 
-pub fn create_feed(mut new_feed: NewFeed, app_handle: tauri::AppHandle) -> Feed {
+pub fn create_feed(
+    mut new_feed: NewFeed,
+    should_collect_data: bool,
+    app_handle: tauri::AppHandle,
+) -> Feed {
     use crate::schema::feeds;
 
     let conn = &mut establish_connection(&app_handle);
 
     if new_feed.folder.is_none() {
         new_feed.folder = Some(String::from("Quipu"));
+    }
+
+    if !should_collect_data {
+        new_feed.last_fetch = None;
     }
 
     let created_feed = diesel::insert_into(feeds::table)
@@ -56,9 +64,11 @@ pub fn create_feed(mut new_feed: NewFeed, app_handle: tauri::AppHandle) -> Feed 
 
     let cloned_app_handle = app_handle.clone();
 
-    tauri::async_runtime::spawn(async move {
-        let _ = collect_feed_content(&created_feed_clone, cloned_app_handle).await;
-    });
+    if should_collect_data {
+        tauri::async_runtime::spawn(async move {
+            let _ = collect_feed_content(&created_feed_clone, cloned_app_handle).await;
+        });
+    }
 
     created_feed
 }
@@ -126,7 +136,7 @@ pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec
         .into_iter()
         .map(|nf| {
             let cloned_app_handle = app_handle.clone();
-            create_feed(nf, cloned_app_handle)
+            create_feed(nf, false, cloned_app_handle)
         })
         .collect()
 }

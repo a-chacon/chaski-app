@@ -1,21 +1,24 @@
 import { FeedInterface } from "../interfaces";
 import { Link } from "@tanstack/react-router";
-import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
-import { Listbox, ListboxItem } from "@nextui-org/react";
+import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine, RiMore2Line } from "@remixicon/react";
+import { Listbox, ListboxItem, Button, Dropdown, DropdownMenu, DropdownItem, DropdownTrigger } from "@nextui-org/react";
 import { useState } from "react";
+import FolderActions from "./FolderActions";
 
 interface FolderListInterface {
   folderName: string,
   feeds: FeedInterface[];
+  reloadSideBar: () => void;
 }
 
-export default function FolderList({ folderName, feeds }: FolderListInterface) {
+export default function FolderList({ folderName, feeds, reloadSideBar }: FolderListInterface) {
+  const [folder, setFolder] = useState(folderName);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen((prev) => !prev);
 
   return (
-    <div className="" key={folderName}>
+    <div className="" key={folder}>
       <div
         role="option"
         className="flex flex-row px-2 py-1 rounded-lg hover:bg-primary-500/50"
@@ -34,14 +37,16 @@ export default function FolderList({ folderName, feeds }: FolderListInterface) {
 
         <Link
           to="/folders/$folderName"
-          params={{ folderName: folderName }}
+          params={{ folderName: folder }}
           className="w-full h-full flex flex-row items-center gap-2"
           activeProps={{
             className: "text-primary-500"
           }}
         >
-          <RiFolder3Line className="w-5 opacity-90" /> {folderName}
+          <RiFolder3Line className="w-5 opacity-90" /> {folder}
         </Link>
+
+        <FolderActions folder={folder} setFolder={setFolder} reloadSideBar={reloadSideBar}></FolderActions>
       </div>
       <Listbox
         key="feeds"

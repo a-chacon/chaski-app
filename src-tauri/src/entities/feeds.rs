@@ -165,14 +165,7 @@ async fn feeds_update_loop(app_handle: tauri::AppHandle) {
 
         for feed in feeds_to_update {
             let cloned_app_handle = app_handle.clone();
-            match collect_feed_content(&feed, cloned_app_handle).await {
-                Ok(_) => {
-                    log::debug!(target: "chaski:entities","Feed Updated Successfully. feed_id: {:?}", feed.id);
-                }
-                Err(err) => {
-                    log::error!(target: "chaski:entities","Error Updating feed {:?}: {err:?}", feed.id);
-                }
-            }
+            collect_feed_content(&feed, cloned_app_handle).await;
         }
 
         sleep(Duration::from_secs(60)).await;

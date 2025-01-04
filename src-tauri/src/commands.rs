@@ -163,13 +163,9 @@ pub async fn collect_feed_content(
 
     let feed = crate::entities::feeds::show(feed_id, app_handle.clone()).unwrap();
 
-    match crate::core::jobs::collect_feed_content(&feed, app_handle.clone()).await {
-        Ok(()) => Ok(String::from("Ok")),
-        Err(err) => {
-            log::error!(target: "chaski:jobs", "Error collect_feed_content. Error: {err:?}");
-            Err(())
-        }
-    }
+    crate::core::jobs::collect_feed_content(&feed, app_handle.clone()).await;
+
+    Ok(String::from("Ok"))
 }
 
 #[command]

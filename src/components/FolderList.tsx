@@ -14,6 +14,16 @@ interface FolderListInterface {
 export default function FolderList({ folderName, feeds, reloadSideBar }: FolderListInterface) {
   const [folder, setFolder] = useState(folderName);
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseOver = () => {
+    setIsHovering(true);
+  };
+
+
+  const handleMouseOut = () => {
+    setIsHovering(false);
+  };
 
   const toggle = () => setIsOpen((prev) => !prev);
 
@@ -22,6 +32,8 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
       <div
         role="option"
         className="flex flex-row px-2 py-1 rounded-lg hover:bg-primary-500/50"
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
       >
         <button onClick={toggle}>
           {isOpen ? (
@@ -45,8 +57,9 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
         >
           <RiFolder3Line className="w-5 opacity-90" /> {folder}
         </Link>
-
-        <FolderActions folder={folder} setFolder={setFolder} reloadSideBar={reloadSideBar}></FolderActions>
+        {isHovering && (
+          <FolderActions folder={folder} setFolder={setFolder} reloadSideBar={reloadSideBar}></FolderActions>
+        )}
       </div>
       <Listbox
         key="feeds"

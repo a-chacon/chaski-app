@@ -175,7 +175,10 @@ pub async fn full_text_search(text: &String, app_handle: tauri::AppHandle) -> Ve
         .expect("Error loading feeds")
 }
 
-pub fn create_list(list_articles: Vec<NewArticle>, app_handle: tauri::AppHandle) -> Vec<Article> {
+pub async fn create_list(
+    list_articles: Vec<NewArticle>,
+    app_handle: tauri::AppHandle,
+) -> Vec<Article> {
     let mut created_articles = Vec::new();
     let conn = &mut establish_connection(&app_handle);
 
@@ -190,19 +193,16 @@ pub fn create_list(list_articles: Vec<NewArticle>, app_handle: tauri::AppHandle)
         .filter(|article| !existing_links.contains(&article.link))
         .collect();
 
-    for new_article in filtered_articles {
+    for mut new_article in filtered_articles {
+        new_article = complete_article(new_article).await;
         let result = diesel::insert_into(articles)
             .values(new_article)
             .returning(Article::as_returning())
             .get_result(conn);
+
         match result {
             Ok(created_article) => {
                 created_articles.push(created_article.clone());
-                let app_handle_clone = app_handle.clone();
-
-                tauri::async_runtime::spawn(async move {
-                    let _ = complete_article(created_article, app_handle_clone).await;
-                });
             }
             Err(e) => {
                 log::error!("Error saving new article: {}", e);

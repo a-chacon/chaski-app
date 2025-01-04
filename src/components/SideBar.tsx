@@ -25,6 +25,7 @@ function groupBy<T>(arr: T[], fn: (item: T) => any) {
 
 function SideBar({ hidden }: SideBarProps) {
   const [feeds, setFeeds] = useState<FeedInterface[]>([]);
+  const [reload, setReload] = useState(1);
   const classes = `overflow-auto shadow bg-default-950 md:border border-default-800 md:rounded-3xl px-1 py-3 h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/3xl:w-1/5 absolute z-10 top-0 left-0 right-0 md:static ${hidden ? "hidden" : "block"}`;
 
   const grouped_feeds = groupBy(feeds, (f) => f.folder);
@@ -43,7 +44,11 @@ function SideBar({ hidden }: SideBarProps) {
 
       fetchFeeds();
     }
-  }, [hidden]);
+  }, [hidden, reload]);
+
+  const reset = () => {
+    setReload(Math.random());
+  }
 
   return (
     <nav className={classes}>
@@ -97,7 +102,7 @@ function SideBar({ hidden }: SideBarProps) {
         <h5 className="px-4 opacity-90">Feeds</h5>
         <div className="w-full relative flex flex-col gap-1 p-1 py-6">
           {Object.entries(grouped_feeds).map(([key, value]) => (
-            <FolderList folderName={key} feeds={value} />
+            <FolderList key={key} folderName={key} feeds={value} reloadSideBar={reset} />
           ))}
         </div>
       </div>

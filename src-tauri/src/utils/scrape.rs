@@ -12,7 +12,7 @@ use tokio::time::{sleep, Duration};
 
 use super::article_extractor;
 
-fn create_client() -> Result<Client, Box<dyn std::error::Error>> {
+fn build_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
     headers.insert(USER_AGENT, HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"));
     headers.insert(
@@ -26,6 +26,11 @@ fn create_client() -> Result<Client, Box<dyn std::error::Error>> {
     headers.insert("DNT", HeaderValue::from_static("1"));
     headers.insert(CACHE_CONTROL, HeaderValue::from_static("no-cache"));
 
+    headers
+}
+
+fn create_async_client() -> Result<Client, Box<dyn std::error::Error>> {
+    let headers = build_headers();
     let client = Client::builder()
         .timeout(Duration::from_secs(30))
         .pool_max_idle_per_host(0)
@@ -61,7 +66,7 @@ async fn fetch_with_retries(
 }
 
 pub async fn scrape_site_feeds(link: String) -> Result<Vec<NewFeed>, Box<dyn std::error::Error>> {
-    let client = create_client()?;
+    let client = create_async_client()?;
     let response = fetch_with_retries(&client, link.as_str(), 3).await?;
 
     let mut new_feeds = Vec::new();
@@ -136,7 +141,7 @@ async fn extract_feeds_from_html(
     for href in hrefs {
         let href_url = Url::parse(&href).or_else(|_| Url::parse(&format!("{}/{}", link, href)))?;
 
-        let client = create_client()?;
+        let client = create_async_client()?;
         let feed_response = client.get(href_url.clone()).send().await?;
 
         if feed_response.status().is_success() {
@@ -206,7 +211,7 @@ async fn autodiscover_feeds(
     new_feeds: &mut Vec<NewFeed>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let possible_paths = ["/feed/", "/rss/", "/feed.xml", "/index.xml", "/feed.rss"];
-    let client = create_client()?;
+    let client = create_async_client()?;
 
     for path in &possible_paths {
         // Check the feed path
@@ -247,15 +252,13 @@ async fn autodiscover_feeds(
     Ok(())
 }
 
-pub async fn scrape_feed_articles(
-    feed: &Feed,
-) -> Result<Vec<NewArticle>, Box<dyn std::error::Error>> {
-    let client = create_client()?;
-    let feed_response = client.get(&feed.link).send().await?;
+pub async fn scrape_feed_articles(feed: &Feed) -> Result<Vec<NewArticle>, ()> {
+    let client = create_async_client().unwrap();
+    let feed_response = client.get(&feed.link).send().await.unwrap();
     let mut new_articles = Vec::new();
 
     if feed_response.status().is_success() {
-        let feed_body_bytes = feed_response.bytes().await?;
+        let feed_body_bytes = feed_response.bytes().await.unwrap();
         let feed_body_str = String::from_utf8_lossy(&feed_body_bytes);
 
         let cursor = Cursor::new(feed_body_bytes.to_vec());
@@ -263,13 +266,13 @@ pub async fn scrape_feed_articles(
         // TODO: I already detect and save if it is rss or feed
 
         if feed_body_str.contains("<rss") {
-            let channel = Channel::read_from(cursor)?;
+            let channel = Channel::read_from(cursor).unwrap();
 
             for item in channel.items {
                 new_articles.push(NewArticle::from_feed_and_item(feed, item));
             }
         } else if feed_body_str.contains("<feed") {
-            let atom_syndication_feed = atom_syndication::Feed::read_from(cursor)?;
+            let atom_syndication_feed = atom_syndication::Feed::read_from(cursor).unwrap();
 
             for entry in atom_syndication_feed.entries {
                 new_articles.push(NewArticle::from_feed_and_entry(feed, entry))
@@ -297,7 +300,7 @@ pub struct ActicleData {
 
 pub async fn scrape_article_data(url: &str) -> Result<ActicleData, Box<dyn std::error::Error>> {
     let parsed_url = Url::parse(url)?;
-    let client = create_client()?;
+    let client = create_async_client()?;
     let res = client.get(url).send().await?;
 
     if res.status().is_success() {

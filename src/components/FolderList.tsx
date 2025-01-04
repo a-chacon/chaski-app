@@ -1,7 +1,7 @@
 import { FeedInterface } from "../interfaces";
 import { Link } from "@tanstack/react-router";
-import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine, RiMore2Line } from "@remixicon/react";
-import { Listbox, ListboxItem, Button, Dropdown, DropdownMenu, DropdownItem, DropdownTrigger } from "@nextui-org/react";
+import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
+import { Listbox, ListboxItem } from "@nextui-org/react";
 import { useState } from "react";
 import FolderActions from "./FolderActions";
 

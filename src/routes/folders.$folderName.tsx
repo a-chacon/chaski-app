@@ -5,9 +5,10 @@ import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import IndexArticles from "../components/IndexArticles";
 import { useArticles } from "../IndexArticlesContext";
-import { Button } from "@nextui-org/react";
-import { RiRefreshLine } from "@remixicon/react";
+import { Button, Tooltip } from "@nextui-org/react";
+import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
 import { useNotification } from "../NotificationContext";
+import { updateArticlesAsReadByFolder } from "../helpers/feedsData";
 
 export const Route = createFileRoute("/folders/$folderName")({
   component: Folder,
@@ -54,6 +55,18 @@ export default function Folder() {
     addNotification("Reloaded", 'Entries are reloaded!', 'primary');
   };
 
+  const handleUpdateArticlesAsRead = async () => {
+    await updateArticlesAsReadByFolder(folderName);
+    resetArticleList();
+
+    addNotification("Updated", 'All entries were updated as read!', 'primary');
+  };
+
+  const resetArticleList = () => {
+    setArticles([]);
+    setPage(1);
+  };
+
   return (
     <MainSectionLayout>
       <div className="flex flex-col p-4 max-w-screen-md mx-auto">
@@ -63,16 +76,28 @@ export default function Folder() {
               <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
             </div>
 
-            <div>
-              <Button
-                color="primary"
-                isIconOnly
-                variant="light"
-                size="sm"
-                onClick={handleReloadButton}
-              >
-                <RiRefreshLine></RiRefreshLine>
-              </Button>
+            <div className="flex flex-row items-center gap-2">
+              <Tooltip content="Update All Articles of The Folder As Read">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onClick={handleUpdateArticlesAsRead}
+                >
+                  <RiCheckDoubleLine></RiCheckDoubleLine>
+                </Button>
+              </Tooltip>
+              <Tooltip content="Reload The Page's Articles">
+                <Button
+                  color="primary"
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onClick={handleReloadButton}
+                >
+                  <RiRefreshLine></RiRefreshLine>
+                </Button>
+              </Tooltip>
             </div>
           </div>
         </div>

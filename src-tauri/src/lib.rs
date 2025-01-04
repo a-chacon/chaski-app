@@ -9,6 +9,7 @@ mod entities {
     pub(crate) mod configurations;
     pub(crate) mod feeds;
     pub(crate) mod filters;
+    pub(crate) mod folders;
 }
 
 mod utils {
@@ -88,6 +89,8 @@ pub fn run() {
             commands::update_article,
             commands::update_feed,
             commands::update_articles_as_read,
+            commands::update_articles_as_read_by_folder,
+            commands::update_articles_as_read_by_feed_id,
             commands::collect_feed_content,
             commands::full_text_search,
             commands::create_filter,
@@ -98,7 +101,9 @@ pub fn run() {
             commands::import_opml,
             commands::export_opml,
             commands::list_configurations,
-            commands::update_configuration
+            commands::update_configuration,
+            commands::rename_folder,
+            commands::delete_folder
         ])
         .run(ctx)
         .expect("error while building tauri application");

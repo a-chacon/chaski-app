@@ -96,7 +96,13 @@ pub fn extract_description(html_content: &str) -> Option<String> {
 
 pub fn extract_content(html_content: &str, url: &tauri::Url) -> Option<String> {
     let mut reader = Cursor::new(html_content);
-    let result = readability::extractor::extract(&mut reader, url);
+    let parser_options = readability::ParseOptions { strict: false };
+    let scorer_options = readability::ScorerOptions::default();
+    let extract_options = readability::ExtractOptions {
+        parse_options: parser_options,
+        scorer_options,
+    };
+    let result = readability::extract(&mut reader, url, extract_options);
     match result {
         Ok(product) => Some(product.content),
         Err(_e) => None,

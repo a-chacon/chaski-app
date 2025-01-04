@@ -55,6 +55,7 @@ function IndexArticles({
       >
         {articles.map((article) => (
           <ArticleCard
+            key={article.id}
             article={article}
             header={header}
           />

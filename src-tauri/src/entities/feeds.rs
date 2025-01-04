@@ -1,6 +1,6 @@
 use crate::core::jobs::collect_feed_content;
 use crate::db::establish_connection;
-use crate::models::{Feed, NewFeed};
+use crate::models::{Feed, IndexFeed, NewFeed};
 use crate::schema::articles;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
@@ -37,10 +37,22 @@ pub fn get_folders(app_handle: tauri::AppHandle) -> Vec<String> {
         .collect()
 }
 
-pub fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Feed {
+pub fn create_feed(
+    mut new_feed: NewFeed,
+    should_collect_data: bool,
+    app_handle: tauri::AppHandle,
+) -> Feed {
     use crate::schema::feeds;
 
     let conn = &mut establish_connection(&app_handle);
+
+    if new_feed.folder.is_none() {
+        new_feed.folder = Some(String::from("Quipu"));
+    }
+
+    if !should_collect_data {
+        new_feed.last_fetch = None;
+    }
 
     let created_feed = diesel::insert_into(feeds::table)
         .values(&new_feed)
@@ -52,9 +64,11 @@ pub fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Feed {
 
     let cloned_app_handle = app_handle.clone();
 
-    tauri::async_runtime::spawn(async move {
-        let _ = collect_feed_content(&created_feed_clone, cloned_app_handle).await;
-    });
+    if should_collect_data {
+        tauri::async_runtime::spawn(async move {
+            let _ = collect_feed_content(&created_feed_clone, cloned_app_handle).await;
+        });
+    }
 
     created_feed
 }
@@ -91,13 +105,30 @@ pub fn destroy(feed_id: i32, app_handle: tauri::AppHandle) {
     let _ = diesel::delete(feeds.filter(id.eq(feed_id))).execute(conn);
 }
 
-pub fn index(app_handle: tauri::AppHandle) -> Vec<Feed> {
+pub fn index(app_handle: tauri::AppHandle) -> Vec<IndexFeed> {
     let conn = &mut establish_connection(&app_handle);
 
-    feeds
-        .select(Feed::as_select())
-        .load(conn)
-        .expect("Error loading posts")
+    let query = r#"
+        SELECT 
+            feeds.id, 
+            feeds.title, 
+            feeds.folder, 
+            feeds.icon,
+            COALESCE(COUNT(articles.id), 0) AS unread_count
+        FROM 
+            feeds
+        LEFT JOIN 
+            articles 
+        ON 
+            articles.feed_id = feeds.id 
+            AND articles.read = 0
+        GROUP BY 
+            feeds.id, feeds.title, feeds.folder, feeds.icon
+    "#;
+
+    sql_query(query)
+        .load::<IndexFeed>(conn)
+        .expect("Error loading feeds with unread count")
 }
 
 pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec<Feed> {
@@ -105,7 +136,7 @@ pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec
         .into_iter()
         .map(|nf| {
             let cloned_app_handle = app_handle.clone();
-            create_feed(nf, cloned_app_handle)
+            create_feed(nf, false, cloned_app_handle)
         })
         .collect()
 }
@@ -118,6 +149,7 @@ pub fn spawn_feeds_update_loop(app_handle: tauri::AppHandle) {
 
 async fn feeds_update_loop(app_handle: tauri::AppHandle) {
     loop {
+        sleep(Duration::from_secs(1)).await;
         let conn = &mut establish_connection(&app_handle);
 
         let feeds_to_update: Vec<Feed> = feeds
@@ -133,16 +165,9 @@ async fn feeds_update_loop(app_handle: tauri::AppHandle) {
 
         for feed in feeds_to_update {
             let cloned_app_handle = app_handle.clone();
-            match collect_feed_content(&feed, cloned_app_handle).await {
-                Ok(_) => {
-                    log::debug!(target: "chaski:entities","Feed Updated Successfully. feed_id: {:?}", feed.id);
-                }
-                Err(err) => {
-                    log::error!(target: "chaski:entities","Error Updating feed {:?}: {err:?}", feed.id);
-                }
-            }
+            collect_feed_content(&feed, cloned_app_handle).await;
         }
 
-        sleep(Duration::from_secs(61)).await;
+        sleep(Duration::from_secs(60)).await;
     }
 }

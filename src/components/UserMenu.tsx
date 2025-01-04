@@ -23,11 +23,6 @@ export default function UserMenu() {
         break;
       case "configurations":
         console.log("Open configurations");
-        // Add your configurations logic here
-        break;
-      case "help_and_feedback":
-        console.log("Open help and feedback");
-        // Add your help and feedback logic here
         break;
       default:
         console.log("Unknown action");
@@ -54,6 +49,11 @@ export default function UserMenu() {
           <DropdownItem key="export_opml">Export All (OPML)</DropdownItem>
           <DropdownItem key="configurations">
             <Link to="/configurations">Configurations</Link>
+          </DropdownItem>
+          <DropdownItem key="about">
+            <Link to="/about">
+              About Chaski
+            </Link>
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>

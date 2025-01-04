@@ -112,19 +112,53 @@ pub fn update(article_id: i32, article: Article, app_handle: tauri::AppHandle) -
         .expect("Update article")
 }
 
-pub fn update_all_as_read(feed_id_eq: Option<i32>, app_handle: tauri::AppHandle) -> usize {
+pub fn update_all_as_read(app_handle: tauri::AppHandle) {
     let conn = &mut establish_connection(&app_handle);
-    let mut query = diesel::update(articles).set(read.eq(1)).into_boxed();
 
-    if let Some(feed_id_eq) = feed_id_eq {
-        query = query.filter(articles::feed_id.eq(feed_id_eq));
-    }
+    let result = diesel::update(articles).set(read.eq(1)).execute(conn);
 
-    match query.execute(conn) {
-        Ok(rows_updated) => rows_updated,
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","All articles updated as read, {:?}", count);
+        }
         Err(e) => {
-            eprintln!("Error updating articles: {:?}", e);
-            0
+            log::error!(target: "chaski:articles","Error updating all articles as read: {:?}", e);
+        }
+    }
+}
+
+pub fn update_all_as_read_by_feed_id(feed_id_eq: i32, app_handle: tauri::AppHandle) {
+    let conn = &mut establish_connection(&app_handle);
+    let result = diesel::update(articles)
+        .set(read.eq(1))
+        .filter(articles::feed_id.eq(feed_id_eq))
+        .execute(conn);
+
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","All articles by feed updated as read, {:?}", count);
+        }
+        Err(e) => {
+            log::error!(target: "chaski:articles","Error updating all articles by feed as read: {:?}", e);
+        }
+    }
+}
+
+pub fn update_all_as_read_by_folder(folder_eq: String, app_handle: tauri::AppHandle) {
+    let conn = &mut establish_connection(&app_handle);
+    let query = format!(
+        "UPDATE articles SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?});",
+        folder_eq
+    );
+
+    let result = sql_query(query).execute(conn);
+
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","All articles by folder updated as read, {:?}", count);
+        }
+        Err(e) => {
+            log::error!(target: "chaski:articles","Error updating all articles by folder as read: {:?}", e);
         }
     }
 }
@@ -141,7 +175,10 @@ pub async fn full_text_search(text: &String, app_handle: tauri::AppHandle) -> Ve
         .expect("Error loading feeds")
 }
 
-pub fn create_list(list_articles: Vec<NewArticle>, app_handle: tauri::AppHandle) -> Vec<Article> {
+pub async fn create_list(
+    list_articles: Vec<NewArticle>,
+    app_handle: tauri::AppHandle,
+) -> Vec<Article> {
     let mut created_articles = Vec::new();
     let conn = &mut establish_connection(&app_handle);
 
@@ -156,19 +193,16 @@ pub fn create_list(list_articles: Vec<NewArticle>, app_handle: tauri::AppHandle)
         .filter(|article| !existing_links.contains(&article.link))
         .collect();
 
-    for new_article in filtered_articles {
+    for mut new_article in filtered_articles {
+        new_article = complete_article(new_article).await;
         let result = diesel::insert_into(articles)
             .values(new_article)
             .returning(Article::as_returning())
             .get_result(conn);
+
         match result {
             Ok(created_article) => {
                 created_articles.push(created_article.clone());
-                let app_handle_clone = app_handle.clone();
-
-                tauri::async_runtime::spawn(async move {
-                    let _ = complete_article(created_article, app_handle_clone).await;
-                });
             }
             Err(e) => {
                 log::error!("Error saving new article: {}", e);

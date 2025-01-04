@@ -88,7 +88,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
       >
         <div className={`${textWrapper} flex flex-col flex-grow`}>
           <Link
-            to={`/articles/${article.id}`}
+            to="/articles/$articleId"
             params={{ articleId: article.id?.toString() || "" }}
           >
             <h3 className="text-lg md:text-xl font-semibold mb-2">

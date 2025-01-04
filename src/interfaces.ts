@@ -14,6 +14,7 @@ export interface FeedInterface {
   history_limit: number;
   update_interval_minutes: number;
   notifications_enabled: number;
+  unread_count: number;
 }
 
 export interface ArticleInterface {

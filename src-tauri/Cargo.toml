@@ -1,6 +1,6 @@
 [package]
 name = "chaski"
-version = "0.1.0"
+version = "0.2.0"
 description = "A beautifully designed, privacy-focused feed reader that keeps you updated."
 authors = ["a-chacon"]
 edition = "2021"
@@ -43,7 +43,7 @@ opml = "1.1.6"
 tauri-plugin-log = "2"
 log = "0.4.22"
 regex = "1.11.1"
-readability-rs = "0.4.0"
+readability-rs = "0.5.0"
 tauri-plugin-process = "2"
 
 [features]

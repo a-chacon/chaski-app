@@ -2,10 +2,11 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@nextui-org/react";
 import { useAppContext } from "../AppContext";
-
+import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
 });
+import { useEffect, useState } from "react";
 
 export default function Configurations() {
   const {
@@ -21,6 +22,14 @@ export default function Configurations() {
     handleSetMarkAsReadOnHover
   } = useAppContext();
 
+  const [autostartState, setAutostartState] = useState(false);
+
+  useEffect(() => {
+    isEnabled().then((state) => {
+      setAutostartState(state)
+    })
+  }, []);
+
   const fonts = [
     { key: "font-garamond", label: "Garamond" },
     { key: "font-arial", label: "Arial" },
@@ -28,6 +37,17 @@ export default function Configurations() {
     { key: "font-roboto", label: "Roboto" },
     { key: "font-opensans", label: "Open Sans" },
   ]
+
+  async function handleAutostartChange() {
+    if (autostartState) {
+      disable();
+      setAutostartState(false);
+    } else {
+      enable();
+      setAutostartState(true);
+
+    }
+  }
 
   return (
     <MainSectionLayout>
@@ -144,6 +164,10 @@ export default function Configurations() {
                   <Switch isSelected={currentMarkAsReadOnHover} onValueChange={handleSetMarkAsReadOnHover} >
                     Mark as Read on hover.
                   </Switch>
+                  <Switch isSelected={autostartState} onValueChange={handleAutostartChange} >
+                    Autostart Application
+                  </Switch>
+
                 </div>
               </CardBody>
             </Card>

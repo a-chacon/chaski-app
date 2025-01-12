@@ -50,6 +50,11 @@ pub fn run() {
         .plugin(
             tauri_plugin_log::Builder::new()
                 .filter(|metadata| metadata.target().contains("chaski"))
+                .level(log::LevelFilter::Info)
+                .max_file_size(10_000_000)
+                .target(tauri_plugin_log::Target::new(
+                    tauri_plugin_log::TargetKind::LogDir { file_name: None },
+                ))
                 .build(),
         )
         .setup(|app| {

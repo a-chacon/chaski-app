@@ -15,6 +15,7 @@
     "clipboard-manager:default",
     "clipboard-manager:allow-read-text",
     "log:default",
-    "process:default"
+    "process:default",
+    "store:default"
   ]
 }

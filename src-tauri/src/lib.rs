@@ -31,6 +31,7 @@ use tauri::{
 pub fn run() {
     let ctx = tauri::generate_context!();
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = app
                 .get_webview_window("main")

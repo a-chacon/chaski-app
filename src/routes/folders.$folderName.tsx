@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import IndexArticles from "../components/IndexArticles";
 import { useArticles } from "../IndexArticlesContext";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@heroui/react";
 import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
 import { useNotification } from "../NotificationContext";
 import { updateArticlesAsReadByFolder } from "../helpers/feedsData";

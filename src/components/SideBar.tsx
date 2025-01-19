@@ -1,4 +1,4 @@
-import { Listbox, ListboxItem } from "@nextui-org/react";
+import { Listbox, ListboxItem } from "@heroui/react";
 import {
   RiCalendarLine,
   RiBookmarkFill,
@@ -26,7 +26,7 @@ function groupBy<T>(arr: T[], fn: (item: T) => any) {
 function SideBar({ hidden }: SideBarProps) {
   const [feeds, setFeeds] = useState<FeedInterface[]>([]);
   const [reload, setReload] = useState(1);
-  const classes = `overflow-auto shadow bg-default-950 md:border border-default-800 md:rounded-3xl px-1 py-3 h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/3xl:w-1/5 absolute z-10 top-0 left-0 right-0 md:static ${hidden ? "hidden" : "block"}`;
+  const classes = `overflow-auto shadow md:border border-primary-100 shadow-xl md:rounded-3xl px-1 py-3 h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/3xl:w-1/5 absolute z-10 top-0 left-0 right-0 md:static ${hidden ? "hidden" : "block"}`;
 
   const grouped_feeds = groupBy(feeds, (f) => f.folder);
 
@@ -59,16 +59,13 @@ function SideBar({ hidden }: SideBarProps) {
           className="py-6"
           onAction={() => { }}
           itemClasses={{
-            base: "data-[hover=true]:bg-primary-500/50",
+            base: "data-[hover=true]:bg-primary-500 data-[hover=true]:text-background",
           }}
         >
           <ListboxItem key="today">
             <Link
               to="/today"
               className="w-full h-full flex flex-row items-center gap-2"
-              activeProps={{
-                className: "text-primary-500",
-              }}
             >
               <RiCalendarLine className="h-5 opacity-90"></RiCalendarLine>
               Today
@@ -78,9 +75,6 @@ function SideBar({ hidden }: SideBarProps) {
             <Link
               to="/read_later"
               className="w-full h-full flex flex-row items-center gap-2"
-              activeProps={{
-                className: "text-primary-500",
-              }}
             >
               <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
               Read Later
@@ -90,9 +84,6 @@ function SideBar({ hidden }: SideBarProps) {
             <Link
               to="/"
               className="w-full h-full flex flex-row items-center gap-2"
-              activeProps={{
-                className: "text-primary-500",
-              }}
             >
               <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
               All

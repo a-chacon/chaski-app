@@ -3,6 +3,7 @@ import Header from "../Header";
 import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
 import { ConfigurationInterface } from "../../interfaces";
+import { load } from '@tauri-apps/plugin-store';
 import {
   indexConfigurations,
   updateConfiguration,
@@ -152,56 +153,27 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     }
   };
 
-  const getCurrentConfigTheme = () => {
-    let result = configurations.find((x) => x.name === "THEME_MODE");
-    if (result) {
-      handleSetCurrentTheme(result.value);
-    } else {
-      handleSetCurrentTheme("AUTO");
-    }
+  const getCurrentConfigTheme = async () => {
+    const store = await load('settings.json', { autoSave: false });
+    const currentTheme = await store.get<{ value: string }>('theme');
+    console.log(currentTheme.value)
+    handleSetCurrentTheme(currentTheme.value);
   };
 
-  const handleSetCurrentTheme = (theme: string) => {
-    let configuration = configurations.find((x) => x.name === "THEME_MODE");
-    if (configuration && configuration.value !== theme) {
-      configuration.value = theme;
-      updateConfiguration(configuration);
-    }
+  const handleSetCurrentTheme = async (newTheme: string) => {
+    const store = await load('settings.json', { autoSave: true });
+    const currentTheme = await store.get<{ value: string }>('theme');
+    await store.set('theme', { value: newTheme });
 
-    setThemeClasses(theme);
-    setCurrentTheme(theme);
+    setThemeClasses(newTheme, currentTheme.value);
+    setCurrentTheme(newTheme);
   };
 
-  const setThemeClasses = (theme: string) => {
-    if (theme === "DARK") {
+  const setThemeClasses = (newTheme: string, oldTheme: string) => {
       document.body.classList.remove(
-        "light",
-        "text-foreground",
-        "bg-background",
+        oldTheme
       );
-      document.body.classList.add("dark", "text-foreground", "bg-background");
-    } else if (theme === "LIGHT") {
-      document.body.classList.remove(
-        "dark",
-        "text-foreground",
-        "bg-background",
-      );
-      document.body.classList.add("light", "text-foreground", "bg-background");
-    } else {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      if (mediaQuery.matches) {
-        setThemeClasses("DARK");
-      } else {
-        setThemeClasses("LIGHT");
-      }
-
-      mediaQuery.addEventListener("change", (event) => {
-        if (event.matches) {
-        } else {
-          setThemeClasses("LIGHT");
-        }
-      });
-    }
+      document.body.classList.add(newTheme);
   };
 
   return (

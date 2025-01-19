@@ -1,6 +1,5 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
 mod commands;
 mod core;
 mod db;
@@ -21,11 +20,14 @@ mod utils {
 mod models;
 mod schema;
 use entities::feeds;
+use serde_json::json;
+use std::collections::HashMap;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
     Manager,
 };
+use tauri_plugin_store::StoreExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -83,6 +85,7 @@ pub fn run() {
                 .build(app)?;
 
             db::init(app.handle());
+            configure_default_app_settings(app);
             let handler_clone = app.handle().clone();
             feeds::spawn_feeds_update_loop(handler_clone);
             Ok(())
@@ -123,4 +126,26 @@ pub fn run() {
         ])
         .run(ctx)
         .expect("error while building tauri application");
+}
+
+fn configure_default_app_settings(app: &mut tauri::App) {
+    let store = app.store("settings.json").unwrap();
+
+    let default_settings: HashMap<&str, serde_json::Value> = [
+        ("onboarding-completed", json!({ "value": false })),
+        ("theme", json!({ "value": "orange-dark" })),
+        ("articles-layout", json!({ "value": "list" })),
+        ("app-mode", json!({ "value": "local" })),
+    ]
+    .iter()
+    .cloned()
+    .collect();
+
+    for (key, default_value) in default_settings {
+        let setting = store.get(key);
+
+        if setting.is_none() {
+            store.set(key, default_value);
+        }
+    }
 }

@@ -1,11 +1,13 @@
-import { createLazyFileRoute, Navigate } from '@tanstack/react-router'
+import { createLazyFileRoute } from '@tanstack/react-router'
 import { load } from '@tauri-apps/plugin-store';
 import {
   Button,
   Card, CardFooter, CardBody
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from 'react';
 import { RiCloudOffLine, RiCloudLine } from '@remixicon/react';
+import ThemeSwitcher from '../components/ThemeSwitcher';
+import { useNavigate } from '@tanstack/react-router';
 
 export const Route = createLazyFileRoute('/onboarding')({
   component: Onboarding,
@@ -13,6 +15,8 @@ export const Route = createLazyFileRoute('/onboarding')({
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate({ from: '/onboarding' })
+
 
   const complete = async () => {
     const store = await load('settings.json', { autoSave: true });
@@ -22,13 +26,23 @@ export default function Onboarding() {
   const goNext = () => {
     if (step + 1 == 5) {
       complete()
-      //TODO: NAVGDATE
+      navigate({ to: '/' })
     }
     setStep((prevStep) => Math.min(prevStep + 1, 4));
   }
 
   const goBack = () => {
     setStep((prevStep) => Math.max(prevStep - 1, 1));
+  }
+
+  const handleModeSelection = async (mode: string) => {
+    const store = await load('settings.json', { autoSave: true });
+    if (mode == "local") {
+      await store.set('app-mode', { value: "local" });
+      goNext();
+    } else if (mode == "remote") {
+
+    }
   }
 
   const renderStepContent = () => {
@@ -44,8 +58,14 @@ export default function Onboarding() {
       case 2:
         return (
           <div>
-            <h2 className="pt-1 pb-4 text-3xl font-bold">Make yourself at home</h2>
-            <p className="text-lg">Personalize your experience with your favorite look</p>
+            <div className="py-4">
+              <h2 className="pt-1 text-3xl font-bold">Make yourself at home</h2>
+              <p className="text-lg">Personalize your experience with your favorite look</p>
+            </div>
+            <div className="py-2">
+              <h3 className="pb-4">Choose your prefered color:</h3>
+              <ThemeSwitcher></ThemeSwitcher>
+            </div>
           </div>
         );
       case 3:
@@ -56,7 +76,7 @@ export default function Onboarding() {
               <p className="text-lg">How will you use this app?</p>
             </div>
             <div className='grid grid-cols-2 gap-5'>
-              <Card className="border-none bg-secondary-50" radius="lg" isPressable>
+              <Card className="border-none hover:bg-default" radius="lg" isPressable onPress={() => handleModeSelection("remote")}>
                 <CardBody className="overflow-visible p-10">
                   <RiCloudLine className='w-20 h-20 mx-auto my-auto' />
                 </CardBody>
@@ -65,7 +85,7 @@ export default function Onboarding() {
                   <p className='py-1'>Connect to servers like FreshRSS, Miniflux, or Tiny Tiny RSS.</p>
                 </CardFooter>
               </Card>
-              <Card className="border-none bg-primary-50" radius="lg" isPressable>
+              <Card className="border-none bg-primary-500 hover:bg-primary-600 text-background" radius="lg" isPressable onPress={() => handleModeSelection("local")}>
                 <CardBody className="overflow-visible p-10">
                   <RiCloudOffLine className='w-20 h-20 mx-auto my-auto' />
                 </CardBody>
@@ -82,7 +102,7 @@ export default function Onboarding() {
         return (
           <div>
             <h2 className="pt-1 pb-4 text-3xl font-bold">Enjoy it! 🚀</h2>
-            <p className="text-lg">A final tip: The name "Chaski" comes from the Inca Chasquis, the swift messengers who carried important messages across the empire.</p>
+            <p className="text-lg"><strong>A final tip:</strong> The name "Chaski" comes from the Inca Chasquis, the swift messengers who carried important messages across the empire.</p>
           </div>
         );
       default:
@@ -99,8 +119,8 @@ export default function Onboarding() {
 
         <div className="absolute bottom-10 flex justify-between w-full p-10">
           <Button onClick={goBack}
-            color="secondary"
-            variant="flat"
+            color="primary"
+            variant="light"
             isDisabled={step === 1}
           >Back</Button>
           <Button onClick={goNext}

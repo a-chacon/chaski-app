@@ -9,12 +9,12 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { RiMoreLine } from "@remixicon/react";
 import { FeedInterface } from "../interfaces";
 import FeedSiteEditModal from "./FeedSiteEditModal";
 import FeedSiteFiltersModal from "./FeedSiteFiltersModal";
-import { useDisclosure } from "@nextui-org/react";
+import { useDisclosure } from "@heroui/react";
 import FolderField from "./FolderField";
 import { save } from "@tauri-apps/plugin-dialog";
 import { exportOPML } from "../helpers/feedsData";
@@ -81,7 +81,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
   if (isSaved) {
     return (
       <div className="flex flex-row items-center gap-2">
-        <Dropdown className="bg-default-800">
+        <Dropdown>
           <DropdownTrigger>
             <Button size="sm" variant="light" isIconOnly className="h-full">
               <RiMoreLine className="w-5"></RiMoreLine>
@@ -131,7 +131,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
             follow
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[240px} bg-default-800 border border-default-600">
+        <PopoverContent className="w-[240px}">
           <form onSubmit={handleFollowNewFeed}>
             <div className="px-1 py-2 w-full">
               <div className="flex justify-between items-center">

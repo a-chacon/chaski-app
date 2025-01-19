@@ -1,4 +1,4 @@
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button } from "@heroui/react";
 import { RiAddLine } from "@remixicon/react";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";

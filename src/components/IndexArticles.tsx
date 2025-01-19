@@ -1,4 +1,4 @@
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@heroui/react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ArticleInterface } from "../interfaces";
 import ArticleCard from "./ArticleCard";

@@ -5,7 +5,7 @@ import {
   CardBody,
   CardFooter,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FeedInterface } from "../interfaces.ts";
 import FeedSiteActions from "./FeedSiteActions.tsx";
 import { Link } from "@tanstack/react-router";
@@ -19,7 +19,7 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
   const [currentFeed, setCurrentFeed] = useState(feed);
 
   return (
-    <Card className="w-full bg-default-900">
+    <Card className="w-full">
       <CardHeader className="flex justify-between">
         <Link to="/feeds/$feedId" params={{ feedId: currentFeed.id ?? "" }}>
           <div className="flex gap-5">
@@ -39,15 +39,15 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
           <FeedSiteActions feed={currentFeed} setFeed={setCurrentFeed} />
         </div>
       </CardHeader>
-      <CardBody className="px-3 py-0 text-small text-default-200">
+      <CardBody className="px-3 py-0 text-small">
         <p className="line-clamp-3">{currentFeed.description}</p>
       </CardBody>
       <CardFooter className="gap-3 flex justify-between">
         <div className="flex gap-1">
-          <p className="font-semibold text-default-100 text-small">
+          <p className="font-semibold text-small">
             {currentFeed.items_count}
           </p>
-          <p className="text-default-400 text-small">Articles</p>
+          <p className="text-small">Articles</p>
         </div>
         <div className="flex gap-1">
           {currentFeed.kind === "rss" ? (

@@ -11,13 +11,14 @@ import SearchModal from "./SearchModal";
 import UserMenu from "./UserMenu";
 import updater from "../helpers/updater";
 import { useNotification } from "../NotificationContext";
+import { Button } from "@heroui/react";
 
-interface VerticalHeaderProps { }
+interface VerticalHeaderProps { };
 
 const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
   const { addNotification } = useNotification();
   const { setSideBarOpen, sideBarOpen } = useAppContext();
-  const toggleSidebar = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const toggleSidebar = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setSideBarOpen((prev) => !prev);
   };
@@ -29,18 +30,25 @@ const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
   return (
     <div className="flex flex-row md:flex-col items-center md:h-full justify-between m-2 md:m-0 md:mr-2">
       <div className="flex md:flex-col gap-6 ">
-        <Link
-          to="/today"
-          className="rounded-full items-center border border-default-800 bg-default-900 h-10 w-10 flex justify-center"
-          activeProps={{
-            className: "text-primary-500",
-          }}
+        <Button
+          variant="flat"
+          isIconOnly
+          className="rounded-full items-center h-10 w-10 flex justify-center"
         >
-          <RiHomeWifiLine className="p-0.5" />
-        </Link>
-        <a
-          className={`rounded-full items-center border border-default-800 bg-default-900 h-10 w-10 flex justify-center ${sideBarOpen ? "text-primary-600" : ""}`}
-          href="/"
+          <Link
+            to="/today"
+            activeProps={{
+              className: "text-primary-500",
+            }}
+          >
+            <RiHomeWifiLine className="p-0.5" />
+          </Link>
+        </Button>
+
+        <Button
+          variant="flat"
+          isIconOnly
+          className={`rounded-full items-center h-10 w-10 flex justify-center ${sideBarOpen ? "text-primary-500" : ""}`}
           onClick={toggleSidebar}
         >
           {sideBarOpen ? (
@@ -48,18 +56,23 @@ const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
           ) : (
             <RiSidebarUnfoldLine className="p-0.5" />
           )}
-        </a>
+        </Button>
       </div>
       <div className="flex gap-4 md:flex-col">
-        <Link
-          className=" rounded-full items-center border border-default-800 bg-default-900 h-10 w-10 flex justify-center"
-          to="/new_feed"
-          activeProps={{
-            className: "text-primary-600",
-          }}
+        <Button
+          variant="flat"
+          isIconOnly
+          className={`rounded-full items-center h-10 w-10 flex justify-center`}
         >
-          <RiAddCircleLine className="p-0.5" />
-        </Link>
+          <Link
+            to="/new_feed"
+            activeProps={{
+              className: "text-primary-500",
+            }}
+          >
+            <RiAddCircleLine className="p-0.5" />
+          </Link>
+        </Button>
         <SearchModal></SearchModal>
       </div>
       <div>

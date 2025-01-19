@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { getFolders } from "../helpers/feedsData";
 import { useState, useEffect } from "react";
 import { FeedInterface } from "../interfaces";

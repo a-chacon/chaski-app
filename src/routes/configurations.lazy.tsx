@@ -1,17 +1,16 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@nextui-org/react";
+import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
 import { useAppContext } from "../AppContext";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
 });
 import { useEffect, useState } from "react";
+import ThemeSwitcher from "../components/ThemeSwitcher";
 
 export default function Configurations() {
   const {
-    currentTheme,
-    handleSetCurrentTheme,
     handleSetCurrentFont,
     currentFont,
     currentFontSize,
@@ -55,43 +54,21 @@ export default function Configurations() {
         <Tabs
           aria-label="Options"
           isVertical={true}
-          color="secondary"
+          color="primary"
           variant="underlined"
         >
           <Tab key="look" title="Look and Feel">
             <Card>
-              <CardBody className="bg-background">
+              <CardBody >
                 <h1 className="text-xl font-semibold pb-2 text-center">
                   Look And Feel
                 </h1>
-                <div>
-                  <h3 className="py-2 font-semibold">Theme</h3>
-                  <div className="flex flex-wrap gap-4 items-center justify-start">
-                    <Button
-                      color="primary"
-                      variant={currentTheme === "DARK" ? "flat" : "light"}
-                      onClick={() => handleSetCurrentTheme("DARK")}
-                    >
-                      Dark
-                    </Button>
-                    <Button
-                      color="primary"
-                      variant={currentTheme === "AUTO" ? "flat" : "light"}
-                      onClick={() => handleSetCurrentTheme("AUTO")}
-                    >
-                      auto
-                    </Button>
-                    <Button
-                      color="primary"
-                      variant={currentTheme === "LIGHT" ? "flat" : "light"}
-                      onClick={() => handleSetCurrentTheme("LIGHT")}
-                    >
-                      Light
-                    </Button>
-                  </div>
+                <div className="pb-4">
+                  <h3 className="pb-4 font-semibold text-lg">Theme</h3>
+                  <ThemeSwitcher></ThemeSwitcher>
                 </div>
                 <div>
-                  <h3 className="py-2 font-semibold">Text</h3>
+                  <h3 className="py-2 font-semibold text-lg">Text</h3>
                   <div className="flex w-full max-w-xs flex-col gap-2">
                     <Select
                       variant="underlined"
@@ -156,18 +133,17 @@ export default function Configurations() {
           </Tab>
           <Tab key="Behavior" title="Behavior">
             <Card>
-              <CardBody className="bg-background">
+              <CardBody>
                 <h1 className="text-xl font-semibold pb-4 text-center">
                   Behavior
                 </h1>
-                <div>
+                <div className="flex flex-col gap-4">
                   <Switch isSelected={currentMarkAsReadOnHover} onValueChange={handleSetMarkAsReadOnHover} >
                     Mark as Read on hover.
                   </Switch>
                   <Switch isSelected={autostartState} onValueChange={handleAutostartChange} >
                     Autostart Application
                   </Switch>
-
                 </div>
               </CardBody>
             </Card>

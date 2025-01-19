@@ -1,7 +1,7 @@
 import React from "react";
 import { RiGridFill, RiListUnordered } from "@remixicon/react";
 import { useAppContext } from "../AppContext";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 
 const ArticleLayoutSwitch: React.FC = () => {
   const { articlesLayout, setArticlesLayout } = useAppContext();

@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { RiArrowUpLine } from "@remixicon/react";
 import { useAppContext } from "../../AppContext";
 
@@ -52,7 +52,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
   return (
     <div
       id="mainDiv"
-      className="rounded-3xl h-full w-full overflow-auto bg-default-950 border border-default-800"
+      className="rounded-3xl h-full w-full overflow-auto border border-primary-100 shadow-xl"
     >
       {children}
       {showButton && (
@@ -60,7 +60,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
           <Button
             onClick={scrollToTop}
             variant="flat"
-            color="secondary"
+            color="primary"
             isIconOnly
             className="rounded-full absolute bottom-20 md:bottom-4 right-5 p-3 transition"
           >

@@ -1,7 +1,7 @@
 import { FeedInterface } from "../interfaces";
 import { Link } from "@tanstack/react-router";
 import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
-import { Listbox, ListboxItem } from "@nextui-org/react";
+import { Listbox, ListboxItem } from "@heroui/react";
 import { useState } from "react";
 import FolderActions from "./FolderActions";
 
@@ -31,7 +31,7 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
     <div className="" key={folder}>
       <div
         role="option"
-        className="flex flex-row px-2 py-1 rounded-lg hover:bg-primary-500/50"
+        className="flex flex-row px-2 py-1 rounded-lg hover:bg-primary-500 hover:text-background"
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
@@ -51,9 +51,6 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
           to="/folders/$folderName"
           params={{ folderName: folder }}
           className="w-full h-full flex flex-row items-center gap-2"
-          activeProps={{
-            className: "text-primary-500"
-          }}
         >
           <RiFolder3Line className="w-5 opacity-90" /> {folder}
         </Link>
@@ -66,7 +63,7 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
         aria-label="feeds"
         className={isOpen ? 'block' : 'hidden'}
         itemClasses={{
-          base: "pl-7 data-[hover=true]:bg-primary-500/50",
+          base: "pl-7 data-[hover=true]:bg-primary-500 data-[hover=true]:text-background",
         }}
       >
         {feeds.map((feed) => (

@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import { Button } from '@nextui-org/react'
+import { Button } from "@heroui/react"
 import { RiRefreshLine } from '@remixicon/react'
 import { useEffect } from 'react'
 import { ArticleInterface } from '../interfaces'

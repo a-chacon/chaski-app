@@ -78,7 +78,7 @@ function Article() {
               />
             )}
           </div>
-          <div className="prose md:prose-lg dark:prose-invert mx-auto">
+          <div className="prose md:prose-lg text-foreground prose-a:text-foreground mx-auto">
             <p className="py-6 line-clamp-3">
               {parse(article.description || "")}
             </p>

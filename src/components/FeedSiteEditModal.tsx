@@ -8,7 +8,7 @@ import {
   Input,
   Switch,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FeedInterface } from "../interfaces";
 import FolderField from "./FolderField";
 import { updateFeed } from "../helpers/feedsData";
@@ -56,7 +56,6 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="bg-default-950"
       scrollBehavior="inside"
     >
       <ModalContent>
@@ -102,7 +101,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
                 variant="underlined"
               />
               <Switch
-                color="secondary"
+                color="primary"
                 isSelected={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
               >
@@ -115,11 +114,11 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
               </Button>
 
               <Button
-                color="success"
+                color="primary"
                 variant="flat"
                 onPress={() => {
                   onSave();
-                  onCloseModal(); // Call your second function here
+                  onCloseModal();
                 }}
               >
                 Update

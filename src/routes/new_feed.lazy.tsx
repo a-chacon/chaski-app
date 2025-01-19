@@ -1,7 +1,7 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import NewFeedSite from "../components/NewFeedSite";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { importOPML } from "../helpers/feedsData";
 import { useState } from "react";
@@ -40,7 +40,7 @@ function NewFeed() {
         <div className="absolute top-10 right-10">
           <Button
             size="sm"
-            color="secondary"
+            color="primary"
             variant="flat"
             onPress={handleImportButton}
             isLoading={isImportLoading}

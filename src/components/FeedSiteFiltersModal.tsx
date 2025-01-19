@@ -5,7 +5,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FeedInterface, FilterInterface } from "../interfaces";
 import { useState, useEffect } from "react";
 import { RiAddLine } from "@remixicon/react";
@@ -74,7 +74,6 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="lg"
-      className="bg-default-950"
       scrollBehavior="inside"
     >
       <ModalContent>

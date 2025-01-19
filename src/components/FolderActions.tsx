@@ -11,7 +11,7 @@ import {
   ModalFooter,
   Input,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { RiMore2Line } from "@remixicon/react";
 import { useState } from "react";
 import { renameFolder, deleteFolder } from "../helpers/foldersData";
@@ -56,7 +56,6 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
         <Modal key={"renamefoldermodal" + folder}
           isOpen={renameModalDisclosure.isOpen}
           onOpenChange={renameModalDisclosure.onOpenChange}
-          className="bg-default-950"
         >
           <ModalContent>
             {(onClose) => (
@@ -88,7 +87,6 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
         <Modal key={"deletefoldermodal" + folder}
           isOpen={deleteModalDisclosure.isOpen}
           onOpenChange={deleteModalDisclosure.onOpenChange}
-          className="bg-default-950"
         >
           <ModalContent>
             {(onClose) => (
@@ -99,7 +97,7 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
                   <p>This will delete all the included feeds in the folder!</p>
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="secondary" variant="light" onPress={onClose}>
+                  <Button color="primary" variant="light" onPress={onClose}>
                     Close
                   </Button>
                   <Button color="danger" variant="flat" onPress={handleDeleteFolder}>
@@ -115,7 +113,7 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
   }
   return (
     <>
-      <Dropdown className="bg-default-800">
+      <Dropdown >
         <DropdownTrigger>
           <Button size="sm" variant="light" isIconOnly className="h-full">
             <RiMore2Line className="w-5"></RiMore2Line>

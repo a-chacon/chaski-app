@@ -2,12 +2,13 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import { load } from '@tauri-apps/plugin-store';
 import {
   Button,
-  Card, CardFooter, CardBody
+  Card, CardFooter, CardBody, useDisclosure
 } from "@heroui/react";
 import { useState } from 'react';
 import { RiCloudOffLine, RiCloudLine } from '@remixicon/react';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import { useNavigate } from '@tanstack/react-router';
+import SyncLoginModal from '../components/SyncLoginModal';
 
 export const Route = createLazyFileRoute('/onboarding')({
   component: Onboarding,
@@ -16,6 +17,8 @@ export const Route = createLazyFileRoute('/onboarding')({
 export default function Onboarding() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate({ from: '/onboarding' })
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [successfulLogin, setSuccessfulLogin] = useState(false)
 
 
   const complete = async () => {
@@ -41,6 +44,7 @@ export default function Onboarding() {
       await store.set('app-mode', { value: "local" });
       goNext();
     } else if (mode == "remote") {
+
 
     }
   }
@@ -76,7 +80,7 @@ export default function Onboarding() {
               <p className="text-lg">How will you use this app?</p>
             </div>
             <div className='grid grid-cols-2 gap-5'>
-              <Card className="border-none hover:bg-default" radius="lg" isPressable onPress={() => handleModeSelection("remote")}>
+              <Card className="border-none hover:bg-default" radius="lg" isPressable onPress={onOpen}>
                 <CardBody className="overflow-visible p-10">
                   <RiCloudLine className='w-20 h-20 mx-auto my-auto' />
                 </CardBody>
@@ -85,7 +89,7 @@ export default function Onboarding() {
                   <p className='py-1'>Connect to servers like FreshRSS, Miniflux, or Tiny Tiny RSS.</p>
                 </CardFooter>
               </Card>
-              <Card className="border-none bg-primary-500 hover:bg-primary-600 text-background" radius="lg" isPressable onPress={() => handleModeSelection("local")}>
+              <Card className="border-none bg-primary-500 hover:bg-primary-600" radius="lg" isPressable onPress={() => handleModeSelection("local")}>
                 <CardBody className="overflow-visible p-10">
                   <RiCloudOffLine className='w-20 h-20 mx-auto my-auto' />
                 </CardBody>
@@ -95,6 +99,13 @@ export default function Onboarding() {
                 </CardFooter>
               </Card>
             </div>
+            <SyncLoginModal
+              setSuccessfulLogin={setSuccessfulLogin}
+              isOpen={isOpen}
+              onOpen={onOpen}
+              onClose={onClose}
+              onOpenChange={onOpenChange}
+            />
           </div>
         );
 

@@ -1,17 +1,17 @@
-import { FeedInterface } from "../interfaces";
-import { Link } from "@tanstack/react-router";
+import React, { useState } from 'react';
+import { FeedInterface } from '../../interfaces';
+import { Link } from '@tanstack/react-router';
+import FolderActions from '../FolderActions';
+import { Listbox, ListboxItem, Button } from '@heroui/react';
 import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
-import { Listbox, ListboxItem } from "@heroui/react";
-import { useState } from "react";
-import FolderActions from "./FolderActions";
 
-interface FolderListInterface {
-  folderName: string,
+interface FolderItemProps {
+  folderName: string;
   feeds: FeedInterface[];
   reloadSideBar: () => void;
 }
 
-export default function FolderList({ folderName, feeds, reloadSideBar }: FolderListInterface) {
+const FolderItem: React.FC<FolderItemProps> = ({ folderName, feeds, reloadSideBar }) => {
   const [folder, setFolder] = useState(folderName);
   const [isOpen, setIsOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -25,46 +25,51 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
     setIsHovering(false);
   };
 
-  const toggle = () => setIsOpen((prev) => !prev);
+  const toggleFolder = () => {
+    setIsOpen(prevState => !prevState);
+  };
 
   return (
-    <div className="" key={folder}>
-      <div
-        role="option"
-        className="flex flex-row px-2 py-1 rounded-lg hover:bg-primary-500 hover:text-background"
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
-      >
-        <button onClick={toggle}>
+    <div className="folder-item"
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
+    >
+      <div className="folder-header flex items-center gap-2" >
+        <Button isIconOnly size='sm' variant='light' onPress={toggleFolder}>
           {isOpen ? (
             <
               RiArrowDownSLine
+              className="w-5"
             />
           ) : (
             <
               RiArrowRightSLine
+              className="w-5"
             />
           )}
-        </button>
+        </Button>
 
         <Link
           to="/folders/$folderName"
-          params={{ folderName: folder }}
+          params={{ folderName: folderName }}
           className="w-full h-full flex flex-row items-center gap-2"
+          activeProps={{
+            className: "text-primary-500"
+          }}
         >
-          <RiFolder3Line className="w-5 opacity-90" /> {folder}
+          <RiFolder3Line className="w-5 opacity-90" /> {folderName}
         </Link>
+
         {isHovering && (
           <FolderActions folder={folder} setFolder={setFolder} reloadSideBar={reloadSideBar}></FolderActions>
         )}
       </div>
+
       <Listbox
         key="feeds"
+        variant='light'
         aria-label="feeds"
         className={isOpen ? 'block' : 'hidden'}
-        itemClasses={{
-          base: "pl-7 data-[hover=true]:bg-primary-500 data-[hover=true]:text-background",
-        }}
       >
         {feeds.map((feed) => (
           <ListboxItem
@@ -100,6 +105,8 @@ export default function FolderList({ folderName, feeds, reloadSideBar }: FolderL
         ))}
       </Listbox>
     </div>
-  )
+  );
+};
 
-}
+export default FolderItem;
+

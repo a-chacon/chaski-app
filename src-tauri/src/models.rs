@@ -1,9 +1,22 @@
-use super::schema::{article_tags, articles, configurations, feeds, filters, tags};
+use super::schema::{accounts, article_tags, articles, configurations, feeds, filters, tags};
 use crate::core::common::{calculate_default_fetch_interval, parse_rfc822_to_naive_datetime};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel::sql_types::{BigInt, Integer, Text};
 use serde::{Deserialize, Serialize};
+
+#[derive(Identifiable, Queryable, Selectable, Serialize, Debug)]
+#[diesel(table_name = accounts)]
+pub struct Account {
+    pub id: i32,
+    pub name: String,
+    pub kind: String,
+    pub auth_token: Option<String>,
+    pub credentials: Option<String>,
+    pub endpoint_url: Option<String>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
 
 #[derive(
     Identifiable,
@@ -17,6 +30,7 @@ use serde::{Deserialize, Serialize};
     QueryableByName,
 )]
 #[diesel(table_name = feeds)]
+#[diesel(belongs_to(Account))]
 pub struct Feed {
     pub id: i32,
     pub title: String,
@@ -35,6 +49,7 @@ pub struct Feed {
     pub notifications_enabled: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub account_id: Option<i32>,
 }
 
 #[derive(QueryableByName, Queryable, Debug, Serialize)]

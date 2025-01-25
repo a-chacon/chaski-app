@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
+import { useDisclosure, Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
 import { useAppContext } from "../AppContext";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 export const Route = createLazyFileRoute("/configurations")({
@@ -8,6 +8,8 @@ export const Route = createLazyFileRoute("/configurations")({
 });
 import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
+import SyncLoginModal from "../components/SyncLoginModal";
+
 
 export default function Configurations() {
   const {
@@ -22,6 +24,8 @@ export default function Configurations() {
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
+  const loginModal = useDisclosure();
+  const [successfulLogin, setSuccessfulLogin] = useState(false)
 
   useEffect(() => {
     isEnabled().then((state) => {
@@ -50,16 +54,15 @@ export default function Configurations() {
 
   return (
     <MainSectionLayout>
-      <div className="max-w-lg mx-auto my-20">
+      <div className="m-20 max-w-prose">
         <Tabs
           aria-label="Options"
           isVertical={true}
           color="primary"
-          variant="underlined"
         >
-          <Tab key="look" title="Look and Feel">
+          <Tab key="look" title="Look and Feel" >
             <Card>
-              <CardBody >
+              <CardBody>
                 <h1 className="text-xl font-semibold pb-2 text-center">
                   Look And Feel
                 </h1>
@@ -145,6 +148,24 @@ export default function Configurations() {
                     Autostart Application
                   </Switch>
                 </div>
+              </CardBody>
+            </Card>
+          </Tab>
+          <Tab key="Sync" title="Sync">
+            <Card>
+              <CardBody>
+                <h1 className="text-xl font-semibold pb-4 text-center">
+                  Syncronization
+                </h1>
+                <p>Currently you are using the app in local mode.</p>
+                <Button color="primary" className="m-4" onPress={loginModal.onOpen}>Add An Account</Button>
+                <SyncLoginModal
+                  setSuccessfulLogin={setSuccessfulLogin}
+                  isOpen={loginModal.isOpen}
+                  onOpen={loginModal.onOpen}
+                  onClose={loginModal.onClose}
+                  onOpenChange={loginModal.onOpenChange}
+                />
               </CardBody>
             </Card>
           </Tab>

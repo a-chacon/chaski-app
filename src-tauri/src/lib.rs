@@ -4,6 +4,7 @@ mod commands;
 mod core;
 mod db;
 mod entities {
+    pub(crate) mod accounts;
     pub(crate) mod articles;
     pub(crate) mod configurations;
     pub(crate) mod feeds;
@@ -100,7 +101,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::fetch_site_feeds,
             commands::create_feed,
-            commands::list_feeds,
+            commands::index_feeds,
             commands::destroy_feed,
             commands::list_articles,
             commands::list_folders,
@@ -122,7 +123,8 @@ pub fn run() {
             commands::list_configurations,
             commands::update_configuration,
             commands::rename_folder,
-            commands::delete_folder
+            commands::delete_folder,
+            commands::index_accounts
         ])
         .run(ctx)
         .expect("error while building tauri application");

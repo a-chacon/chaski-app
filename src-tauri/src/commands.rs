@@ -1,4 +1,5 @@
 use crate::entities::articles::ArticlesFilters;
+use crate::entities::feeds::FeedsFilters;
 use crate::models::{Article, Configuration, Feed, Filter, NewFeed, NewFilter};
 use crate::utils::notifications::send_notification;
 use serde_json::json;
@@ -42,10 +43,13 @@ pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) {
 }
 
 #[command]
-pub async fn list_feeds(app_handle: tauri::AppHandle) -> Result<String, ()> {
+pub async fn index_feeds(
+    app_handle: tauri::AppHandle,
+    filters: Option<FeedsFilters>,
+) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command list_feeds.");
 
-    let results = crate::entities::feeds::index(app_handle);
+    let results = crate::entities::feeds::index(app_handle, filters);
 
     match serde_json::to_string(&results) {
         Ok(json_string) => Ok(json_string),
@@ -362,5 +366,17 @@ pub async fn delete_folder(folder: String, app_handle: tauri::AppHandle) -> Resu
         Ok(String::from("true"))
     } else {
         Ok(String::from("false"))
+    }
+}
+
+#[command]
+pub async fn index_accounts(app_handle: tauri::AppHandle) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command index_accounts.");
+
+    let results = crate::entities::accounts::index(app_handle);
+
+    match serde_json::to_string(&results) {
+        Ok(json_string) => Ok(json_string),
+        Err(_) => Err(()),
     }
 }

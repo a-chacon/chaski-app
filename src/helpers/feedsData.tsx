@@ -99,3 +99,21 @@ export const exportOPML = async (file_path: string, feed_ids: string[]) => {
     throw new Error("Failed to Export");
   }
 };
+
+export const indexFeeds = async (account_id: number) => {
+  try {
+    console.log("HERE")
+    const message = await invoke<string>("index_feeds", {
+      filterFilters: {
+        account_id_eq: account_id,
+      },
+    });
+
+    const response: FeedInterface[] = JSON.parse(message);
+
+    return response;
+  } catch (error) {
+    console.error("Error indexing feeds:", error);
+    throw new Error("Failed to indexing feed");
+  }
+};

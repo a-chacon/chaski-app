@@ -49,6 +49,17 @@ export interface ConfigurationInterface {
   created_at: Date;
 }
 
+export interface AccountInterface {
+  id: number;
+  name: string;
+  kind: string;
+  auth_token?: string;
+  credentials?: string;
+  endpoint_url?: string;
+  updated_at: Date;
+  created_at: Date;
+}
+
 export interface AppContextInterface {
   sideBarOpen: boolean;
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;

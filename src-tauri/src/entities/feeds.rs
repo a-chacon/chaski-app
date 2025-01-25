@@ -8,7 +8,13 @@ use chrono::Utc;
 use diesel::dsl::{now, sql};
 use diesel::prelude::*;
 use diesel::sql_query;
+use serde::Deserialize;
 use tokio::time::{sleep, Duration};
+
+#[derive(Deserialize, Debug)]
+pub struct FeedsFilters {
+    account_id_eq: Option<i32>,
+}
 
 pub fn show(feed_id: i32, app_handle: tauri::AppHandle) -> Option<Feed> {
     let conn = &mut establish_connection(&app_handle);
@@ -105,10 +111,10 @@ pub fn destroy(feed_id: i32, app_handle: tauri::AppHandle) {
     let _ = diesel::delete(feeds.filter(id.eq(feed_id))).execute(conn);
 }
 
-pub fn index(app_handle: tauri::AppHandle) -> Vec<IndexFeed> {
+pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec<IndexFeed> {
     let conn = &mut establish_connection(&app_handle);
 
-    let query = r#"
+    let mut query = r#"
         SELECT 
             feeds.id, 
             feeds.title, 
@@ -122,9 +128,20 @@ pub fn index(app_handle: tauri::AppHandle) -> Vec<IndexFeed> {
         ON 
             articles.feed_id = feeds.id 
             AND articles.read = 0
+    "#
+    .to_string();
+
+    if let Some(filters) = filters {
+        if let Some(account_id_eq) = filters.account_id_eq {
+            query.push_str(&format!(" WHERE feeds.account_id = {}", account_id_eq));
+        }
+    }
+    query.push_str(
+        r#"
         GROUP BY 
             feeds.id, feeds.title, feeds.folder, feeds.icon
-    "#;
+    "#,
+    );
 
     sql_query(query)
         .load::<IndexFeed>(conn)

@@ -20,10 +20,9 @@ import { useNotification } from "../NotificationContext";
 interface FolderActionsProps {
   folder: string;
   setFolder: (folder: string) => void;
-  reloadSideBar: () => void;
 }
 
-const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reloadSideBar }) => {
+const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder }) => {
   const { addNotification } = useNotification();
   const renameModalDisclosure = useDisclosure()
   const deleteModalDisclosure = useDisclosure()
@@ -40,7 +39,6 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
       if (isDeleted) {
         addNotification("Folder Deleted", 'The folder was deleted successfully!', 'success');
         deleteModalDisclosure.onClose();
-        reloadSideBar();
       } else {
         addNotification("Error", 'There was an issue deleting the folder.', 'danger');
       }

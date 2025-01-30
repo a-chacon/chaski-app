@@ -8,10 +8,9 @@ import { RiFolder3Line, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/r
 interface FolderItemProps {
   folderName: string;
   feeds: FeedInterface[];
-  reloadSideBar: () => void;
 }
 
-const FolderItem: React.FC<FolderItemProps> = ({ folderName, feeds, reloadSideBar }) => {
+const FolderItem: React.FC<FolderItemProps> = ({ folderName, feeds }) => {
   const [folder, setFolder] = useState(folderName);
   const [isOpen, setIsOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -61,7 +60,7 @@ const FolderItem: React.FC<FolderItemProps> = ({ folderName, feeds, reloadSideBa
         </Link>
 
         {isHovering && (
-          <FolderActions folder={folder} setFolder={setFolder} reloadSideBar={reloadSideBar}></FolderActions>
+          <FolderActions folder={folder} setFolder={setFolder} ></FolderActions>
         )}
       </div>
 

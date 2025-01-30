@@ -102,9 +102,8 @@ export const exportOPML = async (file_path: string, feed_ids: string[]) => {
 
 export const indexFeeds = async (account_id: number) => {
   try {
-    console.log("HERE")
     const message = await invoke<string>("index_feeds", {
-      filterFilters: {
+      filters: {
         account_id_eq: account_id,
       },
     });

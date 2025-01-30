@@ -1,15 +1,14 @@
 import { AccountInterface } from "../../interfaces";
-import { RiCloudOffLine, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
+import { RiCloudOffLine, RiCloudLine, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
 import { useState } from "react";
 import { Button } from "@heroui/react";
 import AccountItemContent from "./AccountItemContent";
 
 interface AccountItemInterface {
   account: AccountInterface;
-  reloadSideBar: () => void;
 }
 
-export default function AccountItem({ account, reloadSideBar }: AccountItemInterface) {
+export default function AccountItem({ account }: AccountItemInterface) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
@@ -22,10 +21,6 @@ export default function AccountItem({ account, reloadSideBar }: AccountItemInter
   };
 
   const toggle = () => {
-    if (!isOpen && account.kind == "local" || account.kind == "greaderapi") {
-      //Get Data
-
-    }
     setIsOpen((prev) => !prev)
   };
 
@@ -51,7 +46,12 @@ export default function AccountItem({ account, reloadSideBar }: AccountItemInter
         {/*   params={{ accountId: account.id }} */}
         {/*   className="w-full h-full flex flex-row items-center gap-2" */}
         {/* > */}
-        <RiCloudOffLine className="w-5 opacity-90 mr-2" /> {account.name}
+        {account.kind === 'greaderapi' ? (
+          <RiCloudLine className="w-5 opacity-90 mr-2" />
+        ) : (
+          <RiCloudOffLine className="w-5 opacity-90 mr-2" />
+        )}
+        {account.name}
         {/* {isHovering && ( */}
         {/*   <AccountActions account={account} reloadSideBar={reloadSideBar}></AccountActions> */}
         {/* )} */}
@@ -59,7 +59,7 @@ export default function AccountItem({ account, reloadSideBar }: AccountItemInter
 
       {isOpen && (
         <div className="pl-7">
-          <AccountItemContent account={account} reloadSideBar={reloadSideBar} />
+          <AccountItemContent account={account} />
         </div>
       )}
     </div>

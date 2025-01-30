@@ -13,3 +13,28 @@ export const indexAccounts = async () => {
     throw new Error("Failed to indexing configurations");
   }
 };
+
+interface CreateAccountResponse {
+  success: boolean;
+  message: string;
+  data?: AccountInterface;
+}
+
+export const createAccount = async (account: AccountInterface): Promise<AccountInterface> => {
+  try {
+    const message = await invoke<string>("create_account", {
+      newAccount: account,
+    });
+
+    const response: CreateAccountResponse = JSON.parse(message);
+
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+
+    return response.data!;
+  } catch (error) {
+    console.error("Error creating account:", error);
+    throw error instanceof Error ? error : new Error("Failed to create account");
+  }
+};

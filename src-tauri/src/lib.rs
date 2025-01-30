@@ -1,5 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 mod commands;
 mod core;
 mod db;
@@ -18,9 +19,15 @@ mod utils {
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;
 }
+
+mod integrations {
+    pub(crate) mod greader;
+}
+
 mod models;
 mod schema;
-use entities::feeds;
+use crate::entities::accounts;
+use crate::entities::feeds;
 use serde_json::json;
 use std::collections::HashMap;
 use tauri::{
@@ -54,7 +61,7 @@ pub fn run() {
         .plugin(
             tauri_plugin_log::Builder::new()
                 .filter(|metadata| metadata.target().contains("chaski"))
-                .level(log::LevelFilter::Info)
+                .level(log::LevelFilter::Debug)
                 .max_file_size(10_000_000)
                 .target(tauri_plugin_log::Target::new(
                     tauri_plugin_log::TargetKind::LogDir { file_name: None },
@@ -87,8 +94,11 @@ pub fn run() {
 
             db::init(app.handle());
             configure_default_app_settings(app);
-            let handler_clone = app.handle().clone();
-            feeds::spawn_feeds_update_loop(handler_clone);
+            let handler_clone_for_feeds = app.handle().clone();
+            feeds::spawn_feeds_update_loop(handler_clone_for_feeds);
+
+            let handler_clone_for_accounts = app.handle().clone();
+            accounts::spawn_greaderapi_accounts_sync_loop(handler_clone_for_accounts);
             Ok(())
         })
         .on_window_event(|window, event| match event {
@@ -124,7 +134,8 @@ pub fn run() {
             commands::update_configuration,
             commands::rename_folder,
             commands::delete_folder,
-            commands::index_accounts
+            commands::index_accounts,
+            commands::create_account
         ])
         .run(ctx)
         .expect("error while building tauri application");

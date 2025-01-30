@@ -13,9 +13,19 @@ pub struct Account {
     pub kind: String,
     pub auth_token: Option<String>,
     pub credentials: Option<String>,
-    pub endpoint_url: Option<String>,
+    pub server_url: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+#[derive(Insertable, Debug, Serialize, Deserialize)]
+#[diesel(table_name = accounts)]
+pub struct NewAccount {
+    pub name: String,
+    pub kind: String,
+    pub auth_token: Option<String>,
+    pub credentials: Option<String>,
+    pub server_url: Option<String>,
 }
 
 #[derive(
@@ -50,6 +60,7 @@ pub struct Feed {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub account_id: Option<i32>,
+    pub external_id: Option<String>,
 }
 
 #[derive(QueryableByName, Queryable, Debug, Serialize)]
@@ -66,7 +77,7 @@ pub struct IndexFeed {
     pub unread_count: i64,
 }
 
-#[derive(Insertable, Debug, Serialize, Deserialize)]
+#[derive(Insertable, Debug, Serialize, Deserialize, Clone)]
 #[diesel(table_name = feeds)]
 pub struct NewFeed {
     pub title: String,
@@ -79,6 +90,8 @@ pub struct NewFeed {
     pub items_count: Option<i32>,
     pub folder: Option<String>,
     pub update_interval_minutes: i32,
+    pub account_id: Option<i32>,
+    pub external_id: Option<String>,
 }
 
 #[derive(
@@ -110,6 +123,7 @@ pub struct Article {
     pub feed_id: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub external_id: Option<String>,
 }
 
 #[derive(Insertable, Debug)]
@@ -126,6 +140,7 @@ pub struct NewArticle {
     pub hide: i32,
     pub author: Option<String>,
     pub feed_id: i32,
+    pub external_id: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Queryable, Selectable, Serialize)]
@@ -237,6 +252,8 @@ impl From<rss::Channel> for NewFeed {
             items_count: Some(channel.items.len() as i32),
             folder: None,
             update_interval_minutes: update_interval,
+            account_id: None,
+            external_id: None,
         }
     }
 }
@@ -264,6 +281,8 @@ impl From<atom_syndication::Feed> for NewFeed {
             items_count: Some(feed.entries.len() as i32),
             folder: None,
             update_interval_minutes: update_interval,
+            account_id: None,
+            external_id: None,
         }
     }
 }
@@ -282,6 +301,7 @@ impl NewArticle {
             read: 0,
             hide: 0,
             author: item.author,
+            external_id: None,
         }
     }
 
@@ -300,6 +320,7 @@ impl NewArticle {
             read: 0,
             hide: 0,
             author: Some(String::from("aa")), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
+            external_id: None,
         }
     }
 }

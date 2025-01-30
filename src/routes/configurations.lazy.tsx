@@ -8,7 +8,6 @@ export const Route = createLazyFileRoute("/configurations")({
 });
 import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
-import SyncLoginModal from "../components/SyncLoginModal";
 
 
 export default function Configurations() {
@@ -24,8 +23,6 @@ export default function Configurations() {
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
-  const loginModal = useDisclosure();
-  const [successfulLogin, setSuccessfulLogin] = useState(false)
 
   useEffect(() => {
     isEnabled().then((state) => {
@@ -148,24 +145,6 @@ export default function Configurations() {
                     Autostart Application
                   </Switch>
                 </div>
-              </CardBody>
-            </Card>
-          </Tab>
-          <Tab key="Sync" title="Sync">
-            <Card>
-              <CardBody>
-                <h1 className="text-xl font-semibold pb-4 text-center">
-                  Syncronization
-                </h1>
-                <p>Currently you are using the app in local mode.</p>
-                <Button color="primary" className="m-4" onPress={loginModal.onOpen}>Add An Account</Button>
-                <SyncLoginModal
-                  setSuccessfulLogin={setSuccessfulLogin}
-                  isOpen={loginModal.isOpen}
-                  onOpen={loginModal.onOpen}
-                  onClose={loginModal.onClose}
-                  onOpenChange={loginModal.onOpenChange}
-                />
               </CardBody>
             </Card>
           </Tab>

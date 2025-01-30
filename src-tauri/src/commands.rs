@@ -1,6 +1,6 @@
 use crate::entities::articles::ArticlesFilters;
 use crate::entities::feeds::FeedsFilters;
-use crate::models::{Article, Configuration, Feed, Filter, NewFeed, NewFilter};
+use crate::models::{Article, Configuration, Feed, Filter, NewAccount, NewFeed, NewFilter};
 use crate::utils::notifications::send_notification;
 use serde_json::json;
 use tauri::command;
@@ -26,6 +26,7 @@ pub async fn fetch_site_feeds(site_url: String) -> Result<String, ()> {
 #[command]
 pub async fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command created_feed. Params: {new_feed:?}");
+    // TODO: if external_id then sync, greader::create_feed(feed)
 
     let created_feed = crate::entities::feeds::create_feed(new_feed, true, app_handle);
 
@@ -38,6 +39,7 @@ pub async fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Res
 #[command]
 pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) {
     log::debug!(target: "chaski:commands", "Command destroy_feed. Params: {feed_id:?}");
+    // TODO: if has external_id then require sync, greader::destroy_feed(feed)
 
     crate::entities::feeds::destroy(feed_id, app_handle);
 }
@@ -47,7 +49,7 @@ pub async fn index_feeds(
     app_handle: tauri::AppHandle,
     filters: Option<FeedsFilters>,
 ) -> Result<String, ()> {
-    log::debug!(target: "chaski:commands","Command list_feeds.");
+    log::debug!(target: "chaski:commands","Command list_feeds. Filters: {filters:?}");
 
     let results = crate::entities::feeds::index(app_handle, filters);
 
@@ -122,6 +124,7 @@ pub async fn update_feed(
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command update_feed. feed_id: {feed_id:?}, feed: {feed:?}");
+    // TODO: if has external_id then require sync, greader::update_feed(feed)
 
     let result = crate::entities::feeds::update(feed_id, feed, app_handle);
 
@@ -378,5 +381,68 @@ pub async fn index_accounts(app_handle: tauri::AppHandle) -> Result<String, ()> 
     match serde_json::to_string(&results) {
         Ok(json_string) => Ok(json_string),
         Err(_) => Err(()),
+    }
+}
+
+#[command]
+pub async fn create_account(
+    mut new_account: NewAccount,
+    app_handle: tauri::AppHandle,
+) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command create_account. kind: {}", new_account.kind);
+
+    let result = match new_account.kind.as_str() {
+        "local" => Ok(crate::entities::accounts::create(app_handle, new_account)),
+        "greaderapi" => {
+            let credentials = new_account.credentials.take().ok_or(())?;
+            let server_url = new_account.server_url.as_ref().ok_or(())?;
+
+            let creds: serde_json::Value = serde_json::from_str(&credentials).map_err(|_| ())?;
+            let email = creds.get("email").ok_or(())?.as_str().ok_or(())?;
+            let password = creds.get("password").ok_or(())?.as_str().ok_or(())?;
+
+            let response = match crate::integrations::greader::GReaderClient::login(
+                server_url, email, password,
+            )
+            .await
+            {
+                Ok(result) => result,
+                Err(e) => {
+                    log::error!("GReader login failed: {}", e);
+                    let response = json!({
+                        "success": false,
+                        "message": format!("GReader login failed: {}", e),
+                        "data": null
+                    });
+                    return Ok(response.to_string());
+                }
+            };
+
+            new_account.name = format!("GReader ({})", email);
+            new_account.auth_token = Some(response.auth_token);
+            new_account.credentials = Some(credentials);
+
+            Ok(crate::entities::accounts::create(app_handle, new_account))
+        }
+        _ => Err(()),
+    };
+
+    match result {
+        Ok(account) => {
+            let response = json!({
+                "success": true,
+                "message": "Account created successfully",
+                "data": account
+            });
+            Ok(response.to_string())
+        }
+        Err(_) => {
+            let response = json!({
+                "success": false,
+                "message": "Failed to create account",
+                "data": null
+            });
+            Ok(response.to_string())
+        }
     }
 }

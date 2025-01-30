@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import Header from "../Header";
 import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
-import { ConfigurationInterface } from "../../interfaces";
+import { AccountInterface, ConfigurationInterface } from "../../interfaces";
 import { load } from '@tauri-apps/plugin-store';
+import { indexAccounts } from "../../helpers/accountsData";
 import {
   indexConfigurations,
   updateConfiguration,
@@ -22,6 +23,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [configurations, setConfigurations] = useState<
     ConfigurationInterface[]
   >([]);
+  const [accounts, setAccounts] = useState<
+    AccountInterface[]>([]);
   const [currentFont, setCurrentFont] = useState<string>("font-opensans");
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
@@ -115,7 +118,17 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentConfigFontSize();
     getCurrentConfigFontSpace();
     getCurrentConfigMarkAsReadOnHover();
+    getCurrentAccounts();
   }, [configurations]);
+
+  const getCurrentAccounts = async () => {
+    try {
+      const accountResponse = await indexAccounts()
+      setAccounts(accountResponse);
+    } catch (error) {
+      console.error("Error fetching feeds:", error);
+    }
+  };
 
   const getCurrentConfigMarkAsReadOnHover = () => {
     let result = configurations.find((x) => x.name === "MARK_AS_READ_ON_HOVER");
@@ -156,7 +169,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const getCurrentConfigTheme = async () => {
     const store = await load('settings.json', { autoSave: false });
     const currentTheme = await store.get<{ value: string }>('theme');
-    console.log(currentTheme.value)
     handleSetCurrentTheme(currentTheme.value);
   };
 
@@ -170,10 +182,10 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   };
 
   const setThemeClasses = (newTheme: string, oldTheme: string) => {
-      document.body.classList.remove(
-        oldTheme
-      );
-      document.body.classList.add(newTheme);
+    document.body.classList.remove(
+      oldTheme
+    );
+    document.body.classList.add(newTheme);
   };
 
   return (
@@ -195,7 +207,9 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         currentFontSpace,
         handleSetCurrentFontSpace,
         currentMarkAsReadOnHover,
-        handleSetMarkAsReadOnHover
+        handleSetMarkAsReadOnHover,
+        setAccounts,
+        accounts
       }}
     >
       <NotificationProvider>

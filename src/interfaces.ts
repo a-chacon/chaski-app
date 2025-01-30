@@ -50,12 +50,12 @@ export interface ConfigurationInterface {
 }
 
 export interface AccountInterface {
-  id: number;
+  id?: number;
   name: string;
   kind: string;
   auth_token?: string;
   credentials?: string;
-  endpoint_url?: string;
+  server_url?: string;
   updated_at: Date;
   created_at: Date;
 }
@@ -80,6 +80,10 @@ export interface AppContextInterface {
     React.SetStateAction<ConfigurationInterface[]>
   >;
   configurations: ConfigurationInterface[];
+  setAccounts: React.Dispatch<
+    React.SetStateAction<AccountInterface[]>
+  >;
+  accounts: AccountInterface[];
 }
 
 export interface SearchResultsInterface {

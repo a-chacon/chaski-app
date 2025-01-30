@@ -2,13 +2,12 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import { load } from '@tauri-apps/plugin-store';
 import {
   Button,
-  Card, CardFooter, CardBody, useDisclosure
+  useDisclosure
 } from "@heroui/react";
+import NewAccountModal from '../components/NewAccountModal';
 import { useState } from 'react';
-import { RiCloudOffLine, RiCloudLine } from '@remixicon/react';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import { useNavigate } from '@tanstack/react-router';
-import SyncLoginModal from '../components/SyncLoginModal';
 
 export const Route = createLazyFileRoute('/onboarding')({
   component: Onboarding,
@@ -17,8 +16,13 @@ export const Route = createLazyFileRoute('/onboarding')({
 export default function Onboarding() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate({ from: '/onboarding' })
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const [successfulLogin, setSuccessfulLogin] = useState(false)
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure({
+    onClose: () => {
+      if (step === 3) {
+        goNext();
+      }
+    }
+  });
 
 
   const complete = async () => {
@@ -38,82 +42,75 @@ export default function Onboarding() {
     setStep((prevStep) => Math.max(prevStep - 1, 1));
   }
 
-  const handleModeSelection = async (mode: string) => {
-    const store = await load('settings.json', { autoSave: true });
-    if (mode == "local") {
-      await store.set('app-mode', { value: "local" });
-      goNext();
-    } else if (mode == "remote") {
-
-
-    }
-  }
 
   const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
-          <div>
+          <div className="space-y-5">
             <img src="/chaski.png" alt="" className='w-20' />
-            <h1 className="pt-1 pb-4 text-3xl font-bold">Welcome to Chaski! 👋</h1>
-            <p className="text-lg">A Feed Reader App for those who want to control their content.</p>
-          </div>
-        );
-      case 2:
-        return (
-          <div>
-            <div className="py-4">
-              <h2 className="pt-1 text-3xl font-bold">Make yourself at home</h2>
-              <p className="text-lg">Personalize your experience with your favorite look</p>
-            </div>
-            <div className="py-2">
-              <h3 className="pb-4">Choose your prefered color:</h3>
-              <ThemeSwitcher></ThemeSwitcher>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div>
-            <div className='py-4'>
-              <h2 className="pt-1 pb-4 text-3xl font-bold">Choose the mode</h2>
-              <p className="text-lg">How will you use this app?</p>
-            </div>
-            <div className='grid grid-cols-2 gap-5'>
-              <Card className="border-none hover:bg-default" radius="lg" isPressable onPress={onOpen}>
-                <CardBody className="overflow-visible p-10">
-                  <RiCloudLine className='w-20 h-20 mx-auto my-auto' />
-                </CardBody>
-                <CardFooter className='flex flex-col text-left'>
-                  <h2 className="text-lg font-bold p-2">Client App (Google Reader API)</h2>
-                  <p className='py-1'>Connect to servers like FreshRSS, Miniflux, or Tiny Tiny RSS.</p>
-                </CardFooter>
-              </Card>
-              <Card className="border-none bg-primary-500 hover:bg-primary-600" radius="lg" isPressable onPress={() => handleModeSelection("local")}>
-                <CardBody className="overflow-visible p-10">
-                  <RiCloudOffLine className='w-20 h-20 mx-auto my-auto' />
-                </CardBody>
-                <CardFooter className='flex flex-col text-left'>
-                  <h2 className="text-lg font-bold p-2">Local Aggregator</h2>
-                  <p className='py-1'>All data stays on your device. No external servers.</p>
-                </CardFooter>
-              </Card>
-            </div>
-            <SyncLoginModal
-              setSuccessfulLogin={setSuccessfulLogin}
-              isOpen={isOpen}
-              onOpen={onOpen}
-              onClose={onClose}
-              onOpenChange={onOpenChange}
-            />
+            <h1 className="text-3xl font-bold">Welcome to Chaski! 👋</h1>
+            <p className="text-lg text-default-600">
+              Your personal feed reader for staying in control of your content.
+            </p>
           </div>
         );
 
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-3xl font-bold">Make it yours 🎨</h2>
+              <p className="text-lg text-default-600">
+                Personalize your experience with your favorite look and feel
+              </p>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg text-default-600">Choose your theme:</h3>
+              <div>
+                <ThemeSwitcher />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-3xl font-bold">Connect your feeds 📚</h2>
+              <p className="text-lg text-default-600">
+                Add your RSS accounts now or set them up later - your choice!
+              </p>
+            </div>
+            <div className='flex flex-col gap-3 w-1/2'>
+              <Button
+                color="primary"
+                size="md"
+                onPress={onOpen}
+                className="font-semibold"
+              >
+                Add Account
+              </Button>
+              <Button
+                color="primary"
+                variant="faded"
+                size="md"
+                onPress={goNext}
+                className="font-semibold"
+              >
+                Skip for now
+              </Button>
+            </div>
+          </div>
+        );
       case 4:
         return (
-          <div>
-            <h2 className="pt-1 pb-4 text-3xl font-bold">Enjoy it! 🚀</h2>
-            <p className="text-lg"><strong>A final tip:</strong> The name "Chaski" comes from the Inca Chasquis, the swift messengers who carried important messages across the empire.</p>
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold">You're all set! 🎉</h2>
+            <p className="text-lg text-default-600">
+              <strong>Did you know?</strong> The name "Chaski" comes from the Inca Chasquis, the swift messengers who carried important messages across the empire. 🏃‍♂️
+            </p>
           </div>
         );
       default:
@@ -142,6 +139,12 @@ export default function Onboarding() {
           </Button>
         </div>
       </div>
+      <NewAccountModal
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        onOpenChange={onOpenChange}
+      />
     </div>
   );
 }

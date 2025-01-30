@@ -7,7 +7,7 @@ diesel::table! {
         kind -> Text,
         auth_token -> Nullable<Text>,
         credentials -> Nullable<Text>,
-        endpoint_url -> Nullable<Text>,
+        server_url -> Nullable<Text>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -37,6 +37,7 @@ diesel::table! {
         feed_id -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        external_id -> Nullable<Text>,
     }
 }
 
@@ -81,6 +82,7 @@ diesel::table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         account_id -> Nullable<Integer>,
+        external_id -> Nullable<Text>,
     }
 }
 

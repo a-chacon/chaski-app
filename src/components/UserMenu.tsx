@@ -54,6 +54,11 @@ export default function UserMenu() {
               About Chaski
             </Link>
           </DropdownItem>
+          <DropdownItem key="accounts">
+            <Link to="/accounts">
+              Accounts
+            </Link>
+          </DropdownItem>
         </DropdownMenu>
       </Dropdown>
     </>

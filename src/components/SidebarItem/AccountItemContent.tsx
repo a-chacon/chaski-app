@@ -12,13 +12,13 @@ function groupBy<T>(arr: T[], fn: (item: T) => any) {
   }, {});
 }
 
-const AccountItemContent: React.FC<{ account: AccountInterface, reloadSideBar: () => void }> = ({ account, reloadSideBar }) => {
+const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }) => {
   const [groupedFeeds, setGroupedFeeds] = useState<Record<string, FeedInterface[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchFeeds = async () => {
-      const feeds = await indexFeeds(account.id);
+      const feeds = await indexFeeds(account.id!);
 
       const grouped = groupBy(feeds, (f) => f.folder);
 
@@ -41,7 +41,7 @@ const AccountItemContent: React.FC<{ account: AccountInterface, reloadSideBar: (
     <div>
       {account.kind === 'local' || account.kind === 'greaderapi' ? (
         Object.entries(groupedFeeds).map(([folder, feeds]) => (
-          <FolderItem key={folder} folderName={folder} feeds={feeds} reloadSideBar={reloadSideBar} />
+          <FolderItem key={folder} folderName={folder} feeds={feeds} />
         ))
       ) : (
         <div>

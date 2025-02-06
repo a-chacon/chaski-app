@@ -38,10 +38,10 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {account.kind === 'local' || account.kind === 'greaderapi' ? (
         Object.entries(groupedFeeds).map(([folder, feeds]) => (
-          <FolderItem key={folder} folderName={folder} feeds={feeds} />
+          <FolderItem key={folder} account={account} folderName={folder} feeds={feeds} />
         ))
       ) : (
         <div>

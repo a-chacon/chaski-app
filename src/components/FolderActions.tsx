@@ -16,26 +16,29 @@ import { RiMore2Line } from "@remixicon/react";
 import { useState } from "react";
 import { renameFolder, deleteFolder } from "../helpers/foldersData";
 import { useNotification } from "../NotificationContext";
+import { AccountInterface } from "../interfaces";
 
 interface FolderActionsProps {
+  account: AccountInterface;
   folder: string;
   setFolder: (folder: string) => void;
 }
 
-const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder }) => {
+const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolder }) => {
   const { addNotification } = useNotification();
   const renameModalDisclosure = useDisclosure()
   const deleteModalDisclosure = useDisclosure()
   const [newName, setNewName] = useState<string>(folder);
 
   function handleRenameFolder() {
-    renameFolder(folder, newName);
+    renameFolder(account.id!, folder, newName);
     setFolder(newName);
+    renameModalDisclosure.onClose();
     addNotification("Folder Updated", 'The folder was renamed successfully!', 'success');
   }
 
   function handleDeleteFolder() {
-    deleteFolder(folder).then((isDeleted) => {
+    deleteFolder(account.id!, folder).then((isDeleted) => {
       if (isDeleted) {
         addNotification("Folder Deleted", 'The folder was deleted successfully!', 'success');
         deleteModalDisclosure.onClose();
@@ -113,15 +116,15 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder }) => {
     <>
       <Dropdown >
         <DropdownTrigger>
-          <Button size="sm" variant="light" isIconOnly className="h-full">
+          <Button size="sm" variant="light" isIconOnly className="rounded-md">
             <RiMore2Line className="w-5"></RiMore2Line>
           </Button>
         </DropdownTrigger>
         <DropdownMenu variant="light" aria-label="Folder Options" >
-          <DropdownItem key="rename" onClick={renameModalDisclosure.onOpen}>
+          <DropdownItem key="rename" onPress={renameModalDisclosure.onOpen}>
             Rename
           </DropdownItem>
-          <DropdownItem key="delete" onClick={deleteModalDisclosure.onOpen} className="text-danger" color="danger">
+          <DropdownItem key="delete" onPress={deleteModalDisclosure.onOpen} className="text-danger" color="danger">
             Delete
           </DropdownItem>
         </DropdownMenu>

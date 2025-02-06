@@ -31,11 +31,12 @@ pub fn show(feed_id: i32, app_handle: tauri::AppHandle) -> Option<Feed> {
     response.unwrap_or_default()
 }
 
-pub fn get_folders(app_handle: tauri::AppHandle) -> Vec<String> {
+pub fn get_folders(account_id_eq: i32, app_handle: tauri::AppHandle) -> Vec<String> {
     let conn = &mut establish_connection(&app_handle);
 
     let result: Vec<Option<String>> = feeds
         .select(folder)
+        .filter(account_id.eq(account_id_eq))
         .distinct()
         .load::<Option<String>>(conn)
         .expect("Error loading folders");

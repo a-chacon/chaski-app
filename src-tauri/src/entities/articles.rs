@@ -20,6 +20,7 @@ pub struct ArticlesFilters {
     read_eq: Option<i32>,
     pub_date_eq: Option<String>,
     folder_eq: Option<String>,
+    account_id_eq: Option<i32>,
 }
 
 pub fn get_articles_with_feed(
@@ -73,9 +74,12 @@ pub fn get_articles_with_feed(
                 }
             }
         }
-
         if let Some(folder_eq) = filter.folder_eq {
             query = query.filter(feeds::folder.eq(folder_eq));
+        }
+
+        if let Some(account_id_eq) = filter.account_id_eq {
+            query = query.filter(feeds::account_id.eq(account_id_eq));
         }
     }
 
@@ -144,21 +148,25 @@ pub fn update_all_as_read_by_feed_id(feed_id_eq: i32, app_handle: tauri::AppHand
     }
 }
 
-pub fn update_all_as_read_by_folder(folder_eq: String, app_handle: tauri::AppHandle) {
+pub fn update_all_as_read_by_folder(
+    folder_eq: String,
+    account_id_eq: i32,
+    app_handle: tauri::AppHandle,
+) {
     let conn = &mut establish_connection(&app_handle);
     let query = format!(
-        "UPDATE articles SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?});",
-        folder_eq
+        "UPDATE articles SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?} AND account_id = {});",
+        folder_eq, account_id_eq
     );
 
     let result = sql_query(query).execute(conn);
 
     match result {
         Ok(count) => {
-            log::info!(target: "chaski:articles","All articles by folder updated as read, {:?}", count);
+            log::info!(target: "chaski:articles","All articles by folder and account updated as read, {:?}", count);
         }
         Err(e) => {
-            log::error!(target: "chaski:articles","Error updating all articles by folder as read: {:?}", e);
+            log::error!(target: "chaski:articles","Error updating all articles by folder and account as read: {:?}", e);
         }
     }
 }

@@ -14,11 +14,28 @@ export const indexAccounts = async () => {
   }
 };
 
-interface CreateAccountResponse {
+interface CommandResponse {
   success: boolean;
   message: string;
   data?: AccountInterface;
 }
+
+export const fullSync = async (accountId: number): Promise<void> => {
+  try {
+    const message = await invoke<string>("full_sync", {
+      accountId: accountId
+    });
+
+    const response: CommandResponse = JSON.parse(message);
+
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+  } catch (error) {
+    console.error("Error syncing account:", error);
+    throw error instanceof Error ? error : new Error("Failed to sync account");
+  }
+};
 
 export const createAccount = async (account: AccountInterface): Promise<AccountInterface> => {
   try {
@@ -26,7 +43,7 @@ export const createAccount = async (account: AccountInterface): Promise<AccountI
       newAccount: account,
     });
 
-    const response: CreateAccountResponse = JSON.parse(message);
+    const response: CommandResponse = JSON.parse(message);
 
     if (!response.success) {
       throw new Error(response.message);

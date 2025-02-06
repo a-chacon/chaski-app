@@ -28,12 +28,12 @@ export default function AccountItem({ account }: AccountItemInterface) {
     <div className="" key={account.id}>
       <div
         role="option"
-        className="flex items-center px-2 py-1 rounded-lg"
+        className="flex items-center px-2 py-1 rounded-lg gap-1"
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
 
-        <Button isIconOnly size='sm' variant='light' onPress={toggle}>
+        <Button className='rounded-md' isIconOnly size='sm' variant='light' onPress={toggle}>
           {isOpen ? (
             <RiArrowDownSLine />
           ) : (

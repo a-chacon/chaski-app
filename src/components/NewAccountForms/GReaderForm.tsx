@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AccountInterface } from "../../interfaces";
-import { createAccount } from "../../helpers/accountsData";
+import { createAccount, fullSync } from "../../helpers/accountsData";
 import { Form, Input, Button } from "@heroui/react";
 import { useAppContext } from "../../AppContext";
 
@@ -39,6 +39,7 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
 
     try {
       const newAccount = await createAccount(accountData);
+      fullSync(newAccount.id!);
 
       setAccounts((prevAccounts: AccountInterface[]) => {
         const updatedAccounts: AccountInterface[] = [...prevAccounts, newAccount];

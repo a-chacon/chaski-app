@@ -9,9 +9,10 @@ export const updateAllArticlesAsRead = async () => {
   }
 };
 
-export const updateArticlesAsReadByFolder = async (folder: string) => {
+export const updateArticlesAsReadByFolder = async (folder: string, account_id_eq: number) => {
   try {
     await invoke<string>("update_articles_as_read_by_folder", {
+      accountId: account_id_eq,
       folder: folder,
     });
   } catch (error) {

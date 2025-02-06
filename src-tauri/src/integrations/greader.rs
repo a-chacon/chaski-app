@@ -9,15 +9,15 @@ struct GReaderSubscription {
     title: String,
     categories: Vec<GReaderCategory>,
     url: String,
-    #[serde(rename = "htmlUrl")]
-    html_url: String,
+    // #[serde(rename = "htmlUrl")]
+    // html_url: String,
     #[serde(rename = "iconUrl")]
     icon_url: String,
 }
 
 #[derive(Debug, Deserialize)]
 struct GReaderCategory {
-    id: String,
+    // id: String,
     label: String,
 }
 
@@ -30,14 +30,6 @@ pub struct GReaderClient {
     pub client: Client,
     pub server_url: String,
     pub auth_token: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct LoginResponse {
-    #[serde(rename = "SID")]
-    sid: String,
-    #[serde(rename = "Auth")]
-    auth: String,
 }
 
 impl GReaderClient {
@@ -165,15 +157,5 @@ impl GReaderClient {
             .collect();
 
         Ok(feeds)
-    }
-
-    pub async fn get_articles(&self, stream_id: &str, count: usize) -> Result<String, String> {
-        let mut params = HashMap::new();
-        let count_str = count.to_string();
-        params.insert("s", stream_id);
-        params.insert("n", &count_str);
-
-        self.request("reader/api/0/stream/contents", Some(params))
-            .await
     }
 }

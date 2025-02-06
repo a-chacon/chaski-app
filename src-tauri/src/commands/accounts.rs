@@ -76,3 +76,48 @@ pub async fn create_account(
         }
     }
 }
+
+#[command]
+pub async fn full_sync(account_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command full_sync for account_id: {}", account_id);
+
+    let account = match crate::entities::accounts::show(account_id, app_handle.clone()) {
+        Some(acc) => acc,
+        None => {
+            let response = json!({
+                "success": false,
+                "message": format!("Account with id {} not found", account_id),
+                "data": null
+            });
+            return Ok(response.to_string());
+        }
+    };
+
+    if account.kind != "greaderapi" {
+        let response = json!({
+            "success": false,
+            "message": "Full sync is only supported for GReaderAPI accounts",
+            "data": null
+        });
+        return Ok(response.to_string());
+    }
+
+    match crate::entities::feeds::full_sync_greaderapi_account_feeds(&account, app_handle).await {
+        Ok(_) => {
+            let response = json!({
+                "success": true,
+                "message": "Full sync completed successfully",
+                "data": null
+            });
+            Ok(response.to_string())
+        }
+        Err(e) => {
+            let response = json!({
+                "success": false,
+                "message": format!("Full sync failed: {}", e),
+                "data": null
+            });
+            Ok(response.to_string())
+        }
+    }
+}

@@ -135,7 +135,8 @@ pub fn run() {
             commands::folders::rename_folder,
             commands::folders::delete_folder,
             commands::accounts::index_accounts,
-            commands::accounts::create_account
+            commands::accounts::create_account,
+            commands::accounts::full_sync
         ])
         .run(ctx)
         .expect("error while building tauri application");

@@ -11,7 +11,7 @@ import SearchModal from "./SearchModal";
 import UserMenu from "./UserMenu";
 import updater from "../helpers/updater";
 import { useNotification } from "../NotificationContext";
-import { Button } from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
 
 interface VerticalHeaderProps { };
 
@@ -45,35 +45,43 @@ const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
           </Link>
         </Button>
 
-        <Button
-          variant="flat"
-          isIconOnly
-          className={`rounded-full items-center h-10 w-10 flex justify-center ${sideBarOpen ? "text-primary-500" : ""}`}
-          onClick={toggleSidebar}
-        >
-          {sideBarOpen ? (
-            <RiSidebarFoldLine className="p-0.5" />
-          ) : (
-            <RiSidebarUnfoldLine className="p-0.5" />
-          )}
-        </Button>
+        <Tooltip content={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"} delay={500}>
+          <Button
+            variant="flat"
+            isIconOnly
+            className={`rounded-full items-center h-10 w-10 flex justify-center ${sideBarOpen ? "text-primary-500" : ""}`}
+            onClick={toggleSidebar}
+          >
+            {sideBarOpen ? (
+              <RiSidebarFoldLine className="p-0.5" />
+            ) : (
+              <RiSidebarUnfoldLine className="p-0.5" />
+            )}
+          </Button>
+        </Tooltip>
       </div>
       <div className="flex gap-4 md:flex-col">
-        <Button
-          variant="flat"
-          isIconOnly
-          className={`rounded-full items-center h-10 w-10 flex justify-center`}
-        >
-          <Link
-            to="/new_feed"
-            activeProps={{
-              className: "text-primary-500",
-            }}
+        <Tooltip content="Add new feed" delay={500}>
+          <Button
+            variant="flat"
+            isIconOnly
+            className={`rounded-full items-center h-10 w-10 flex justify-center`}
           >
-            <RiAddCircleLine className="p-0.5" />
-          </Link>
-        </Button>
-        <SearchModal></SearchModal>
+            <Link
+              to="/new_feed"
+              activeProps={{
+                className: "text-primary-500",
+              }}
+            >
+              <RiAddCircleLine className="p-0.5" />
+            </Link>
+          </Button>
+        </Tooltip>
+        <Tooltip content="Search Feeds and Entries" delay={500}>
+          <div>
+            <SearchModal></SearchModal>
+          </div>
+        </Tooltip>
       </div>
       <div>
         <UserMenu></UserMenu>

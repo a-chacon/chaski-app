@@ -68,7 +68,7 @@ function Article() {
               <h1 className="text-xl md:text-3xl font-semibold">
                 {article.title}
               </h1>
-              <span>{article.author}</span>
+              <span>Author: {article.author ? article.author : ""}</span>
             </div>
             {article.image && (
               <img

@@ -20,6 +20,17 @@ pub fn create(app_handle: tauri::AppHandle, account: NewAccount) -> Account {
         .expect("Error creating new account")
 }
 
+pub fn show(account_id: i32, app_handle: tauri::AppHandle) -> Option<Account> {
+    let conn = &mut establish_connection(&app_handle);
+
+    accounts
+        .find(account_id)
+        .select(Account::as_select())
+        .first(conn)
+        .optional()
+        .expect("Error finding account")
+}
+
 pub fn spawn_greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {
     tauri::async_runtime::spawn(async move {
         let _ = greaderapi_accounts_sync_loop(app_handle).await;
@@ -36,11 +47,21 @@ async fn greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {
             .expect("Error loading GReader accounts");
 
         for account in greader_accounts {
+            log::info!(target: "chaski:sync", "Starting sync for account: {} (ID: {})", account.name, account.id);
+
             let cloned_app_handle = app_handle.clone();
-            crate::feeds::full_sync_greaderapi_account_feeds(&account, cloned_app_handle).await;
+            match crate::feeds::full_sync_greaderapi_account_feeds(&account, cloned_app_handle)
+                .await
+            {
+                Ok(_) => {
+                    log::info!(target: "chaski:sync", "Successfully synced account: {} (ID: {})", account.name, account.id);
+                }
+                Err(e) => {
+                    log::error!(target: "chaski:sync", "Error syncing account {} (ID: {}): {}", account.name, account.id, e);
+                }
+            }
         }
 
-        // Wait before next sync
-        sleep(Duration::from_secs(60 * 60)).await; // Every 15 minutes
+        sleep(Duration::from_secs(60 * 60)).await;
     }
 }

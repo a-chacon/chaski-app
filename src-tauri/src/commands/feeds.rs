@@ -3,16 +3,22 @@ use crate::models::{Feed, NewFeed};
 use tauri::command;
 
 #[command]
-pub async fn fetch_site_feeds(site_url: String) -> Result<String, ()> {
-    log::debug!(target: "chaski:commands","Command fetch_site_feeds. Params: {site_url:?}");
+pub async fn fetch_site_feeds(site_url: String, account_id: i32) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command fetch_site_feeds. Params: site_url: {site_url:?}, account_id: {account_id}");
 
     let result = crate::utils::scrape::scrape_site_feeds(site_url).await;
 
     match result {
-        Ok(feeds) => match serde_json::to_string(&feeds) {
-            Ok(json_string) => Ok(json_string),
-            Err(_) => Err(()),
-        },
+        Ok(mut feeds) => {
+            for feed in &mut feeds {
+                feed.account_id = Some(account_id);
+            }
+
+            match serde_json::to_string(&feeds) {
+                Ok(json_string) => Ok(json_string),
+                Err(_) => Err(()),
+            }
+        }
         Err(e) => {
             log::error!(target: "chaski:commands","Error scraping site feeds. Error: {e:?}");
             Err(())

@@ -21,17 +21,15 @@ pub async fn full_text_search(text: String, app_handle: tauri::AppHandle) -> Res
 }
 
 #[command]
-pub async fn import_opml(app_handle: tauri::AppHandle, file_path: String) -> Result<(), ()> {
+pub async fn import_opml(
+    account_id: i32,
+    file_path: String,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command import_opml. file_path: {file_path:?}");
-    // TODO: BY account
-
-    send_notification(
-        &app_handle,
-        "Importing OPML",
-        "The file will be processed, it could take a while.",
-    );
 
     let result = crate::utils::opml_utils::opml_file_to_new_feeds(file_path.as_str()).await;
+
     match result {
         Ok(new_feeds) => {
             send_notification(
@@ -42,9 +40,21 @@ pub async fn import_opml(app_handle: tauri::AppHandle, file_path: String) -> Res
                     new_feeds.len()
                 ),
             );
-            crate::entities::feeds::create_list(new_feeds, app_handle);
+
+            let mut feeds_with_account = new_feeds;
+            for feed in &mut feeds_with_account {
+                feed.account_id = Some(account_id);
+            }
+
+            crate::entities::feeds::create_list(feeds_with_account, app_handle);
         }
         Err(err) => {
+            send_notification(
+                &app_handle,
+                "Importing OPML",
+                &format!("Error importing OPML: {}", err),
+            );
+
             log::error!(target: "chaski:commands","Command import_opml. error: {err:?}");
         }
     }

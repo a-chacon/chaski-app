@@ -254,7 +254,13 @@ async fn autodiscover_feeds(
 
 pub async fn scrape_feed_articles(feed: &Feed) -> Result<Vec<NewArticle>, ()> {
     let client = create_async_client().unwrap();
-    let feed_response = client.get(&feed.link).send().await.unwrap();
+    let feed_response = match client.get(&feed.link).send().await {
+        Ok(response) => response,
+        Err(e) => {
+            log::error!("Error fetching feed {}: {}", feed.link, e);
+            return Ok(Vec::new());
+        }
+    };
     let mut new_articles = Vec::new();
 
     if feed_response.status().is_success() {

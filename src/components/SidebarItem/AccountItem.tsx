@@ -1,5 +1,6 @@
 import { AccountInterface } from "../../interfaces";
 import { RiCloudOffLine, RiCloudLine, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@heroui/react";
 import AccountItemContent from "./AccountItemContent";
@@ -41,20 +42,22 @@ export default function AccountItem({ account }: AccountItemInterface) {
           )}
         </Button>
 
-        {/* <Link */}
-        {/*   to="/accounts/$accountId" */}
-        {/*   params={{ accountId: account.id }} */}
-        {/*   className="w-full h-full flex flex-row items-center gap-2" */}
-        {/* > */}
-        {account.kind === 'greaderapi' ? (
-          <RiCloudLine className="w-5 opacity-90 mr-2" />
-        ) : (
-          <RiCloudOffLine className="w-5 opacity-90 mr-2" />
-        )}
-        {account.name}
-        {/* {isHovering && ( */}
-        {/*   <AccountActions account={account} reloadSideBar={reloadSideBar}></AccountActions> */}
-        {/* )} */}
+
+        <Link
+          to="/account/$accountId"
+          params={{ accountId: account.id!.toString() }}
+          className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
+          activeProps={{
+            className: "bg-default/40"
+          }}
+        >
+          {account.kind === 'greaderapi' ? (
+            <RiCloudLine className="w-5 opacity-90 mr-2" />
+          ) : (
+            <RiCloudOffLine className="w-5 opacity-90 mr-2" />
+          )}
+          {account.name}
+        </Link>
       </div>
 
       {isOpen && (

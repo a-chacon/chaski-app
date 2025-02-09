@@ -45,18 +45,12 @@ export default function UserMenu() {
           onAction={(key) => handleDropDownMenuKey(key.toString())}
           aria-label="Profile Actions"
         >
-          <DropdownItem key="export_opml">Export All (OPML)</DropdownItem>
           <DropdownItem key="configurations">
             <Link to="/configurations">Configurations</Link>
           </DropdownItem>
           <DropdownItem key="about">
             <Link to="/about">
               About Chaski
-            </Link>
-          </DropdownItem>
-          <DropdownItem key="accounts">
-            <Link to="/accounts">
-              Accounts
             </Link>
           </DropdownItem>
         </DropdownMenu>

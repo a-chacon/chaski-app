@@ -2,6 +2,7 @@ use crate::db::establish_connection;
 use crate::models::Account;
 use crate::models::NewAccount;
 use crate::schema::accounts::dsl::*;
+use crate::schema::{articles, feeds, filters};
 use diesel::prelude::*;
 use tokio::time::{sleep, Duration};
 
@@ -29,6 +30,32 @@ pub fn show(account_id: i32, app_handle: tauri::AppHandle) -> Option<Account> {
         .first(conn)
         .optional()
         .expect("Error finding account")
+}
+
+pub fn destroy(account_id_eq: i32, app_handle: tauri::AppHandle) -> Result<(), String> {
+    let conn = &mut establish_connection(&app_handle);
+
+    conn.transaction::<_, diesel::result::Error, _>(|conn| {
+        let feed_ids: Vec<i32> = feeds::table
+            .select(feeds::id)
+            .filter(feeds::account_id.eq(account_id_eq))
+            .load(conn)?;
+
+        diesel::delete(articles::table.filter(articles::feed_id.eq_any(&feed_ids)))
+            .execute(conn)?;
+
+        diesel::delete(filters::table.filter(filters::feed_id.eq_any(&feed_ids))).execute(conn)?;
+
+        diesel::delete(feeds::table.filter(feeds::account_id.eq(account_id_eq))).execute(conn)?;
+
+        diesel::delete(accounts.find(account_id_eq)).execute(conn)?;
+
+        Ok(())
+    })
+    .map_err(|e| {
+        log::error!("Error deleting account {}: {}", account_id_eq, e);
+        format!("Failed to delete account: {}", e)
+    })
 }
 
 pub fn spawn_greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {

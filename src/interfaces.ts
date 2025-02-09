@@ -1,5 +1,5 @@
 export interface FeedInterface {
-  id?: string;
+  id?: number;
   title: string;
   description: string;
   link: string;
@@ -15,6 +15,7 @@ export interface FeedInterface {
   update_interval_minutes: number;
   notifications_enabled: number;
   unread_count: number;
+  account_id: number;
 }
 
 export interface ArticleInterface {
@@ -54,7 +55,10 @@ export interface AccountInterface {
   name: string;
   kind: string;
   auth_token?: string;
-  credentials?: string;
+  credentials?: {
+    username: string;
+    password: string;
+  };
   server_url?: string;
   updated_at: Date;
   created_at: Date;

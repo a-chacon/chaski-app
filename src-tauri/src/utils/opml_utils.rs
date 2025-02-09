@@ -9,7 +9,13 @@ pub async fn opml_file_to_new_feeds(
     file_path: &str,
 ) -> Result<Vec<NewFeed>, Box<dyn std::error::Error>> {
     let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    let document = OPML::from_str(contents.as_str()).unwrap();
+    let document = match OPML::from_str(contents.as_str()) {
+        Ok(doc) => doc,
+        Err(e) => {
+            log::error!(target: "chaski:opml", "Failed to parse OPML file: {:?}", e);
+            return Err(format!("Invalid OPML file format: {}", e).into());
+        }
+    };
     let mut new_feeds: Vec<NewFeed> = Vec::new();
 
     for outline in document.body.outlines.iter() {

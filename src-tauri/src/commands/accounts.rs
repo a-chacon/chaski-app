@@ -28,11 +28,11 @@ pub async fn create_account(
             let server_url = new_account.server_url.as_ref().ok_or(())?;
 
             let creds: serde_json::Value = serde_json::from_str(&credentials).map_err(|_| ())?;
-            let email = creds.get("email").ok_or(())?.as_str().ok_or(())?;
+            let username = creds.get("username").ok_or(())?.as_str().ok_or(())?;
             let password = creds.get("password").ok_or(())?.as_str().ok_or(())?;
 
             let response = match crate::integrations::greader::GReaderClient::login(
-                server_url, email, password,
+                server_url, username, password,
             )
             .await
             {
@@ -48,7 +48,7 @@ pub async fn create_account(
                 }
             };
 
-            new_account.name = format!("GReader ({})", email);
+            new_account.name = format!("GReader ({})", username);
             new_account.auth_token = Some(response.auth_token);
             new_account.credentials = Some(credentials);
 
@@ -70,6 +70,54 @@ pub async fn create_account(
             let response = json!({
                 "success": false,
                 "message": "Failed to create account",
+                "data": null
+            });
+            Ok(response.to_string())
+        }
+    }
+}
+
+#[command]
+pub async fn show_account(account_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command show_account for account_id: {}", account_id);
+
+    match crate::entities::accounts::show(account_id, app_handle) {
+        Some(account) => {
+            let response = json!({
+                "success": true,
+                "message": "Account found",
+                "data": account
+            });
+            Ok(response.to_string())
+        }
+        None => {
+            let response = json!({
+                "success": false,
+                "message": format!("Account with id {} not found", account_id),
+                "data": null
+            });
+            Ok(response.to_string())
+        }
+    }
+}
+
+#[command]
+pub async fn destroy_account(account_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command destroy_account for account_id: {}", account_id);
+
+    match crate::entities::accounts::destroy(account_id, app_handle) {
+        Ok(_) => {
+            let response = json!({
+                "success": true,
+                "message": format!("Account {} deleted successfully", account_id),
+                "data": null
+            });
+            Ok(response.to_string())
+        }
+        Err(e) => {
+            let response = json!({
+                "success": false,
+                "message": format!("Failed to delete account {}: {}", account_id, e),
                 "data": null
             });
             Ok(response.to_string())

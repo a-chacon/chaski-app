@@ -46,6 +46,8 @@ regex = "1.11.1"
 readability-rs = "0.5.0"
 tauri-plugin-process = "2"
 tauri-plugin-store = "2"
+urlencoding = "2.1"
+
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

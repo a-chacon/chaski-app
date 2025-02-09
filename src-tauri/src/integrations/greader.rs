@@ -33,12 +33,12 @@ pub struct GReaderClient {
 }
 
 impl GReaderClient {
-    pub async fn login(server_url: &str, email: &str, password: &str) -> Result<Self, String> {
+    pub async fn login(server_url: &str, username: &str, password: &str) -> Result<Self, String> {
         let client = Client::new();
 
         let login_url = format!(
             "{}/accounts/ClientLogin?Email={}&Passwd={}",
-            server_url, email, password
+            server_url, username, password
         );
 
         let response = client

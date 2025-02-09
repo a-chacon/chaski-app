@@ -6,6 +6,8 @@ import FeedSite from "./FeedSite";
 import { AccountInterface, FeedInterface } from "../interfaces";
 import { readText } from '@tauri-apps/plugin-clipboard-manager';
 import { useAppContext } from "../AppContext";
+import { open } from "@tauri-apps/plugin-dialog";
+import { importOPML } from "../helpers/feedsData";
 
 export default function App() {
 
@@ -20,6 +22,7 @@ export default function App() {
   const [availableFeeds, setAvailableFeeds] = useState<any>([]);
   const [siteUrl, setSiteUrl] = useState("");
   const [selectedAccount, setSelectedAccount] = useState<AccountInterface | null>(null);
+  const [isImportLoading, setIsImportLoading] = useState(false);
 
   useEffect(() => {
     const fetchClipboardContent = async () => {
@@ -41,6 +44,20 @@ export default function App() {
 
     fetchClipboardContent();
   }, []);
+
+  const handleImportButton = async () => {
+    setIsImportLoading(true);
+    const file = await open({
+      multiple: false,
+      directory: false,
+      filters: [{ name: "Opml", extensions: ["opml"] }],
+    });
+    if (file) {
+      await importOPML(selectedAccount!.id!, file);
+    }
+
+    setIsImportLoading(false);
+  };
 
   const previewNewBlogSite = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -127,6 +144,8 @@ export default function App() {
           <Input
             type="url"
             variant="underlined"
+            label="Feed Url"
+            description="It will try to discover the RSS feed if a direct link is not provided"
             isInvalid={isInvalid}
             errorMessage={isInvalidMessage}
             value={siteUrl}
@@ -148,14 +167,25 @@ export default function App() {
           </Button>
 
         </form>
-        <Button
-          size="sm"
-          variant="light"
-          className="self-start"
-          onPress={() => setStep(0)}
-        >
-          ← Change Account
-        </Button>
+        <div className="flex gap-2 justify-between">
+          <Button
+            size="sm"
+            variant="light"
+            onPress={() => setStep(0)}
+          >
+            ← Change Account
+          </Button>
+          {selectedAccount?.kind === "local" && (
+            <Button
+              size="sm"
+              variant="faded"
+              onPress={handleImportButton}
+              isLoading={isImportLoading}
+            >
+              Import OPML
+            </Button>
+          )}
+        </div>
       </div>
     );
   } else {

@@ -23,15 +23,20 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
 
     const formData = new FormData(e.currentTarget);
     const credentials = {
-      email: formData.get('email') as string,
+      username: formData.get('username') as string,
       password: formData.get('password') as string
     };
 
-    const serverUrl = formData.get('server') as string;
+    let serverUrl = formData.get('server') as string;
+
+    if (!/^https?:\/\//i.test(serverUrl)) {
+      serverUrl = `http://${serverUrl}`;
+    }
+
     const accountData: AccountInterface = {
       name: serverUrl,
       kind: 'greaderapi',
-      credentials: JSON.stringify(credentials),
+      credentials: credentials,
       server_url: serverUrl,
       updated_at: new Date(),
       created_at: new Date()
@@ -72,10 +77,10 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
 
       <Input
         isRequired
-        errorMessage="Please enter a valid email"
-        label="Email"
+        errorMessage="Please enter a valid username"
+        label="Username"
         labelPlacement="outside"
-        name="email"
+        name="username"
         placeholder="Enter your username"
         type="text"
       />

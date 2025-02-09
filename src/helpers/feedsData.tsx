@@ -40,8 +40,8 @@ export const refreshArticles = async (feed_id: number) => {
   }
 };
 
-export const getFolders = async (): Promise<string[]> => {
-  const response = await invoke<string>("list_folders", {});
+export const getFolders = async (account_id: number): Promise<string[]> => {
+  const response = await invoke<string>("list_folders", { accountId: account_id });
   const folders: string[] = JSON.parse(response);
   return folders;
 };
@@ -78,9 +78,10 @@ export const getFeed = async (feed_id: number) => {
   }
 };
 
-export const importOPML = async (file_path: string) => {
+export const importOPML = async (account_id: number, file_path: string) => {
   try {
     await invoke<string>("import_opml", {
+      accountId: account_id,
       filePath: file_path,
     });
   } catch (error) {

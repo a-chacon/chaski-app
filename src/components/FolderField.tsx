@@ -16,7 +16,7 @@ export default function FolderField({ feed }: FolderFieldInterface) {
 
   useEffect(() => {
     const fetchFolders = async () => {
-      const response = await getFolders();
+      const response = await getFolders(feed.account_id);
       const folders = response.map((folder) => ({ label: folder }));
       setAvailableFolders(folders);
     };

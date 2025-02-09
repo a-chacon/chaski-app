@@ -67,7 +67,7 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) =
         {feeds.map((feed) => (
           <Link
             to="/feeds/$feedId"
-            params={{ feedId: feed.id ?? "" }}
+            params={{ feedId: feed.id!.toString() }}
             className="w-full h-full flex flex-row items-center opacity-80 hover:bg-default/40 rounded-md p-1 px-2 justify-between"
             activeProps={{
               className: "bg-default/40"

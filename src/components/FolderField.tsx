@@ -37,7 +37,6 @@ export default function FolderField({ feed }: FolderFieldInterface) {
       defaultItems={availableFolders}
       defaultSelectedKey={feed.folder}
       onInputChange={onInputChange}
-      variant="underlined"
     >
       {(item: FolderItem) => (
         <AutocompleteItem key={item.label} value={item.label}>

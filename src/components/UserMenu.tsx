@@ -8,9 +8,10 @@ import {
 import { RiUserLine } from "@remixicon/react";
 import { save } from "@tauri-apps/plugin-dialog";
 import { exportOPML } from "../helpers/feedsData";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function UserMenu() {
+  const navigate = useNavigate();
   const handleDropDownMenuKey = async (key: string) => {
     switch (key) {
       case "export_opml":
@@ -22,7 +23,10 @@ export default function UserMenu() {
         }
         break;
       case "configurations":
-        console.log("Open configurations");
+        navigate({ to: "/configurations" });
+        break;
+      case "about":
+        navigate({ to: "/about" });
         break;
       default:
         console.log("Unknown action");
@@ -46,12 +50,10 @@ export default function UserMenu() {
           aria-label="Profile Actions"
         >
           <DropdownItem key="configurations">
-            <Link to="/configurations">Configurations</Link>
+            Configurations
           </DropdownItem>
           <DropdownItem key="about">
-            <Link to="/about">
-              About Chaski
-            </Link>
+            About Chaski
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>

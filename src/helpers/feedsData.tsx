@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { ApiResponse } from "../interfaces";
 import { FeedInterface } from "../interfaces";
 
 export const updateAllArticlesAsRead = async () => {
@@ -90,7 +91,7 @@ export const importOPML = async (account_id: number, file_path: string) => {
   }
 };
 
-export const exportOPML = async (file_path: string, feed_ids: string[]) => {
+export const exportOPML = async (file_path: string, feed_ids: number[]) => {
   try {
     await invoke<string>("export_opml", {
       filePath: file_path,
@@ -99,6 +100,34 @@ export const exportOPML = async (file_path: string, feed_ids: string[]) => {
   } catch (error) {
     console.error("Error exporting OPML :", error);
     throw new Error("Failed to Export");
+  }
+};
+
+export const createFeed = async (feed: FeedInterface): Promise<ApiResponse<FeedInterface>> => {
+  try {
+    const message = await invoke<string>("create_feed", {
+      newFeed: feed,
+    });
+    const response: ApiResponse<FeedInterface> = JSON.parse(message);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("Error creating feed:", error);
+    throw new Error("Failed to create feed");
+  }
+};
+
+export const destroyFeed = async (feed: FeedInterface): Promise<ApiResponse<FeedInterface>> => {
+  try {
+    const message = await invoke<string>("destroy_feed", {
+      feedId: feed.id!,
+    });
+    const response: ApiResponse<FeedInterface> = JSON.parse(message);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("Error creating feed:", error);
+    throw new Error("Failed to create feed");
   }
 };
 

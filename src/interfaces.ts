@@ -1,3 +1,9 @@
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
 export interface FeedInterface {
   id?: number;
   title: string;

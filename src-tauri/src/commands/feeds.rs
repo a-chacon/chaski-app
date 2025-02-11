@@ -1,5 +1,6 @@
 use crate::entities::feeds::FeedsFilters;
 use crate::models::{Feed, NewFeed};
+use serde_json::json;
 use tauri::command;
 
 #[command]
@@ -27,24 +28,89 @@ pub async fn fetch_site_feeds(site_url: String, account_id: i32) -> Result<Strin
 }
 
 #[command]
-pub async fn create_feed(new_feed: NewFeed, app_handle: tauri::AppHandle) -> Result<String, ()> {
+pub async fn create_feed(
+    new_feed: NewFeed,
+    app_handle: tauri::AppHandle,
+) -> Result<String, String> {
     log::debug!(target: "chaski:commands","Command created_feed. Params: {new_feed:?}");
-    // TODO: if external_id then sync, greader::create_feed(feed)
+    use serde_json::json;
+
+    if let Some(account_id) = new_feed.account_id {
+        use crate::entities::accounts;
+        use crate::integrations::greader::GReaderClient;
+
+        if let Some(account) = accounts::show(account_id, app_handle.clone()) {
+            if account.kind == "greaderapi" {
+                if let (Some(server_url), Some(auth_token)) =
+                    (account.server_url, account.auth_token)
+                {
+                    if let Ok(client) = GReaderClient::new(server_url, auth_token) {
+                        if client.create_feed(&new_feed).await.is_err() {
+                            return Ok(json!({
+                            "success": false,
+                            "message": "We couldn't create the feed in the remote server. Please try again later.",
+                            "data": null
+                        }).to_string());
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     let created_feed = crate::entities::feeds::create_feed(new_feed, true, app_handle);
 
-    match serde_json::to_string(&created_feed) {
-        Ok(json_string) => Ok(json_string),
-        Err(_) => Err(()),
-    }
+    let response = json!({
+        "success": true,
+        "message": "Feed created successfully",
+        "data": created_feed
+    });
+
+    Ok(response.to_string())
 }
 
 #[command]
-pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) {
+pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) -> Result<String, String> {
     log::debug!(target: "chaski:commands", "Command destroy_feed. Params: {feed_id:?}");
-    // TODO: if has external_id then require sync, greader::destroy_feed(feed)
+
+    use crate::entities::accounts;
+    use crate::integrations::greader::GReaderClient;
+    use serde_json::json;
+
+    if let Some(feed) = crate::entities::feeds::show(feed_id, app_handle.clone()) {
+        if let Some(external_id) = feed.external_id {
+            // If it has an external_id, we need to delete it from the remote server
+            if let Some(account_id) = feed.account_id {
+                if let Some(account) = accounts::show(account_id, app_handle.clone()) {
+                    if account.kind == "greaderapi" {
+                        if let (Some(server_url), Some(auth_token)) =
+                            (account.server_url, account.auth_token)
+                        {
+                            if let Ok(client) = GReaderClient::new(server_url, auth_token) {
+                                if client.delete_feed(&feed.link).await.is_err() {
+                                    return Ok(json!({
+                                        "success": false,
+                                        "message": "We couldn't delete the feed from the remote server. Please try again later.",
+                                        "data": null
+                                    }).to_string());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     crate::entities::feeds::destroy(feed_id, app_handle);
+
+    let response = json!({
+        "success": true,
+        "message": "Feed deleted successfully",
+        "data": null
+    });
+
+    Ok(response.to_string())
 }
 
 #[command]

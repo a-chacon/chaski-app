@@ -174,7 +174,7 @@ pub fn update_all_as_read_by_folder(
 pub async fn full_text_search(text: &String, app_handle: tauri::AppHandle) -> Vec<Article> {
     let conn = &mut establish_connection(&app_handle);
     let query = format!(
-        "SELECT articles.* FROM articles INNER JOIN articles_fts ON articles_fts.article_id = articles.id WHERE articles_fts MATCH '\"{}\"'",
+        "SELECT articles.* FROM articles INNER JOIN articles_fts ON articles_fts.article_id = articles.id WHERE articles_fts MATCH '\"{}\"' LIMIT 15",
         text
     );
 

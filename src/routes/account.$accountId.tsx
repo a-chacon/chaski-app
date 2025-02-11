@@ -1,6 +1,8 @@
 import { ArticleInterface, AccountInterface } from '../interfaces'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { exportOPML } from "../helpers/feedsData";
+import { save } from "@tauri-apps/plugin-dialog";
 import { invoke } from '@tauri-apps/api/core'
 import {
   Button,
@@ -12,13 +14,14 @@ import {
   ModalBody,
   ModalFooter,
 } from '@heroui/react'
-import { RiRefreshLine, RiDownloadCloudLine, RiDeleteBinLine } from "@remixicon/react";
+import { RiRefreshLine, RiDownloadCloudLine, RiDeleteBinLine, RiDownloadLine } from "@remixicon/react";
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import IndexArticles from '../components/IndexArticles'
 import { useAppContext } from "../AppContext";
 import { useArticles } from '../IndexArticlesContext'
 import { useNavigate } from '@tanstack/react-router';
 import { showAccount, fullSync, deleteAccount } from '../helpers/accountsData'
+import { indexFeeds } from '../helpers/feedsData';
 
 export const Route = createFileRoute('/account/$accountId')({
   component: RouteComponent,
@@ -32,7 +35,6 @@ export default function RouteComponent() {
   const navigate = useNavigate({ from: '/' })
   const {
     setAccounts,
-    accounts
   } = useAppContext();
 
   useEffect(() => {
@@ -81,6 +83,23 @@ export default function RouteComponent() {
       navigate({ to: '/today' })
     } catch (error) {
       console.error('Error deleting account:', error);
+    }
+  };
+
+  const handleExportOPML = async () => {
+    try {
+      const feeds = await indexFeeds(parseInt(accountId));
+      const feedIds = feeds.map(feed => feed.id!);
+
+      const path_to_save = await save({
+        filters: [{ name: "Opml", extensions: ["opml"] }],
+      });
+
+      if (path_to_save) {
+        await exportOPML(path_to_save, feedIds);
+      }
+    } catch (error) {
+      console.error('Error exporting OPML:', error);
     }
   };
 
@@ -154,6 +173,16 @@ export default function RouteComponent() {
                   </Button>
                 </Tooltip>
               )}
+              <Tooltip content="Export Feeds (OPML)">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onPress={handleExportOPML}
+                >
+                  <RiDownloadLine />
+                </Button>
+              </Tooltip>
               <Tooltip content="Delete Account">
                 <Button
                   isIconOnly

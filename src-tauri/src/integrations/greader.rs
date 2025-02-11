@@ -33,6 +33,107 @@ pub struct GReaderClient {
 }
 
 impl GReaderClient {
+    pub async fn create_feed(&self, feed: &NewFeed) -> Result<String, String> {
+        let mut params = HashMap::new();
+        params.insert("quickadd", feed.link.as_str());
+
+        let response = self
+            .request("reader/api/0/subscription/quickadd", Some(params))
+            .await?;
+
+        #[derive(Debug, Deserialize)]
+        struct QuickAddResponse {
+            #[serde(rename = "streamId")]
+            stream_id: String,
+            // #[serde(rename = "streamName")]
+            // stream_name: String,
+            #[serde(rename = "numResults")]
+            num_results: i32,
+            // #[serde(rename = "query")]
+            // query: String,
+        }
+
+        let quickadd_response: QuickAddResponse = serde_json::from_str(&response).map_err(|e| {
+            log::error!(
+                "Failed to parse quickadd response: {} - Response: {}",
+                e,
+                response
+            );
+            format!(
+                "Failed to parse quickadd response: {} - Response: {}",
+                e, response
+            )
+        })?;
+
+        if quickadd_response.num_results == 0 {
+            log::error!("Failed to add feed via quickadd");
+            return Err("Failed to add feed via quickadd".to_string());
+        }
+
+        if let Some(folder) = &feed.folder {
+            let mut edit_params = HashMap::new();
+            edit_params.insert("ac", "edit");
+            edit_params.insert("s", &quickadd_response.stream_id);
+            let folder_param = format!("user/-/label/{}", folder);
+            edit_params.insert("a", &folder_param);
+
+            let edit_response = self
+                .request("reader/api/0/subscription/edit", Some(edit_params))
+                .await?;
+
+            if edit_response != "OK" {
+                log::error!("Failed to set folder: {}", edit_response);
+                return Err(format!("Failed to set folder: {}", edit_response));
+            }
+        }
+
+        Ok(quickadd_response.stream_id)
+    }
+
+    pub async fn update_feed(&self, feed: &NewFeed) -> Result<(), String> {
+        let mut params = HashMap::new();
+        let stream_id = format!("feed/{}", feed.link);
+        params.insert("ac", "edit");
+        params.insert("s", &stream_id);
+
+        let category: String;
+        if let Some(folder) = &feed.folder {
+            category = format!("user/-/label/{}", folder);
+            params.insert("a", &category);
+        } else {
+            params.insert("r", "user/-/label/");
+        }
+
+        if !feed.title.is_empty() {
+            params.insert("t", &feed.title);
+        }
+
+        let response = self
+            .request("reader/api/0/subscription/edit", Some(params))
+            .await?;
+        if response == "OK" {
+            Ok(())
+        } else {
+            Err(format!("Failed to update feed: {}", response))
+        }
+    }
+
+    pub async fn delete_feed(&self, feed_url: &str) -> Result<(), String> {
+        let mut params = HashMap::new();
+        let stream_id = format!("feed/{}", feed_url);
+        params.insert("ac", "unsubscribe");
+        params.insert("s", &stream_id);
+
+        let response = self
+            .request("reader/api/0/subscription/edit", Some(params))
+            .await?;
+        if response == "OK" {
+            Ok(())
+        } else {
+            Err(format!("Failed to delete feed: {}", response))
+        }
+    }
+
     pub async fn login(server_url: &str, username: &str, password: &str) -> Result<Self, String> {
         let client = Client::new();
 

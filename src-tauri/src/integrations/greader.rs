@@ -1,4 +1,4 @@
-use crate::models::NewFeed;
+use crate::models::{Feed, NewFeed};
 use reqwest::Client;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -90,7 +90,7 @@ impl GReaderClient {
         Ok(quickadd_response.stream_id)
     }
 
-    pub async fn update_feed(&self, feed: &NewFeed) -> Result<(), String> {
+    pub async fn update_feed(&self, feed: &Feed) -> Result<(), String> {
         let mut params = HashMap::new();
         let stream_id = format!("feed/{}", feed.link);
         params.insert("ac", "edit");
@@ -220,6 +220,105 @@ impl GReaderClient {
             .text()
             .await
             .map_err(|e| format!("Failed to read response: {}", e))
+    }
+
+    pub async fn rename_tag(&self, old_tag: &str, new_tag: &str) -> Result<(), String> {
+        let old_tag = if !old_tag.starts_with("user/-/label/") {
+            format!("user/-/label/{}", old_tag)
+        } else {
+            old_tag.to_string()
+        };
+
+        let new_tag = if !new_tag.starts_with("user/-/label/") {
+            format!("user/-/label/{}", new_tag)
+        } else {
+            new_tag.to_string()
+        };
+
+        let mut params = HashMap::new();
+        params.insert("s", old_tag);
+        params.insert("dest", new_tag);
+
+        let url = format!("{}/reader/api/0/rename-tag", self.server_url);
+        let response = self
+            .client
+            .post(&url)
+            .header(
+                "Authorization",
+                format!("GoogleLogin auth={}", self.auth_token),
+            )
+            .form(&params)
+            .send()
+            .await
+            .map_err(|e| {
+                log::error!("Failed to rename tag: {}", e);
+                format!("Failed to rename tag: {}", e)
+            })?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let body = response.text().await.unwrap_or_default();
+            log::error!("Failed to rename tag: {} - {}", status, body);
+            return Err(format!("Failed to rename tag: {} - {}", status, body));
+        }
+
+        let response_text = response.text().await.map_err(|e| {
+            log::error!("Failed to read response: {}", e);
+            format!("Failed to read response: {}", e)
+        })?;
+
+        if response_text == "OK" {
+            Ok(())
+        } else {
+            log::error!("Failed to rename tag: {}", response_text);
+            Err(format!("Failed to rename tag: {}", response_text))
+        }
+    }
+
+    pub async fn disable_tag(&self, folder_name: &str) -> Result<(), String> {
+        let tag = if !folder_name.starts_with("user/-/label/") {
+            format!("user/-/label/{}", folder_name)
+        } else {
+            folder_name.to_string()
+        };
+
+        let mut params = HashMap::new();
+        params.insert("s", tag);
+
+        let url = format!("{}/reader/api/0/disable-tag", self.server_url);
+        let response = self
+            .client
+            .post(&url)
+            .header(
+                "Authorization",
+                format!("GoogleLogin auth={}", self.auth_token),
+            )
+            .form(&params)
+            .send()
+            .await
+            .map_err(|e| {
+                log::error!("Failed to disable tag: {}", e);
+                format!("Failed to disable tag: {}", e)
+            })?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let body = response.text().await.unwrap_or_default();
+            log::error!("Failed to disable tag: {} - {}", status, body);
+            return Err(format!("Failed to disable tag: {} - {}", status, body));
+        }
+
+        let response_text = response.text().await.map_err(|e| {
+            log::error!("Failed to read response: {}", e);
+            format!("Failed to read response: {}", e)
+        })?;
+
+        if response_text == "OK" {
+            Ok(())
+        } else {
+            log::error!("Failed to disable tag: {}", response_text);
+            Err(format!("Failed to disable tag: {}", response_text))
+        }
     }
 
     pub async fn get_feeds(&self) -> Result<Vec<NewFeed>, String> {

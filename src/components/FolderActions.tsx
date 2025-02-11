@@ -30,25 +30,31 @@ const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolde
   const deleteModalDisclosure = useDisclosure()
   const [newName, setNewName] = useState<string>(folder);
 
-  function handleRenameFolder() {
-    renameFolder(account.id!, folder, newName);
-    setFolder(newName);
-    renameModalDisclosure.onClose();
-    addNotification("Folder Updated", 'The folder was renamed successfully!', 'success');
+  async function handleRenameFolder() {
+    const response = await renameFolder(account.id!, folder, newName);
+    if (response.success) {
+      setFolder(newName);
+      renameModalDisclosure.onClose();
+      addNotification("Folder Updated", 'The folder was renamed successfully!', 'success');
+    } else {
+      addNotification("Error Folder Rename", response.message, 'danger');
+    }
   }
 
-  function handleDeleteFolder() {
-    deleteFolder(account.id!, folder).then((isDeleted) => {
-      if (isDeleted) {
-        addNotification("Folder Deleted", 'The folder was deleted successfully!', 'success');
+  async function handleDeleteFolder() {
+    try {
+      const response = await deleteFolder(account.id!, folder);
+      if (response.success) {
+        addNotification("Folder Deleted", response.message, 'success');
         deleteModalDisclosure.onClose();
       } else {
-        addNotification("Error", 'There was an issue deleting the folder.', 'danger');
+        addNotification("Error", response.message, 'danger');
       }
-    }).catch((error) => {
+    } catch (error) {
       console.error("Error deleting folder:", error);
-      addNotification("Error", 'An unexpected error occurred.', 'danger');
-    });
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      addNotification("Error", errorMessage, 'danger');
+    }
   }
 
   function renameModal() {

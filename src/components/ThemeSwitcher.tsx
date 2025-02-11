@@ -26,7 +26,7 @@ const ThemeSwitcher = () => {
               color="primary"
               size="sm"
               variant={currentTheme === color ? 'flat' : 'light'}
-              onClick={() => handleSetCurrentTheme(color)}
+              onPress={() => handleSetCurrentTheme(color)}
               isIconOnly
             >
               <RiSunLine />
@@ -43,7 +43,7 @@ const ThemeSwitcher = () => {
               color="primary"
               size="sm"
               variant={currentTheme === color ? 'flat' : 'light'}
-              onClick={() => handleSetCurrentTheme(color)}
+              onPress={() => handleSetCurrentTheme(color)}
               isIconOnly
             >
               <RiMoonLine />

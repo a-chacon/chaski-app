@@ -48,8 +48,12 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
     feed.update_interval_minutes = updateIntervalMinutes;
     feed.notifications_enabled = notificationsEnabled ? 1 : 0;
     let response = await updateFeed(feed);
-    addNotification("Feed Updated", 'The feed was updated successfully!', 'success');
-    setFeed(response);
+    if (response.success) {
+      setFeed(response.data);
+      addNotification("Feed Updated", 'The feed was updated successfully!', 'success');
+    } else {
+      addNotification("Error Updating", response.message, 'warning');
+    }
   };
 
   return (

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { AccountInterface } from "../../interfaces";
 import { createAccount, fullSync } from "../../helpers/accountsData";
 import { Form, Input, Button } from "@heroui/react";
+import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import { useAppContext } from "../../AppContext";
 
 interface SyncLoginFormProps {
@@ -15,6 +16,7 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -92,7 +94,21 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
         labelPlacement="outside"
         name="password"
         placeholder="Enter your password"
-        type="password"
+        type={isPasswordVisible ? "text" : "password"}
+        endContent={
+          <button
+            className="focus:outline-none"
+            type="button"
+            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+          >
+            {isPasswordVisible ? (
+              <RiEyeLine></RiEyeLine>
+            ) : (
+              <RiEyeOffLine></RiEyeOffLine>
+            )}
+          </button>
+        }
       />
 
       {errorMessage && (

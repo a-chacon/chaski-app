@@ -133,16 +133,46 @@ pub async fn update_feed(
     feed_id: i32,
     feed: Feed,
     app_handle: tauri::AppHandle,
-) -> Result<String, ()> {
+) -> Result<String, String> {
     log::debug!(target: "chaski:commands","Command update_feed. feed_id: {feed_id:?}, feed: {feed:?}");
-    // TODO: if has external_id then require sync, greader::update_feed(feed)
+    use serde_json::json;
 
+    // If feed has an external_id, sync with remote server
+    if let Some(external_id) = &feed.external_id {
+        if let Some(account_id) = feed.account_id {
+            use crate::entities::accounts;
+            use crate::integrations::greader::GReaderClient;
+
+            if let Some(account) = accounts::show(account_id, app_handle.clone()) {
+                if account.kind == "greaderapi" {
+                    if let (Some(server_url), Some(auth_token)) =
+                        (account.server_url, account.auth_token)
+                    {
+                        if let Ok(client) = GReaderClient::new(server_url, auth_token) {
+                            if client.update_feed(&feed).await.is_err() {
+                                return Ok(json!({
+                                    "success": false,
+                                    "message": "We couldn't update the feed on the remote server. Please try again later.",
+                                    "data": null
+                                }).to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Update the feed locally
     let result = crate::entities::feeds::update(feed_id, feed, app_handle);
 
-    match serde_json::to_string(&result) {
-        Ok(json_string) => Ok(json_string),
-        Err(_) => Err(()),
-    }
+    let response = json!({
+        "success": true,
+        "message": "Feed updated successfully",
+        "data": result
+    });
+
+    Ok(response.to_string())
 }
 
 #[command]

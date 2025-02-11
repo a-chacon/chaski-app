@@ -55,9 +55,9 @@ export const updateFeed = async (feed: FeedInterface) => {
       feed: feed,
     });
 
-    const response_feed: FeedInterface = JSON.parse(message);
 
-    return response_feed;
+    const response: ApiResponse<FeedInterface> = JSON.parse(message);
+    return response;
   } catch (error) {
     console.error("Error updating feed:", error);
     throw new Error("Failed to update feed");
@@ -109,7 +109,6 @@ export const createFeed = async (feed: FeedInterface): Promise<ApiResponse<FeedI
       newFeed: feed,
     });
     const response: ApiResponse<FeedInterface> = JSON.parse(message);
-    console.log(response);
     return response;
   } catch (error) {
     console.error("Error creating feed:", error);

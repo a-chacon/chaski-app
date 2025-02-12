@@ -51,7 +51,7 @@
 
 ## Download
 
-You can [download](https://github.com/a-chacon/chaski/releases/latest) the latest installable version of Chaski for Windows, macOS and Linux.
+You can [download](https://github.com/a-chacon/chaski-app/releases) the latest installable version of Chaski for Windows, macOS and Linux.
 
 ## Contributing
 

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import Header from "../Header";
 import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
-import { ConfigurationInterface } from "../../interfaces";
+import { AccountInterface, ConfigurationInterface } from "../../interfaces";
+import { load } from '@tauri-apps/plugin-store';
+import { indexAccounts } from "../../helpers/accountsData";
 import {
   indexConfigurations,
   updateConfiguration,
@@ -21,6 +23,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [configurations, setConfigurations] = useState<
     ConfigurationInterface[]
   >([]);
+  const [accounts, setAccounts] = useState<
+    AccountInterface[]>([]);
   const [currentFont, setCurrentFont] = useState<string>("font-opensans");
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
@@ -114,7 +118,17 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentConfigFontSize();
     getCurrentConfigFontSpace();
     getCurrentConfigMarkAsReadOnHover();
+    getCurrentAccounts();
   }, [configurations]);
+
+  const getCurrentAccounts = async () => {
+    try {
+      const accountResponse = await indexAccounts()
+      setAccounts(accountResponse);
+    } catch (error) {
+      console.error("Error fetching feeds:", error);
+    }
+  };
 
   const getCurrentConfigMarkAsReadOnHover = () => {
     let result = configurations.find((x) => x.name === "MARK_AS_READ_ON_HOVER");
@@ -152,56 +166,26 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     }
   };
 
-  const getCurrentConfigTheme = () => {
-    let result = configurations.find((x) => x.name === "THEME_MODE");
-    if (result) {
-      handleSetCurrentTheme(result.value);
-    } else {
-      handleSetCurrentTheme("AUTO");
-    }
+  const getCurrentConfigTheme = async () => {
+    const store = await load('settings.json', { autoSave: false });
+    const currentTheme = await store.get<{ value: string }>('theme');
+    handleSetCurrentTheme(currentTheme!.value);
   };
 
-  const handleSetCurrentTheme = (theme: string) => {
-    let configuration = configurations.find((x) => x.name === "THEME_MODE");
-    if (configuration && configuration.value !== theme) {
-      configuration.value = theme;
-      updateConfiguration(configuration);
-    }
+  const handleSetCurrentTheme = async (newTheme: string) => {
+    const store = await load('settings.json', { autoSave: true });
+    const currentTheme = await store.get<{ value: string }>('theme');
+    await store.set('theme', { value: newTheme });
 
-    setThemeClasses(theme);
-    setCurrentTheme(theme);
+    setThemeClasses(newTheme, currentTheme!.value);
+    setCurrentTheme(newTheme);
   };
 
-  const setThemeClasses = (theme: string) => {
-    if (theme === "DARK") {
-      document.body.classList.remove(
-        "light",
-        "text-foreground",
-        "bg-background",
-      );
-      document.body.classList.add("dark", "text-foreground", "bg-background");
-    } else if (theme === "LIGHT") {
-      document.body.classList.remove(
-        "dark",
-        "text-foreground",
-        "bg-background",
-      );
-      document.body.classList.add("light", "text-foreground", "bg-background");
-    } else {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      if (mediaQuery.matches) {
-        setThemeClasses("DARK");
-      } else {
-        setThemeClasses("LIGHT");
-      }
-
-      mediaQuery.addEventListener("change", (event) => {
-        if (event.matches) {
-        } else {
-          setThemeClasses("LIGHT");
-        }
-      });
-    }
+  const setThemeClasses = (newTheme: string, oldTheme: string) => {
+    document.body.classList.remove(
+      oldTheme
+    );
+    document.body.classList.add(newTheme);
   };
 
   return (
@@ -223,7 +207,9 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         currentFontSpace,
         handleSetCurrentFontSpace,
         currentMarkAsReadOnHover,
-        handleSetMarkAsReadOnHover
+        handleSetMarkAsReadOnHover,
+        setAccounts,
+        accounts
       }}
     >
       <NotificationProvider>

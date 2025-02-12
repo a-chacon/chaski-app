@@ -4,13 +4,14 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { RiUserLine } from "@remixicon/react";
 import { save } from "@tauri-apps/plugin-dialog";
 import { exportOPML } from "../helpers/feedsData";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function UserMenu() {
+  const navigate = useNavigate();
   const handleDropDownMenuKey = async (key: string) => {
     switch (key) {
       case "export_opml":
@@ -22,7 +23,10 @@ export default function UserMenu() {
         }
         break;
       case "configurations":
-        console.log("Open configurations");
+        navigate({ to: "/configurations" });
+        break;
+      case "about":
+        navigate({ to: "/about" });
         break;
       default:
         console.log("Unknown action");
@@ -31,12 +35,12 @@ export default function UserMenu() {
 
   return (
     <>
-      <Dropdown placement="right-end" className="bg-default-800">
+      <Dropdown placement="right-end">
         <DropdownTrigger>
           <Button
             isIconOnly
-            variant="light"
-            className="rounded-full items-center border border-default-800 bg-default-900 h-10 w-10 flex justify-center"
+            variant="flat"
+            className="rounded-full shadow-lg items-center h-10 w-10 flex justify-center"
           >
             <RiUserLine className="p-0.5" />
           </Button>
@@ -44,16 +48,12 @@ export default function UserMenu() {
         <DropdownMenu
           onAction={(key) => handleDropDownMenuKey(key.toString())}
           aria-label="Profile Actions"
-          variant="flat"
         >
-          <DropdownItem key="export_opml">Export All (OPML)</DropdownItem>
           <DropdownItem key="configurations">
-            <Link to="/configurations">Configurations</Link>
+            Configurations
           </DropdownItem>
           <DropdownItem key="about">
-            <Link to="/about">
-              About Chaski
-            </Link>
+            About Chaski
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>

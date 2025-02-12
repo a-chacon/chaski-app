@@ -1,71 +1,73 @@
-import { ArticleInterface } from "../interfaces";
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import MainSectionLayout from "../components/layout/MainSectionLayout";
-import IndexArticles from "../components/IndexArticles";
-import { useArticles } from "../IndexArticlesContext";
-import { Button, Tooltip } from "@nextui-org/react";
-import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
-import { useNotification } from "../NotificationContext";
-import { updateArticlesAsReadByFolder } from "../helpers/feedsData";
+import { ArticleInterface } from '../interfaces'
+import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { invoke } from '@tauri-apps/api/core'
+import MainSectionLayout from '../components/layout/MainSectionLayout'
+import IndexArticles from '../components/IndexArticles'
+import { useArticles } from '../IndexArticlesContext'
+import { Button, Tooltip } from '@heroui/react'
+import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
+import { useNotification } from '../NotificationContext'
+import { updateArticlesAsReadByFolder } from '../helpers/feedsData'
 
-export const Route = createFileRoute("/folders/$folderName")({
+export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
-});
+})
 
 export default function Folder() {
-  const { addNotification } = useNotification();
-  const { folderName } = Route.useParams();
+  const { addNotification } = useNotification()
+  const { folderName: folderParam } = Route.useParams()
+  const [accountIdStr, folderName] = folderParam.split('-')
+  const accountId = Number(accountIdStr)
   const { articles, setArticles, page, setPage, hasMore, setHasMore } =
-    useArticles(folderName);
+    useArticles(folderName)
 
   useEffect(() => {
     if (page === 1 && articles.length == 0) {
-      fetchArticles();
+      fetchArticles()
     }
-  }, [page]);
+  }, [page])
 
   const fetchArticles = async () => {
     try {
-      const message = await invoke<string>("list_articles", {
+      const message = await invoke<string>('list_articles', {
         page,
         items: 10,
-        filters: { folder_eq: folderName, read_eq: 0 },
-      });
+        filters: { folder_eq: folderName, read_eq: 0, account_id_eq: accountId },
+      })
 
-      const new_articles: ArticleInterface[] = JSON.parse(message);
+      const new_articles: ArticleInterface[] = JSON.parse(message)
 
-      setArticles((prevArticles) => [...prevArticles, ...new_articles]);
+      setArticles((prevArticles) => [...prevArticles, ...new_articles])
 
       if (new_articles.length === 0) {
-        setHasMore(false);
+        setHasMore(false)
       }
 
-      setPage((prevPage) => prevPage + 1);
+      setPage((prevPage) => prevPage + 1)
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      console.error('Error fetching articles:', error)
     }
-  };
+  }
 
   const handleReloadButton = () => {
-    setPage(1);
-    setArticles([]);
+    setPage(1)
+    setArticles([])
 
-    addNotification("Reloaded", 'Entries are reloaded!', 'primary');
-  };
+    addNotification('Reloaded', 'Entries are reloaded!', 'primary')
+  }
 
   const handleUpdateArticlesAsRead = async () => {
-    await updateArticlesAsReadByFolder(folderName);
-    resetArticleList();
+    await updateArticlesAsReadByFolder(folderName, accountId)
+    resetArticleList()
 
-    addNotification("Updated", 'All entries were updated as read!', 'primary');
-  };
+    addNotification('Updated', 'All entries were updated as read!', 'primary')
+  }
 
   const resetArticleList = () => {
-    setArticles([]);
-    setPage(1);
-  };
+    setArticles([])
+    setPage(1)
+  }
 
   return (
     <MainSectionLayout>
@@ -82,7 +84,7 @@ export default function Folder() {
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onClick={handleUpdateArticlesAsRead}
+                  onPress={handleUpdateArticlesAsRead}
                 >
                   <RiCheckDoubleLine></RiCheckDoubleLine>
                 </Button>
@@ -93,7 +95,7 @@ export default function Folder() {
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onClick={handleReloadButton}
+                  onPress={handleReloadButton}
                 >
                   <RiRefreshLine></RiRefreshLine>
                 </Button>
@@ -102,7 +104,7 @@ export default function Folder() {
           </div>
         </div>
         <IndexArticles
-          key={folderName}
+          key={folderParam}
           articles={articles}
           fetchArticles={fetchArticles}
           hasMore={hasMore}
@@ -110,5 +112,5 @@ export default function Folder() {
         />
       </div>
     </MainSectionLayout>
-  );
+  )
 }

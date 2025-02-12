@@ -17,7 +17,7 @@ import {
   useDisclosure,
   Input,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 import { useNotification } from "../NotificationContext";
 

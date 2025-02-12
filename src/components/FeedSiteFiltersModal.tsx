@@ -5,7 +5,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FeedInterface, FilterInterface } from "../interfaces";
 import { useState, useEffect } from "react";
 import { RiAddLine } from "@remixicon/react";
@@ -35,7 +35,7 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
   }, [feed]);
 
   const setCurrentFilters = async () => {
-    let current_filters = await indexFilters(parseInt(feed.id || ""));
+    let current_filters = await indexFilters(parseInt(feed.id!.toString()));
     setFilters(current_filters);
   };
 
@@ -45,7 +45,7 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
       operator: "",
       value: "",
       logical_operator: "AND",
-      feed_id: parseInt(feed.id || ""),
+      feed_id: parseInt(feed.id!.toString()),
     });
 
     setFilters([...filters, { ...filter }]);
@@ -74,7 +74,6 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="lg"
-      className="bg-default-950"
       scrollBehavior="inside"
     >
       <ModalContent>

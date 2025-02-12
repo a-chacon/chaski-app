@@ -1,109 +1,89 @@
-import { Listbox, ListboxItem } from "@nextui-org/react";
+import { Button, useDisclosure, Tooltip } from "@heroui/react";
 import {
   RiCalendarLine,
   RiBookmarkFill,
   RiAlignJustify,
+  RiAddCircleLine,
+  RiAccountBoxLine
 } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
-import FolderList from "./FolderList";
-import { useState, useEffect } from "react";
-import { FeedInterface } from "../interfaces";
-import { invoke } from "@tauri-apps/api/core";
+import { useAppContext } from "../AppContext";
+import NewAccountModal from '../components/NewAccountModal';
+import AccountItem from "./SidebarItem/AccountItem";
 
 interface SideBarProps {
   hidden: boolean;
 }
 
-function groupBy<T>(arr: T[], fn: (item: T) => any) {
-  return arr.reduce<Record<string, T[]>>((prev, curr) => {
-    const groupKey = fn(curr);
-    const group = prev[groupKey] || [];
-    group.push(curr);
-    return { ...prev, [groupKey]: group };
-  }, {});
-}
-
 function SideBar({ hidden }: SideBarProps) {
-  const [feeds, setFeeds] = useState<FeedInterface[]>([]);
-  const [reload, setReload] = useState(1);
-  const classes = `overflow-auto shadow bg-default-950 md:border border-default-800 md:rounded-3xl px-1 py-3 h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/3xl:w-1/5 absolute z-10 top-0 left-0 right-0 md:static ${hidden ? "hidden" : "block"}`;
 
-  const grouped_feeds = groupBy(feeds, (f) => f.folder);
+  const newAccountModal = useDisclosure()
 
-  useEffect(() => {
-    if (!hidden) {
-      const fetchFeeds = async () => {
-        try {
-          const message = await invoke<string>("list_feeds");
-          const feeds: FeedInterface[] = JSON.parse(message);
-          setFeeds(feeds);
-        } catch (error) {
-          console.error("Error fetching feeds:", error);
-        }
-      };
+  const {
+    accounts,
+  } = useAppContext();
 
-      fetchFeeds();
-    }
-  }, [hidden, reload]);
-
-  const reset = () => {
-    setReload(Math.random());
-  }
+  const classes = `overflow-auto shadow md:border border-primary-100 shadow-xl md:rounded-3xl px-1 py-3 h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/3xl:w-1/5 absolute z-10 top-0 left-0 right-0 md:static ${hidden ? "hidden" : "block"}`;
 
   return (
     <nav className={classes}>
       <div className="flex flex-col">
-        <Listbox
-          key="menu"
-          aria-label="Actions"
-          className="py-6"
-          onAction={() => { }}
-          itemClasses={{
-            base: "data-[hover=true]:bg-primary-500/50",
-          }}
-        >
-          <ListboxItem key="today">
-            <Link
-              to="/today"
-              className="w-full h-full flex flex-row items-center gap-2"
-              activeProps={{
-                className: "text-primary-500",
-              }}
-            >
-              <RiCalendarLine className="h-5 opacity-90"></RiCalendarLine>
-              Today
-            </Link>
-          </ListboxItem>
-          <ListboxItem key="read_later">
-            <Link
-              to="/read_later"
-              className="w-full h-full flex flex-row items-center gap-2"
-              activeProps={{
-                className: "text-primary-500",
-              }}
-            >
-              <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
-              Read Later
-            </Link>
-          </ListboxItem>
-          <ListboxItem key="all">
-            <Link
-              to="/"
-              className="w-full h-full flex flex-row items-center gap-2"
-              activeProps={{
-                className: "text-primary-500",
-              }}
-            >
-              <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
-              All
-            </Link>
-          </ListboxItem>
-        </Listbox>
-        <h5 className="px-4 opacity-90">Feeds</h5>
-        <div className="w-full relative flex flex-col gap-1 p-1 py-6">
-          {Object.entries(grouped_feeds).map(([key, value]) => (
-            <FolderList key={key} folderName={key} feeds={value} reloadSideBar={reset} />
-          ))}
+        <div className="px-1 flex flex-col py-6 gap-2">
+          <Link
+            to="/today"
+            className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
+            activeProps={{
+              className: "bg-default/40"
+            }}
+          >
+            <RiCalendarLine className="h-5 opacity-90"></RiCalendarLine>
+            Today
+          </Link>
+          <Link
+            to="/read_later"
+            className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
+            activeProps={{
+              className: "bg-default/40"
+            }}
+          >
+            <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
+            Read Later
+          </Link>
+          <Link
+            to="/"
+            className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
+            activeProps={{
+              className: "bg-default/40"
+            }}
+          >
+            <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
+            All
+          </Link>
+        </div>
+        <div className="px-3 flex flex-row justify-between items-center">
+          <div className="flex flex-row gap-2">
+            <RiAccountBoxLine />
+            <h5 className="font-bold" >
+              Accounts
+            </h5>
+          </div>
+          <Tooltip content="Add new account" delay={500} >
+            <Button variant="light" isIconOnly onPress={newAccountModal.onOpen} className="rounded-md">
+              <RiAddCircleLine></RiAddCircleLine>
+            </Button>
+          </Tooltip>
+        </div>
+        <NewAccountModal
+          isOpen={newAccountModal.isOpen}
+          onOpen={newAccountModal.onOpen}
+          onClose={newAccountModal.onClose}
+          onOpenChange={newAccountModal.onOpenChange}
+        />
+
+        <div className="w-full relative flex flex-col gap-1 py-2">
+          {accounts.map((a) => {
+            return <AccountItem account={a} ></AccountItem>
+          })}
         </div>
       </div>
     </nav>

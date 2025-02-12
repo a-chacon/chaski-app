@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { getFolders } from "../helpers/feedsData";
 import { useState, useEffect } from "react";
 import { FeedInterface } from "../interfaces";
@@ -16,7 +16,7 @@ export default function FolderField({ feed }: FolderFieldInterface) {
 
   useEffect(() => {
     const fetchFolders = async () => {
-      const response = await getFolders();
+      const response = await getFolders(feed.account_id);
       const folders = response.map((folder) => ({ label: folder }));
       setAvailableFolders(folders);
     };
@@ -37,7 +37,6 @@ export default function FolderField({ feed }: FolderFieldInterface) {
       defaultItems={availableFolders}
       defaultSelectedKey={feed.folder}
       onInputChange={onInputChange}
-      variant="underlined"
     >
       {(item: FolderItem) => (
         <AutocompleteItem key={item.label} value={item.label}>

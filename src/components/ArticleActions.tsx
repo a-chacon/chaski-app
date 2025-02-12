@@ -7,7 +7,7 @@ import {
   RiCloseLine
 } from "@remixicon/react";
 import { ArticleInterface } from "../interfaces";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip } from "@heroui/react";
 import {
   updateArticleAsRead,
   updateArticleAsUnRead,

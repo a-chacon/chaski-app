@@ -8,7 +8,7 @@ import {
   CardBody,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { RiSearchLine, RiCloseLine, RiSearch2Line } from "@remixicon/react";
 import { useEffect, useState } from "react";
 import { fullTextSearch } from "../helpers/searchData";
@@ -42,9 +42,9 @@ export default function SearchModal() {
     <>
       <Button
         onPress={onOpen}
-        variant="light"
+        variant="flat"
         isIconOnly
-        className="rounded-full items-center border border-default-800 bg-default-900 h-10 w-10 flex justify-center"
+        className="rounded-full items-center h-10 w-10 flex justify-center"
       >
         <RiSearchLine className="p-0.5" />
       </Button>
@@ -56,7 +56,6 @@ export default function SearchModal() {
         radius="lg"
         hideCloseButton={true}
         scrollBehavior="inside"
-        className="bg-default-950 border border-default-600"
         placement="center"
       >
         <ModalContent>
@@ -94,12 +93,12 @@ export default function SearchModal() {
                         <li key={feed.id} className="py-2">
                           <Link
                             to="/feeds/$feedId"
-                            params={{ feedId: feed.id || "" }}
+                            params={{ feedId: feed.id!.toString() }}
                             onClick={() => {
                               onClose();
                             }}
                           >
-                            <Card className="bg-default-800">
+                            <Card>
                               <CardBody>
                                 <p className="line-clamp-1">
                                   {feed.title} -{" "}
@@ -125,7 +124,7 @@ export default function SearchModal() {
                               onClose();
                             }}
                           >
-                            <Card className="bg-default-800">
+                            <Card>
                               <CardBody>
                                 <p className="line-clamp-1">{article.title}</p>
                               </CardBody>

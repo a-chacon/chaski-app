@@ -6,7 +6,7 @@ import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import IndexArticles from "../components/IndexArticles";
 import FeedSiteActions from "../components/FeedSiteActions";
-import { Button, Spinner, Snippet, Tooltip } from "@nextui-org/react";
+import { Button, Spinner, Snippet, Tooltip } from "@heroui/react";
 import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
 import { updateArticlesAsReadByFeedId, refreshArticles } from "../helpers/feedsData";
 import { getFeed } from "../helpers/feedsData";
@@ -63,7 +63,7 @@ export default function Feed() {
   };
 
   const handleUpdateAllArticlesAsRead = async () => {
-    await updateArticlesAsReadByFeedId(parseInt(feed?.id || "1"));
+    await updateArticlesAsReadByFeedId(parseInt(feed!.id!.toString()));
     resetArticleList();
 
     addNotification("Updated", 'All entries were updated as read!', 'primary');
@@ -71,7 +71,7 @@ export default function Feed() {
 
   const handleRefreshArticles = async () => {
     setRefreshLoading(true);
-    await refreshArticles(parseInt(feed?.id || "1"));
+    await refreshArticles(parseInt(feed!.id!.toString()));
     resetArticleList();
     setRefreshLoading(false);
 
@@ -86,7 +86,7 @@ export default function Feed() {
   return (
     <MainSectionLayout>
       <div className="flex flex-col p-4 max-w-screen-md mx-auto">
-        <div className="flex flex-col border-b border-default-500 py-4 justify-between items-start">
+        <div className="flex flex-col border-b border-primary-500 py-4 justify-between items-start">
           <div className="flex flex-row justify-between w-full">
             <div className="flex flex-row">
               <img
@@ -115,7 +115,7 @@ export default function Feed() {
                   onClick={handleRefreshArticles}
                 >
                   {refreshLoading ? (
-                    <Spinner color="default" size="sm" />
+                    <Spinner color="primary" size="sm" />
                   ) : (
                     <RiRefreshLine></RiRefreshLine>
                   )}

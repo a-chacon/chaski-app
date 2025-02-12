@@ -10,9 +10,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@nextui-org/listbox": "^2.1.27",
-    "@nextui-org/react": "2.6.5",
-    "@nextui-org/tabs": "^2.0.37",
+    "@heroui/listbox": "2.3.10",
+    "@heroui/react": "2.6.14",
+    "@heroui/tabs": "2.2.8",
     "@remixicon/react": "^4.2.0",
     "@tailwindcss/typography": "^0.5.15",
     "@tanstack/react-router": "^1.57.17",
@@ -24,6 +24,7 @@
     "@tauri-apps/plugin-notification": "~2",
     "@tauri-apps/plugin-process": "~2",
     "@tauri-apps/plugin-shell": "~2.0.0-rc",
+    "@tauri-apps/plugin-store": "~2",
     "@tauri-apps/plugin-updater": "~2",
     "autoprefixer": "^10.4.20",
     "chroma.ts": "^1.0.10",
@@ -45,6 +46,7 @@
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.1",
+    "prettier": "3.4.2",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
   }

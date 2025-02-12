@@ -1,5 +1,11 @@
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
 export interface FeedInterface {
-  id?: string;
+  id?: number;
   title: string;
   description: string;
   link: string;
@@ -15,6 +21,7 @@ export interface FeedInterface {
   update_interval_minutes: number;
   notifications_enabled: number;
   unread_count: number;
+  account_id: number;
 }
 
 export interface ArticleInterface {
@@ -49,6 +56,20 @@ export interface ConfigurationInterface {
   created_at: Date;
 }
 
+export interface AccountInterface {
+  id?: number;
+  name: string;
+  kind: string;
+  auth_token?: string;
+  credentials?: {
+    username: string;
+    password: string;
+  };
+  server_url?: string;
+  updated_at: Date;
+  created_at: Date;
+}
+
 export interface AppContextInterface {
   sideBarOpen: boolean;
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,6 +90,10 @@ export interface AppContextInterface {
     React.SetStateAction<ConfigurationInterface[]>
   >;
   configurations: ConfigurationInterface[];
+  setAccounts: React.Dispatch<
+    React.SetStateAction<AccountInterface[]>
+  >;
+  accounts: AccountInterface[];
 }
 
 export interface SearchResultsInterface {

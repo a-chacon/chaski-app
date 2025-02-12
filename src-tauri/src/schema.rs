@@ -1,6 +1,19 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    accounts (id) {
+        id -> Integer,
+        name -> Text,
+        kind -> Text,
+        auth_token -> Nullable<Text>,
+        credentials -> Nullable<Text>,
+        server_url -> Nullable<Text>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     article_tags (tag_id, article_id) {
         id -> Integer,
         tag_id -> Integer,
@@ -24,6 +37,7 @@ diesel::table! {
         feed_id -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        external_id -> Nullable<Text>,
     }
 }
 
@@ -67,6 +81,8 @@ diesel::table! {
         notifications_enabled -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        account_id -> Nullable<Integer>,
+        external_id -> Nullable<Text>,
     }
 }
 
@@ -94,9 +110,11 @@ diesel::table! {
 diesel::joinable!(article_tags -> articles (article_id));
 diesel::joinable!(article_tags -> tags (tag_id));
 diesel::joinable!(articles -> feeds (feed_id));
+diesel::joinable!(feeds -> accounts (account_id));
 diesel::joinable!(filters -> feeds (feed_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    accounts,
     article_tags,
     articles,
     changes,

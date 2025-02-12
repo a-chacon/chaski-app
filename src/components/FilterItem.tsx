@@ -1,5 +1,5 @@
 import React from "react";
-import { Select, SelectItem, Input, Button } from "@nextui-org/react"; // Adjust based on your UI library
+import { Select, SelectItem, Input, Button } from "@heroui/react"; // Adjust based on your UI library
 import { FilterInterface } from "../interfaces";
 import { RiCloseLine } from "@remixicon/react";
 

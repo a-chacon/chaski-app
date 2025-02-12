@@ -8,7 +8,7 @@ import {
   Input,
   Switch,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FeedInterface } from "../interfaces";
 import FolderField from "./FolderField";
 import { updateFeed } from "../helpers/feedsData";
@@ -48,15 +48,18 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
     feed.update_interval_minutes = updateIntervalMinutes;
     feed.notifications_enabled = notificationsEnabled ? 1 : 0;
     let response = await updateFeed(feed);
-    addNotification("Feed Updated", 'The feed was updated successfully!', 'success');
-    setFeed(response);
+    if (response.success) {
+      setFeed(response.data);
+      addNotification("Feed Updated", 'The feed was updated successfully!', 'success');
+    } else {
+      addNotification("Error Updating", response.message, 'warning');
+    }
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="bg-default-950"
       scrollBehavior="inside"
     >
       <ModalContent>
@@ -102,7 +105,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
                 variant="underlined"
               />
               <Switch
-                color="secondary"
+                color="primary"
                 isSelected={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
               >
@@ -115,11 +118,11 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
               </Button>
 
               <Button
-                color="success"
+                color="primary"
                 variant="flat"
                 onPress={() => {
                   onSave();
-                  onCloseModal(); // Call your second function here
+                  onCloseModal();
                 }}
               >
                 Update

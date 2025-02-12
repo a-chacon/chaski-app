@@ -18,6 +18,10 @@ function Article() {
   const [article, setArticle] = useState<ArticleInterface>();
   const { setSideBarOpen } = useAppContext();
 
+  const {
+    currentTheme,
+  } = useAppContext();
+
   useEffect(() => {
     setSideBarOpen(false);
     getArticle(parseInt(articleId)).then((article) => {
@@ -29,6 +33,8 @@ function Article() {
   }, [articleId]);
 
   const { history } = useRouter();
+
+  const isDarkTheme = (theme: string) => theme.endsWith('-dark');
 
   return (
     article && (
@@ -52,7 +58,7 @@ function Article() {
           <div className="flex flex-col justify-between w-full">
             <Link
               to="/feeds/$feedId"
-              params={{ feedId: article.feed?.id ?? "" }}
+              params={{ feedId: article.feed!.id!.toString() }}
               className="flex gap-2 items-center pt-6"
             >
               <img
@@ -68,7 +74,7 @@ function Article() {
               <h1 className="text-xl md:text-3xl font-semibold">
                 {article.title}
               </h1>
-              <span>{article.author}</span>
+              <span>Author: {article.author ? article.author : ""}</span>
             </div>
             {article.image && (
               <img
@@ -78,7 +84,7 @@ function Article() {
               />
             )}
           </div>
-          <div className="prose md:prose-lg dark:prose-invert mx-auto">
+          <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
             <p className="py-6 line-clamp-3">
               {parse(article.description || "")}
             </p>

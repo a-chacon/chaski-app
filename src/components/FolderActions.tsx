@@ -11,43 +11,50 @@ import {
   ModalFooter,
   Input,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { RiMore2Line } from "@remixicon/react";
 import { useState } from "react";
 import { renameFolder, deleteFolder } from "../helpers/foldersData";
 import { useNotification } from "../NotificationContext";
+import { AccountInterface } from "../interfaces";
 
 interface FolderActionsProps {
+  account: AccountInterface;
   folder: string;
   setFolder: (folder: string) => void;
-  reloadSideBar: () => void;
 }
 
-const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reloadSideBar }) => {
+const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolder }) => {
   const { addNotification } = useNotification();
   const renameModalDisclosure = useDisclosure()
   const deleteModalDisclosure = useDisclosure()
   const [newName, setNewName] = useState<string>(folder);
 
-  function handleRenameFolder() {
-    renameFolder(folder, newName);
-    setFolder(newName);
-    addNotification("Folder Updated", 'The folder was renamed successfully!', 'success');
+  async function handleRenameFolder() {
+    const response = await renameFolder(account.id!, folder, newName);
+    if (response.success) {
+      setFolder(newName);
+      renameModalDisclosure.onClose();
+      addNotification("Folder Updated", 'The folder was renamed successfully!', 'success');
+    } else {
+      addNotification("Error Folder Rename", response.message, 'danger');
+    }
   }
 
-  function handleDeleteFolder() {
-    deleteFolder(folder).then((isDeleted) => {
-      if (isDeleted) {
-        addNotification("Folder Deleted", 'The folder was deleted successfully!', 'success');
+  async function handleDeleteFolder() {
+    try {
+      const response = await deleteFolder(account.id!, folder);
+      if (response.success) {
+        addNotification("Folder Deleted", response.message, 'success');
         deleteModalDisclosure.onClose();
-        reloadSideBar();
       } else {
-        addNotification("Error", 'There was an issue deleting the folder.', 'danger');
+        addNotification("Error", response.message, 'danger');
       }
-    }).catch((error) => {
+    } catch (error) {
       console.error("Error deleting folder:", error);
-      addNotification("Error", 'An unexpected error occurred.', 'danger');
-    });
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      addNotification("Error", errorMessage, 'danger');
+    }
   }
 
   function renameModal() {
@@ -56,7 +63,6 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
         <Modal key={"renamefoldermodal" + folder}
           isOpen={renameModalDisclosure.isOpen}
           onOpenChange={renameModalDisclosure.onOpenChange}
-          className="bg-default-950"
         >
           <ModalContent>
             {(onClose) => (
@@ -88,7 +94,6 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
         <Modal key={"deletefoldermodal" + folder}
           isOpen={deleteModalDisclosure.isOpen}
           onOpenChange={deleteModalDisclosure.onOpenChange}
-          className="bg-default-950"
         >
           <ModalContent>
             {(onClose) => (
@@ -99,7 +104,7 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
                   <p>This will delete all the included feeds in the folder!</p>
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="secondary" variant="light" onPress={onClose}>
+                  <Button color="primary" variant="light" onPress={onClose}>
                     Close
                   </Button>
                   <Button color="danger" variant="flat" onPress={handleDeleteFolder}>
@@ -115,17 +120,17 @@ const FolderActions: React.FC<FolderActionsProps> = ({ folder, setFolder, reload
   }
   return (
     <>
-      <Dropdown className="bg-default-800">
+      <Dropdown >
         <DropdownTrigger>
-          <Button size="sm" variant="light" isIconOnly className="h-full">
+          <Button size="sm" variant="light" isIconOnly className="rounded-md">
             <RiMore2Line className="w-5"></RiMore2Line>
           </Button>
         </DropdownTrigger>
         <DropdownMenu variant="light" aria-label="Folder Options" >
-          <DropdownItem key="rename" onClick={renameModalDisclosure.onOpen}>
+          <DropdownItem key="rename" onPress={renameModalDisclosure.onOpen}>
             Rename
           </DropdownItem>
-          <DropdownItem key="delete" onClick={deleteModalDisclosure.onOpen} className="text-danger" color="danger">
+          <DropdownItem key="delete" onPress={deleteModalDisclosure.onOpen} className="text-danger" color="danger">
             Delete
           </DropdownItem>
         </DropdownMenu>

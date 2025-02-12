@@ -13,18 +13,20 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as IndexImport } from './routes/index'
 import { Route as FoldersFolderNameImport } from './routes/folders.$folderName'
 import { Route as FeedsFeedIdImport } from './routes/feeds.$feedId'
 import { Route as ArticlesArticleIdImport } from './routes/articles.$articleId'
+import { Route as AccountAccountIdImport } from './routes/account.$accountId'
 
 // Create Virtual Routes
 
 const TodayLazyImport = createFileRoute('/today')()
 const ReadlaterLazyImport = createFileRoute('/read_later')()
+const OnboardingLazyImport = createFileRoute('/onboarding')()
 const NewfeedLazyImport = createFileRoute('/new_feed')()
 const ConfigurationsLazyImport = createFileRoute('/configurations')()
 const AboutLazyImport = createFileRoute('/about')()
-const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
 
@@ -39,6 +41,12 @@ const ReadlaterLazyRoute = ReadlaterLazyImport.update({
   path: '/read_later',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/read_later.lazy').then((d) => d.Route))
+
+const OnboardingLazyRoute = OnboardingLazyImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/onboarding.lazy').then((d) => d.Route))
 
 const NewfeedLazyRoute = NewfeedLazyImport.update({
   id: '/new_feed',
@@ -60,7 +68,7 @@ const AboutLazyRoute = AboutLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
 
-const IndexLazyRoute = IndexLazyImport.update({
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
@@ -84,6 +92,12 @@ const ArticlesArticleIdRoute = ArticlesArticleIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AccountAccountIdRoute = AccountAccountIdImport.update({
+  id: '/account/$accountId',
+  path: '/account/$accountId',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -92,7 +106,7 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -116,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewfeedLazyImport
       parentRoute: typeof rootRoute
     }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/read_later': {
       id: '/read_later'
       path: '/read_later'
@@ -128,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/today'
       fullPath: '/today'
       preLoaderRoute: typeof TodayLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/account/$accountId': {
+      id: '/account/$accountId'
+      path: '/account/$accountId'
+      fullPath: '/account/$accountId'
+      preLoaderRoute: typeof AccountAccountIdImport
       parentRoute: typeof rootRoute
     }
     '/articles/$articleId': {
@@ -157,24 +185,28 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
   '/new_feed': typeof NewfeedLazyRoute
+  '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof ReadlaterLazyRoute
   '/today': typeof TodayLazyRoute
+  '/account/$accountId': typeof AccountAccountIdRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
   '/new_feed': typeof NewfeedLazyRoute
+  '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof ReadlaterLazyRoute
   '/today': typeof TodayLazyRoute
+  '/account/$accountId': typeof AccountAccountIdRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
@@ -182,12 +214,14 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
   '/new_feed': typeof NewfeedLazyRoute
+  '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof ReadlaterLazyRoute
   '/today': typeof TodayLazyRoute
+  '/account/$accountId': typeof AccountAccountIdRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
@@ -200,8 +234,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/configurations'
     | '/new_feed'
+    | '/onboarding'
     | '/read_later'
     | '/today'
+    | '/account/$accountId'
     | '/articles/$articleId'
     | '/feeds/$feedId'
     | '/folders/$folderName'
@@ -211,8 +247,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/configurations'
     | '/new_feed'
+    | '/onboarding'
     | '/read_later'
     | '/today'
+    | '/account/$accountId'
     | '/articles/$articleId'
     | '/feeds/$feedId'
     | '/folders/$folderName'
@@ -222,8 +260,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/configurations'
     | '/new_feed'
+    | '/onboarding'
     | '/read_later'
     | '/today'
+    | '/account/$accountId'
     | '/articles/$articleId'
     | '/feeds/$feedId'
     | '/folders/$folderName'
@@ -231,24 +271,28 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
+  IndexRoute: typeof IndexRoute
   AboutLazyRoute: typeof AboutLazyRoute
   ConfigurationsLazyRoute: typeof ConfigurationsLazyRoute
   NewfeedLazyRoute: typeof NewfeedLazyRoute
+  OnboardingLazyRoute: typeof OnboardingLazyRoute
   ReadlaterLazyRoute: typeof ReadlaterLazyRoute
   TodayLazyRoute: typeof TodayLazyRoute
+  AccountAccountIdRoute: typeof AccountAccountIdRoute
   ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
   FeedsFeedIdRoute: typeof FeedsFeedIdRoute
   FoldersFolderNameRoute: typeof FoldersFolderNameRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  IndexRoute: IndexRoute,
   AboutLazyRoute: AboutLazyRoute,
   ConfigurationsLazyRoute: ConfigurationsLazyRoute,
   NewfeedLazyRoute: NewfeedLazyRoute,
+  OnboardingLazyRoute: OnboardingLazyRoute,
   ReadlaterLazyRoute: ReadlaterLazyRoute,
   TodayLazyRoute: TodayLazyRoute,
+  AccountAccountIdRoute: AccountAccountIdRoute,
   ArticlesArticleIdRoute: ArticlesArticleIdRoute,
   FeedsFeedIdRoute: FeedsFeedIdRoute,
   FoldersFolderNameRoute: FoldersFolderNameRoute,
@@ -268,15 +312,17 @@ export const routeTree = rootRoute
         "/about",
         "/configurations",
         "/new_feed",
+        "/onboarding",
         "/read_later",
         "/today",
+        "/account/$accountId",
         "/articles/$articleId",
         "/feeds/$feedId",
         "/folders/$folderName"
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"
@@ -287,11 +333,17 @@ export const routeTree = rootRoute
     "/new_feed": {
       "filePath": "new_feed.lazy.tsx"
     },
+    "/onboarding": {
+      "filePath": "onboarding.lazy.tsx"
+    },
     "/read_later": {
       "filePath": "read_later.lazy.tsx"
     },
     "/today": {
       "filePath": "today.lazy.tsx"
+    },
+    "/account/$accountId": {
+      "filePath": "account.$accountId.tsx"
     },
     "/articles/$articleId": {
       "filePath": "articles.$articleId.tsx"

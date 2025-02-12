@@ -5,6 +5,7 @@ mod commands;
 mod core;
 mod db;
 mod entities {
+    pub(crate) mod accounts;
     pub(crate) mod articles;
     pub(crate) mod configurations;
     pub(crate) mod feeds;
@@ -18,19 +19,29 @@ mod utils {
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;
 }
+
+mod integrations {
+    pub(crate) mod greader;
+}
+
 mod models;
 mod schema;
-use entities::feeds;
+use crate::entities::accounts;
+use crate::entities::feeds;
+use serde_json::json;
+use std::collections::HashMap;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
     Manager,
 };
+use tauri_plugin_store::StoreExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let ctx = tauri::generate_context!();
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = app
                 .get_webview_window("main")
@@ -50,6 +61,11 @@ pub fn run() {
         .plugin(
             tauri_plugin_log::Builder::new()
                 .filter(|metadata| metadata.target().contains("chaski"))
+                .level(log::LevelFilter::Debug)
+                .max_file_size(10_000_000)
+                .target(tauri_plugin_log::Target::new(
+                    tauri_plugin_log::TargetKind::LogDir { file_name: None },
+                ))
                 .build(),
         )
         .setup(|app| {
@@ -77,8 +93,12 @@ pub fn run() {
                 .build(app)?;
 
             db::init(app.handle());
-            let handler_clone = app.handle().clone();
-            feeds::spawn_feeds_update_loop(handler_clone);
+            configure_default_app_settings(app);
+            let handler_clone_for_feeds = app.handle().clone();
+            feeds::spawn_feeds_update_loop(handler_clone_for_feeds);
+
+            let handler_clone_for_accounts = app.handle().clone();
+            accounts::spawn_greaderapi_accounts_sync_loop(handler_clone_for_accounts);
             Ok(())
         })
         .on_window_event(|window, event| match event {
@@ -89,32 +109,59 @@ pub fn run() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            commands::fetch_site_feeds,
-            commands::create_feed,
-            commands::list_feeds,
-            commands::destroy_feed,
-            commands::list_articles,
-            commands::list_folders,
-            commands::show_article,
-            commands::update_article,
-            commands::update_feed,
-            commands::update_articles_as_read,
-            commands::update_articles_as_read_by_folder,
-            commands::update_articles_as_read_by_feed_id,
-            commands::collect_feed_content,
-            commands::full_text_search,
-            commands::create_filter,
-            commands::update_filter,
-            commands::destroy_filter,
-            commands::index_filters,
-            commands::show_feed,
-            commands::import_opml,
-            commands::export_opml,
-            commands::list_configurations,
-            commands::update_configuration,
-            commands::rename_folder,
-            commands::delete_folder
+            commands::feeds::fetch_site_feeds,
+            commands::feeds::create_feed,
+            commands::feeds::index_feeds,
+            commands::feeds::destroy_feed,
+            commands::articles::list_articles,
+            commands::folders::list_folders,
+            commands::articles::show_article,
+            commands::articles::update_article,
+            commands::feeds::update_feed,
+            commands::articles::update_articles_as_read,
+            commands::folders::update_articles_as_read_by_folder,
+            commands::articles::update_articles_as_read_by_feed_id,
+            commands::feeds::collect_feed_content,
+            commands::utils::full_text_search,
+            commands::filters::create_filter,
+            commands::filters::update_filter,
+            commands::filters::destroy_filter,
+            commands::filters::index_filters,
+            commands::feeds::show_feed,
+            commands::utils::import_opml,
+            commands::utils::export_opml,
+            commands::configurations::list_configurations,
+            commands::configurations::update_configuration,
+            commands::folders::rename_folder,
+            commands::folders::delete_folder,
+            commands::accounts::index_accounts,
+            commands::accounts::create_account,
+            commands::accounts::full_sync,
+            commands::accounts::show_account,
+            commands::accounts::destroy_account,
         ])
         .run(ctx)
         .expect("error while building tauri application");
+}
+
+fn configure_default_app_settings(app: &mut tauri::App) {
+    let store = app.store("settings.json").unwrap();
+
+    let default_settings: HashMap<&str, serde_json::Value> = [
+        ("onboarding-completed", json!({ "value": false })),
+        ("theme", json!({ "value": "orange-dark" })),
+        ("articles-layout", json!({ "value": "list" })),
+        ("app-mode", json!({ "value": "local" })),
+    ]
+    .iter()
+    .cloned()
+    .collect();
+
+    for (key, default_value) in default_settings {
+        let setting = store.get(key);
+
+        if setting.is_none() {
+            store.set(key, default_value);
+        }
+    }
 }

@@ -19,7 +19,7 @@ interface NewAccountModalInterface {
 
 type AccountType = 'local' | 'google-reader';
 
-const NewAccountModal: React.FC<NewAccountModalInterface> = ({ isOpen, onOpen, onClose, onOpenChange }) => {
+const NewAccountModal: React.FC<NewAccountModalInterface> = ({ isOpen, onOpenChange }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAccountType, setSelectedAccountType] = useState<AccountType | null>(null);
 

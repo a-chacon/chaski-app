@@ -11,15 +11,6 @@ interface AccountItemInterface {
 
 export default function AccountItem({ account }: AccountItemInterface) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseOver = () => {
-    setIsHovering(true);
-  };
-
-  const handleMouseOut = () => {
-    setIsHovering(false);
-  };
 
   const toggle = () => {
     setIsOpen((prev) => !prev)
@@ -30,8 +21,6 @@ export default function AccountItem({ account }: AccountItemInterface) {
       <div
         role="option"
         className="flex items-center px-2 py-1 rounded-lg gap-1"
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
       >
 
         <Button className='rounded-md' isIconOnly size='sm' variant='light' onPress={toggle}>

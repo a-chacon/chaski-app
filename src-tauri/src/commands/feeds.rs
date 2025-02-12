@@ -78,22 +78,19 @@ pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) -> Result<
     use serde_json::json;
 
     if let Some(feed) = crate::entities::feeds::show(feed_id, app_handle.clone()) {
-        if let Some(external_id) = feed.external_id {
-            // If it has an external_id, we need to delete it from the remote server
-            if let Some(account_id) = feed.account_id {
-                if let Some(account) = accounts::show(account_id, app_handle.clone()) {
-                    if account.kind == "greaderapi" {
-                        if let (Some(server_url), Some(auth_token)) =
-                            (account.server_url, account.auth_token)
-                        {
-                            if let Ok(client) = GReaderClient::new(server_url, auth_token) {
-                                if client.delete_feed(&feed.link).await.is_err() {
-                                    return Ok(json!({
-                                        "success": false,
-                                        "message": "We couldn't delete the feed from the remote server. Please try again later.",
-                                        "data": null
-                                    }).to_string());
-                                }
+        if let Some(account_id) = feed.account_id {
+            if let Some(account) = accounts::show(account_id, app_handle.clone()) {
+                if account.kind == "greaderapi" {
+                    if let (Some(server_url), Some(auth_token)) =
+                        (account.server_url, account.auth_token)
+                    {
+                        if let Ok(client) = GReaderClient::new(server_url, auth_token) {
+                            if client.delete_feed(&feed.link).await.is_err() {
+                                return Ok(json!({
+                                    "success": false,
+                                    "message": "We couldn't delete the feed from the remote server. Please try again later.",
+                                    "data": null
+                                }).to_string());
                             }
                         }
                     }
@@ -137,25 +134,22 @@ pub async fn update_feed(
     log::debug!(target: "chaski:commands","Command update_feed. feed_id: {feed_id:?}, feed: {feed:?}");
     use serde_json::json;
 
-    // If feed has an external_id, sync with remote server
-    if let Some(external_id) = &feed.external_id {
-        if let Some(account_id) = feed.account_id {
-            use crate::entities::accounts;
-            use crate::integrations::greader::GReaderClient;
+    if let Some(account_id) = feed.account_id {
+        use crate::entities::accounts;
+        use crate::integrations::greader::GReaderClient;
 
-            if let Some(account) = accounts::show(account_id, app_handle.clone()) {
-                if account.kind == "greaderapi" {
-                    if let (Some(server_url), Some(auth_token)) =
-                        (account.server_url, account.auth_token)
-                    {
-                        if let Ok(client) = GReaderClient::new(server_url, auth_token) {
-                            if client.update_feed(&feed).await.is_err() {
-                                return Ok(json!({
-                                    "success": false,
-                                    "message": "We couldn't update the feed on the remote server. Please try again later.",
-                                    "data": null
-                                }).to_string());
-                            }
+        if let Some(account) = accounts::show(account_id, app_handle.clone()) {
+            if account.kind == "greaderapi" {
+                if let (Some(server_url), Some(auth_token)) =
+                    (account.server_url, account.auth_token)
+                {
+                    if let Ok(client) = GReaderClient::new(server_url, auth_token) {
+                        if client.update_feed(&feed).await.is_err() {
+                            return Ok(json!({
+                                "success": false,
+                                "message": "We couldn't update the feed on the remote server. Please try again later.",
+                                "data": null
+                            }).to_string());
                         }
                     }
                 }
@@ -163,7 +157,6 @@ pub async fn update_feed(
         }
     }
 
-    // Update the feed locally
     let result = crate::entities::feeds::update(feed_id, feed, app_handle);
 
     let response = json!({

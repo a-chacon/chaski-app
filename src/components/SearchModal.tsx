@@ -93,7 +93,7 @@ export default function SearchModal() {
                         <li key={feed.id} className="py-2">
                           <Link
                             to="/feeds/$feedId"
-                            params={{ feedId: feed.id || "" }}
+                            params={{ feedId: feed.id!.toString() }}
                             onClick={() => {
                               onClose();
                             }}

@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import { useDisclosure, Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
+import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
 import { useAppContext } from "../AppContext";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 export const Route = createLazyFileRoute("/configurations")({

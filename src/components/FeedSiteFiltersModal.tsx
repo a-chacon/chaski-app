@@ -35,7 +35,7 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
   }, [feed]);
 
   const setCurrentFilters = async () => {
-    let current_filters = await indexFilters(parseInt(feed.id || ""));
+    let current_filters = await indexFilters(parseInt(feed.id!.toString()));
     setFilters(current_filters);
   };
 
@@ -45,7 +45,7 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
       operator: "",
       value: "",
       logical_operator: "AND",
-      feed_id: parseInt(feed.id || ""),
+      feed_id: parseInt(feed.id!.toString()),
     });
 
     setFilters([...filters, { ...filter }]);

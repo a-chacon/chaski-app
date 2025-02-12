@@ -70,7 +70,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
       {header && (
         <Link
           to="/feeds/$feedId"
-          params={{ feedId: article.feed?.id ?? "" }}
+          params={{ feedId: article.feed!.id!.toString() }}
           className="flex gap-2 items-center pb-2"
         >
           <img

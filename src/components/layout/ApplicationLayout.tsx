@@ -169,7 +169,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const getCurrentConfigTheme = async () => {
     const store = await load('settings.json', { autoSave: false });
     const currentTheme = await store.get<{ value: string }>('theme');
-    handleSetCurrentTheme(currentTheme.value);
+    handleSetCurrentTheme(currentTheme!.value);
   };
 
   const handleSetCurrentTheme = async (newTheme: string) => {
@@ -177,7 +177,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     const currentTheme = await store.get<{ value: string }>('theme');
     await store.set('theme', { value: newTheme });
 
-    setThemeClasses(newTheme, currentTheme.value);
+    setThemeClasses(newTheme, currentTheme!.value);
     setCurrentTheme(newTheme);
   };
 

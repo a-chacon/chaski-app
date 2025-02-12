@@ -63,7 +63,7 @@ export default function Feed() {
   };
 
   const handleUpdateAllArticlesAsRead = async () => {
-    await updateArticlesAsReadByFeedId(parseInt(feed?.id || "1"));
+    await updateArticlesAsReadByFeedId(parseInt(feed!.id!.toString()));
     resetArticleList();
 
     addNotification("Updated", 'All entries were updated as read!', 'primary');
@@ -71,7 +71,7 @@ export default function Feed() {
 
   const handleRefreshArticles = async () => {
     setRefreshLoading(true);
-    await refreshArticles(parseInt(feed?.id || "1"));
+    await refreshArticles(parseInt(feed!.id!.toString()));
     resetArticleList();
     setRefreshLoading(false);
 

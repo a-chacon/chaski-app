@@ -14,16 +14,6 @@ interface FolderItemProps {
 const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) => {
   const [folder, setFolder] = useState(folderName);
   const [isOpen, setIsOpen] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseOver = () => {
-    setIsHovering(true);
-  };
-
-
-  const handleMouseOut = () => {
-    setIsHovering(false);
-  };
 
   const toggleFolder = () => {
     setIsOpen(prevState => !prevState);
@@ -31,8 +21,6 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) =
 
   return (
     <div className="folder-item pl-2"
-      onMouseOver={handleMouseOver}
-      onMouseOut={handleMouseOut}
     >
       <div className="folder-header flex items-center gap-0.5 pr-4" >
         <Button isIconOnly size='sm' variant='light' onPress={toggleFolder} className='rounded-md' >

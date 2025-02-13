@@ -3326,6 +3326,13 @@
   dependencies:
     "@tauri-apps/api" "^2.0.0"
 
+"@tauri-apps/plugin-os@~2":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-os/-/plugin-os-2.2.0.tgz#ef5511269f59c0ccc580a9d09600034cfaa9743b"
+  integrity sha512-HszbCdbisMlu5QhCNAN8YIWyz2v33abAWha6+uvV2CKX8P5VSct/y+kEe22JeyqrxCnWlQ3DRx7s49Byg7/0EA==
+  dependencies:
+    "@tauri-apps/api" "^2.0.0"
+
 "@tauri-apps/plugin-process@~2":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-process/-/plugin-process-2.2.0.tgz#e9f9b510374250967d2ba7d343a08c9024bdd473"

@@ -1,6 +1,6 @@
 [package]
 name = "chaski"
-version = "0.3.1"
+version = "0.3.0"
 description = "A beautifully designed, privacy-focused feed reader that keeps you updated."
 authors = ["a-chacon"]
 edition = "2021"
@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc", features = ["tray-icon"] }
+tauri = { version = "2.0.0-rc", features = ["tray-icon", "devtools"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dirs = "5.0"
@@ -47,6 +47,7 @@ readability-rs = "0.5.0"
 tauri-plugin-process = "2"
 tauri-plugin-store = "2"
 urlencoding = "2.1"
+tauri-plugin-os = "2"
 
 
 [features]

@@ -95,3 +95,8 @@ pub async fn export_opml(
 
     Ok(())
 }
+
+#[command]
+pub async fn get_env(name: &str) -> Result<String, ()> {
+    Ok(std::env::var(String::from(name)).unwrap_or(String::from("")))
+}

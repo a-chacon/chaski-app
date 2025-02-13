@@ -20,7 +20,7 @@
   },
   "productName": "Chaski",
   "mainBinaryName": "chaski",
-  "version": "0.3.1",
+  "version": "0.3.0",
   "identifier": "com.chaski.app",
   "plugins": {
     "updater": {

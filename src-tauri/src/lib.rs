@@ -41,6 +41,7 @@ use tauri_plugin_store::StoreExt;
 pub fn run() {
     let ctx = tauri::generate_context!();
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = app
@@ -123,6 +124,7 @@ pub fn run() {
             commands::articles::update_articles_as_read_by_feed_id,
             commands::feeds::collect_feed_content,
             commands::utils::full_text_search,
+            commands::utils::get_env,
             commands::filters::create_filter,
             commands::filters::update_filter,
             commands::filters::destroy_filter,

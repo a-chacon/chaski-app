@@ -32,22 +32,69 @@
 - **Auto-discovery of RSS/Atom**: The app will automatically find the URL when possible.
 - **Modern UI**: A clean, soft, and modern interface that helps you focus on reading without distractions.
 - **Dark/Light Mode**: Switch between dark and light modes for optimal viewing.
+- **Multiple Themes**: Choose from multiple themes to customize your reading experience.
 - **Import/Export OPML**: Import and export your feeds in OPML format.
 - **Organize Feeds in Folders**: Categorize your feeds for better organization.
 - **Customizable Filters**: Configure custom filters for each feed.
 - **New Entry Notifications**: Get notified when new content is available.
 - **Configurable Fonts**: Choose and customize your preferred fonts for reading.
-- **Built with Tauri**: A cross-platform app that works on Linux, Windows, and macOS. Android support coming soon.
+- **Multiple Account Support**: Manage both local accounts and Google Reader API-compliant accounts like FreshRSS, Miniflux, and TinyTiny RSS.
+- **API Sync with Google Reader API**: Sync your feeds with popular services like **FreshRSS**, **Miniflux**, and **TinyTiny RSS** for a seamless experience. Notice this is work in progress.
 - **Full-Text Search**: Search through your articles with ease.
 - **Read Full Articles**: View the complete text of articles directly in the app.
 - **Offline Mode**: Access your content even when you're offline.
+- **Built with Tauri**: A cross-platform app that works on Linux, Windows, and macOS. Android support coming soon.
 - **User Feedback**: I read and value your feedback to improve the app further!
 
 ### On the Roadmap
 
-- **Multilingual Support**: Adding at least Spanish language support.
-- **Android Version**: Compile and release for Android.
-- **Google News Sitemap Support**: Support for news sites that don't have an RSS/Atom feed but offer Google News sitemaps.
+- [ ] **Multiple Content Views**
+
+  - [ ] Video Content
+  - [ ] Podcast Content
+  - [ ] Image Content
+  - [ x] Article Content
+
+- [ ] **Multiple Accounts Support** (In Progress)
+
+  - [x] Local account management
+    - [x] Create/Delete local RSS/ATOM accounts.
+    - [x] Export/Import OPML
+  - [ ] **Google Reader API**. (FreshRSS, Miniflux, TinyTiny Rss, etc.)
+    - [x] Login
+    - [x] Sync Subscriptions/Feeds
+    - [x] Create/Update/Delete Subscription/feed
+    - [x] Sync Folder/Category
+    - [x] Create/Update/Delete Folder/Category
+    - [ ] Sync Entries/Articles Read/Unread
+  - [ ] **Bluesky**.
+    - [ ] Login
+    - [ ] Sync Feed
+    - [ ] Create Post
+      - [ ] Create Post from RSS/ATOM entry. (Easy share)
+  - [ ] **Mastodon**.
+    - [ ] Login
+    - [ ] Sync Feed
+    - [ ] Create Post
+      - [ ] Create Post from RSS/ATOM entry. (Easy share)
+
+- [ ] **Offline Mode Enhancements**
+
+  - [ ] Improve offline article caching
+  - [ ] Add offline reading indicators
+  - [ ] Implement background sync
+
+- [ ] **Multilingual Support**
+
+  - [ ] Add Spanish language support
+  - [ ] Add support for additional languages
+
+- [ ] **Mobile Version**
+
+  - [ ] Compile for Android
+  - [ ] Release Android version
+  - [ ] Compile for IOS
+  - [ ] Release IOS version
 
 ## Download
 

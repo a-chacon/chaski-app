@@ -21,7 +21,7 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
   return (
     <Card className="w-full">
       <CardHeader className="flex justify-between">
-        <Link to="/feeds/$feedId" params={{ feedId: currentFeed.id!.toString() }}>
+        <Link to="/feeds/$feedId" params={{ feedId: currentFeed.id?.toString() || "" }}>
           <div className="flex gap-5">
             <img
               alt={currentFeed.title}

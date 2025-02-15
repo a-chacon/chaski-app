@@ -61,6 +61,7 @@ pub struct Feed {
     pub updated_at: NaiveDateTime,
     pub account_id: Option<i32>,
     pub external_id: Option<String>,
+    pub default_content_type: String,
 }
 
 #[derive(QueryableByName, Queryable, Debug, Serialize)]
@@ -92,6 +93,7 @@ pub struct NewFeed {
     pub update_interval_minutes: i32,
     pub account_id: Option<i32>,
     pub external_id: Option<String>,
+    pub default_content_type: String,
 }
 
 #[derive(
@@ -124,6 +126,7 @@ pub struct Article {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub external_id: Option<String>,
+    pub content_type: String,
 }
 
 #[derive(Insertable, Debug)]
@@ -141,6 +144,7 @@ pub struct NewArticle {
     pub author: Option<String>,
     pub feed_id: i32,
     pub external_id: Option<String>,
+    pub content_type: String,
 }
 
 #[derive(Debug, PartialEq, Queryable, Selectable, Serialize)]
@@ -158,6 +162,7 @@ pub struct ShortArticle {
     pub feed_id: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub content_type: String,
 }
 
 #[derive(Serialize)]
@@ -254,6 +259,7 @@ impl From<rss::Channel> for NewFeed {
             update_interval_minutes: update_interval,
             account_id: None,
             external_id: None,
+            default_content_type: String::from("article"),
         }
     }
 }
@@ -283,6 +289,7 @@ impl From<atom_syndication::Feed> for NewFeed {
             update_interval_minutes: update_interval,
             account_id: None,
             external_id: None,
+            default_content_type: String::from("article"),
         }
     }
 }
@@ -302,6 +309,7 @@ impl NewArticle {
             hide: 0,
             author: item.author,
             external_id: None,
+            content_type: feed.default_content_type.clone(),
         }
     }
 
@@ -319,8 +327,9 @@ impl NewArticle {
             read_later: 0,
             read: 0,
             hide: 0,
-            author: Some(String::from("aa")), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
+            author: Some(feed.title.clone()), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
             external_id: None,
+            content_type: feed.default_content_type.clone(),
         }
     }
 }

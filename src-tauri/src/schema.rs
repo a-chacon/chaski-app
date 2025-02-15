@@ -38,6 +38,7 @@ diesel::table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         external_id -> Nullable<Text>,
+        content_type -> Text,
     }
 }
 
@@ -83,6 +84,7 @@ diesel::table! {
         updated_at -> Timestamp,
         account_id -> Nullable<Integer>,
         external_id -> Nullable<Text>,
+        default_content_type -> Text,
     }
 }
 

@@ -22,6 +22,7 @@ export interface FeedInterface {
   notifications_enabled: number;
   unread_count: number;
   account_id: number;
+  default_content_type: string;
 }
 
 export interface ArticleInterface {
@@ -37,6 +38,7 @@ export interface ArticleInterface {
   hide: number;
   author: string;
   feed?: FeedInterface;
+  content_type: string;
 }
 
 export interface FilterInterface {

@@ -1,7 +1,8 @@
 import { Spinner } from "@heroui/react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ArticleInterface } from "../interfaces";
-import ArticleCard from "./ArticleCard";
+import CommentCard from "./EntryViews/Comment/CommentCard";
+import ArticleCard from "./EntryViews/Article/ArticleCard";
 import ArticleLayoutSwitch from "./ArticlesLayoutSwitch";
 import { useAppContext } from "../AppContext";
 
@@ -54,7 +55,8 @@ function EntriesList({
         }
       >
         {articles.map((article) => {
-          switch (article.content_type) {
+          console.log(article.entry_type)
+          switch (article.entry_type) {
             // case 'podcast':
             //   return (
             //     <PodcastCard
@@ -63,22 +65,22 @@ function EntriesList({
             //       header={header}
             //     />
             //   );
-            case 'image':
-              return (
-                <ImageCard
-                  key={article.id}
-                  article={article}
-                  header={header}
-                />
-              );
-            case 'video':
-              return (
-                <VideoCard
-                  key={article.id}
-                  article={article}
-                  header={header}
-                />
-              );
+            // case 'image':
+            //   return (
+            //     <ImageCard
+            //       key={article.id}
+            //       article={article}
+            //       header={header}
+            //     />
+            //   );
+            // case 'video':
+            //   return (
+            //     <VideoCard
+            //       key={article.id}
+            //       article={article}
+            //       header={header}
+            //     />
+            //   );
             case 'comment':
               return (
                 <CommentCard

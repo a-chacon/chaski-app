@@ -79,9 +79,9 @@ pub async fn scrape_site_feeds(link: String) -> Result<Vec<NewFeed>, Box<dyn std
     let body = String::from_utf8_lossy(&body_bytes);
 
     if body.contains("<rss") {
-        add_rss_feed(&body_bytes, &mut new_feeds, &link)?;
+        add_rss_feed(&body_bytes, &mut new_feeds, &link).await?;
     } else if body.contains("<feed") {
-        add_atom_feed(&body_bytes, &mut new_feeds, &link)?;
+        add_atom_feed(&body_bytes, &mut new_feeds, &link).await?;
     } else if body.contains("<html") {
         extract_feeds_from_html(body.to_string(), &mut new_feeds, &link).await?;
     }
@@ -93,7 +93,7 @@ pub async fn scrape_site_feeds(link: String) -> Result<Vec<NewFeed>, Box<dyn std
     Ok(new_feeds)
 }
 
-fn add_rss_feed(
+async fn add_rss_feed(
     body_bytes: &[u8],
     new_feeds: &mut Vec<NewFeed>,
     link: &str,
@@ -103,28 +103,37 @@ fn add_rss_feed(
     new_feed.link = String::from(link);
 
     if new_feed.icon.is_none() {
-        //TODO: this should be an scrape to the base url
-        let body_str = String::from_utf8_lossy(body_bytes);
-        new_feed.icon = Some(parse_html_for_favicon(&body_str, link));
+        let client = create_async_client()?;
+        let response = client.get(link).send().await?;
+
+        if response.status().is_success() {
+            let body = response.bytes().await?;
+            let body_str = String::from_utf8_lossy(&body);
+            new_feed.icon = Some(parse_html_for_favicon(&body_str, link));
+        }
     }
 
     new_feeds.push(new_feed);
     Ok(())
 }
 
-fn add_atom_feed(
+async fn add_atom_feed(
     body_bytes: &[u8],
     new_feeds: &mut Vec<NewFeed>,
     link: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let feed = atom_syndication::Feed::read_from(body_bytes)?;
     let mut new_feed = NewFeed::from(feed);
-
     new_feed.link = String::from(link);
+
     if new_feed.icon.is_none() {
-        //TODO: this should be an scrape to the base url
-        let body_str = String::from_utf8_lossy(body_bytes);
-        new_feed.icon = Some(parse_html_for_favicon(&body_str, link));
+        let client = create_async_client()?;
+        let response = client.get(link).send().await?;
+        if response.status().is_success() {
+            let body = response.bytes().await?;
+            let body_str = String::from_utf8_lossy(&body);
+            new_feed.icon = Some(parse_html_for_favicon(&body_str, link));
+        }
     }
 
     new_feeds.push(new_feed);
@@ -149,9 +158,9 @@ async fn extract_feeds_from_html(
             let feed_body_str = String::from_utf8_lossy(&feed_body_bytes);
 
             if feed_body_str.contains("<rss") {
-                add_rss_feed(&feed_body_bytes, new_feeds, href_url.as_str())?;
+                add_rss_feed(&feed_body_bytes, new_feeds, href_url.as_str()).await?;
             } else if feed_body_str.contains("<feed") {
-                add_atom_feed(&feed_body_bytes, new_feeds, href_url.as_str())?;
+                add_atom_feed(&feed_body_bytes, new_feeds, href_url.as_str()).await?;
             }
         }
     }
@@ -181,7 +190,6 @@ fn parse_html_for_favicon(body: &str, base_url: &str) -> String {
     let document = Html::parse_document(body);
     let selector = Selector::parse("link").unwrap();
 
-    // Try to find the favicon in the HTML
     for element in document.select(&selector) {
         if let Some(rel) = element.value().attr("rel") {
             if rel == "icon" || rel == "shortcut icon" {
@@ -197,12 +205,10 @@ fn parse_html_for_favicon(body: &str, base_url: &str) -> String {
         }
     }
 
-    // If no favicon was found, return the default favicon URL
     if let Ok(base) = Url::parse(base_url) {
         return base.join("/favicon.ico").unwrap().to_string();
     }
 
-    // Fallback in case of a parse error (should not happen with valid base URLs)
     String::from("/favicon.ico")
 }
 
@@ -225,9 +231,9 @@ async fn autodiscover_feeds(
             let feed_url_str = feed_url.as_str();
 
             if feed_body_str.contains("<rss") {
-                add_rss_feed(&feed_body_bytes, new_feeds, feed_url_str)?;
+                add_rss_feed(&feed_body_bytes, new_feeds, feed_url_str).await?;
             } else if feed_body_str.contains("<feed") {
-                add_atom_feed(&feed_body_bytes, new_feeds, feed_url_str)?;
+                add_atom_feed(&feed_body_bytes, new_feeds, feed_url_str).await?;
             }
         }
 
@@ -241,9 +247,9 @@ async fn autodiscover_feeds(
                 let root_url_str = root_url.as_str();
 
                 if root_body_str.contains("<rss") {
-                    add_rss_feed(&root_body_bytes, new_feeds, root_url_str)?;
+                    add_rss_feed(&root_body_bytes, new_feeds, root_url_str).await?;
                 } else if root_body_str.contains("<feed") {
-                    add_atom_feed(&root_body_bytes, new_feeds, root_url_str)?;
+                    add_atom_feed(&root_body_bytes, new_feeds, root_url_str).await?;
                 }
             }
         }

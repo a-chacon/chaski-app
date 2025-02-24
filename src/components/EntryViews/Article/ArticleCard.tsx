@@ -114,7 +114,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
 
         {article.image && (
-          <Link
+          < Link
             to="/articles/$articleId"
             params={{ articleId: article.id?.toString() || "" }}
             className={imageWrapper}
@@ -127,7 +127,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
           </Link>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

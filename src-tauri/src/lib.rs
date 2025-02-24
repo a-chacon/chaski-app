@@ -15,6 +15,7 @@ mod entities {
 
 mod utils {
     pub(crate) mod article_extractor;
+    pub(crate) mod detect_entry_type;
     pub(crate) mod notifications;
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;

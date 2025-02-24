@@ -5,7 +5,7 @@ import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useEffect } from 'react'
 import { ArticleInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
-import IndexArticles from '../components/IndexArticles'
+import EntriesList from '../components/EntriesList'
 import { useArticles } from '../IndexArticlesContext'
 import { useNotification } from '../NotificationContext'
 import { updateAllArticlesAsRead } from '../helpers/feedsData'
@@ -83,7 +83,7 @@ export default function App() {
                 isIconOnly
                 variant="light"
                 size="sm"
-                onClick={handleUpdateArticlesAsRead}
+                onPress={handleUpdateArticlesAsRead}
               >
                 <RiCheckDoubleLine></RiCheckDoubleLine>
               </Button>
@@ -94,14 +94,14 @@ export default function App() {
                 isIconOnly
                 variant="light"
                 size="sm"
-                onClick={handleReloadButton}
+                onPress={handleReloadButton}
               >
                 <RiRefreshLine></RiRefreshLine>
               </Button>
             </Tooltip>
           </div>
         </div>
-        <IndexArticles
+        <EntriesList
           key="index"
           articles={articles}
           fetchArticles={fetchArticles}

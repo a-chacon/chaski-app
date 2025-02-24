@@ -191,7 +191,7 @@ pub async fn create_list(
     let conn = &mut establish_connection(&app_handle);
 
     let existing_links: Vec<String> = articles
-        .filter(feed_id.eq(list_articles[0].feed_id)) // Assuming feed_id is consistent for all articles
+        .filter(feed_id.eq(list_articles[0].feed_id))
         .select(articles::link)
         .load(conn)
         .unwrap_or_else(|_| Vec::new());
@@ -202,7 +202,10 @@ pub async fn create_list(
         .collect();
 
     for mut new_article in filtered_articles {
-        new_article = complete_article(new_article).await;
+        if new_article.entry_type == "article" {
+            new_article = complete_article(new_article).await;
+        }
+
         let result = diesel::insert_into(articles)
             .values(new_article)
             .returning(Article::as_returning())

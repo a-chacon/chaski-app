@@ -16,7 +16,7 @@ import {
 } from '@heroui/react'
 import { RiRefreshLine, RiDownloadCloudLine, RiDeleteBinLine, RiDownloadLine } from "@remixicon/react";
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import IndexArticles from '../components/IndexArticles'
+import EntriesList from '../components/EntriesList';
 import { useAppContext } from "../AppContext";
 import { useArticles } from '../IndexArticlesContext'
 import { useNavigate } from '@tanstack/react-router';
@@ -226,7 +226,7 @@ export default function RouteComponent() {
             </div>
           </div>
         </div>
-        <IndexArticles
+        <EntriesList
           key={accountId}
           articles={articles}
           fetchArticles={fetchArticles}

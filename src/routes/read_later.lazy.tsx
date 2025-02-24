@@ -5,7 +5,7 @@ import { RiRefreshLine } from '@remixicon/react'
 import { useEffect } from 'react'
 import { ArticleInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
-import IndexArticles from '../components/IndexArticles'
+import EntriesList from '../components/EntriesList'
 import { useArticles } from '../IndexArticlesContext'
 
 export const Route = createLazyFileRoute('/read_later')({
@@ -64,7 +64,7 @@ export default function ReadLater() {
             </Button>
           </div>
         </div>
-        <IndexArticles
+        <EntriesList
           key="index"
           articles={articles}
           fetchArticles={fetchArticles}

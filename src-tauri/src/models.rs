@@ -61,7 +61,7 @@ pub struct Feed {
     pub updated_at: NaiveDateTime,
     pub account_id: Option<i32>,
     pub external_id: Option<String>,
-    pub default_content_type: String,
+    pub default_entry_type: String,
 }
 
 #[derive(QueryableByName, Queryable, Debug, Serialize)]
@@ -93,7 +93,7 @@ pub struct NewFeed {
     pub update_interval_minutes: i32,
     pub account_id: Option<i32>,
     pub external_id: Option<String>,
-    pub default_content_type: String,
+    pub default_entry_type: String,
 }
 
 #[derive(
@@ -126,6 +126,7 @@ pub struct Article {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub external_id: Option<String>,
+    pub entry_type: String,
     pub content_type: String,
 }
 
@@ -144,6 +145,7 @@ pub struct NewArticle {
     pub author: Option<String>,
     pub feed_id: i32,
     pub external_id: Option<String>,
+    pub entry_type: String,
     pub content_type: String,
 }
 
@@ -162,6 +164,7 @@ pub struct ShortArticle {
     pub feed_id: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub entry_type: String,
     pub content_type: String,
 }
 
@@ -259,7 +262,7 @@ impl From<rss::Channel> for NewFeed {
             update_interval_minutes: update_interval,
             account_id: None,
             external_id: None,
-            default_content_type: String::from("article"),
+            default_entry_type: String::from("article"),
         }
     }
 }
@@ -289,7 +292,7 @@ impl From<atom_syndication::Feed> for NewFeed {
             update_interval_minutes: update_interval,
             account_id: None,
             external_id: None,
-            default_content_type: String::from("article"),
+            default_entry_type: String::from("article"),
         }
     }
 }
@@ -309,7 +312,8 @@ impl NewArticle {
             hide: 0,
             author: item.author,
             external_id: None,
-            content_type: feed.default_content_type.clone(),
+            entry_type: feed.default_entry_type.clone(),
+            content_type: String::from("text/html"),
         }
     }
 
@@ -329,7 +333,8 @@ impl NewArticle {
             hide: 0,
             author: Some(feed.title.clone()), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
             external_id: None,
-            content_type: feed.default_content_type.clone(),
+            entry_type: feed.default_entry_type.clone(),
+            content_type: String::from("text/html"),
         }
     }
 }

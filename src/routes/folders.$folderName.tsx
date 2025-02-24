@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import IndexArticles from '../components/IndexArticles'
+import EntriesList from '../components/EntriesList'
 import { useArticles } from '../IndexArticlesContext'
 import { Button, Tooltip } from '@heroui/react'
 import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
@@ -103,7 +103,7 @@ export default function Folder() {
             </div>
           </div>
         </div>
-        <IndexArticles
+        <EntriesList
           key={folderParam}
           articles={articles}
           fetchArticles={fetchArticles}

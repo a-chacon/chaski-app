@@ -54,7 +54,6 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
             found_articles,
             filters::index(filter_filters, app_handle.clone()),
         );
-
         let limit = feed.entry_limit.max(0) as usize;
         let limited_articles = final_articles.into_iter().take(limit).collect::<Vec<_>>();
 

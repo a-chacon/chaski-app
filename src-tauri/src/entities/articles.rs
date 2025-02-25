@@ -202,7 +202,9 @@ pub async fn create_list(
         .collect();
 
     for mut new_article in filtered_articles {
-        if new_article.entry_type == "article" {
+        if new_article.entry_type == "article"
+            && (new_article.image.is_none() || new_article.content.is_none())
+        {
             new_article = complete_article(new_article).await;
         }
 

@@ -93,11 +93,22 @@ const CommentCard: React.FC<CommentCardProps> = ({
 
           {article.image && (
             <div className="w-full">
-              <img
-                className="rounded-xl object-cover w-full h-auto aspect-video"
-                src={article.image}
-                alt={article.title}
-              />
+              {article.content_type?.startsWith('image/') && (
+                <img
+                  className="rounded-xl object-cover w-full h-auto aspect-video"
+                  src={article.image}
+                  alt={article.title}
+                />
+              )}
+              {article.content_type?.startsWith('video/') && (
+                <video
+                  className="rounded-xl object-cover w-full h-auto aspect-video"
+                  controls
+                >
+                  <source src={article.image} type={article.content_type} />
+                  Your browser does not support the video tag.
+                </video>
+              )}
             </div>
           )}
         </div>

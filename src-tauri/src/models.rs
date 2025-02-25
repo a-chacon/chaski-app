@@ -299,21 +299,38 @@ impl From<atom_syndication::Feed> for NewFeed {
 
 impl NewArticle {
     pub fn from_feed_and_item(feed: &Feed, item: rss::Item) -> Self {
+        let mut image = None;
+        let mut content_type = String::from("text/html");
+
+        let extensions = item.extensions();
+        if let Some(media_map) = extensions.get("media") {
+            if let Some(contents) = media_map.get("content") {
+                if let Some(first_content) = contents.first() {
+                    if let Some(url) = first_content.attrs.get("url").cloned() {
+                        image = Some(url);
+                        if let Some(media_type) = first_content.attrs.get("type").cloned() {
+                            content_type = media_type;
+                        }
+                    }
+                }
+            }
+        }
+
         NewArticle {
             feed_id: feed.id,
             title: item.title,
             link: item.link.unwrap_or(feed.link.clone()),
-            image: Some(String::from("")),
+            image,
             pub_date: parse_rfc822_to_naive_datetime(item.pub_date),
             description: crate::core::common::remove_html_tags(item.description),
-            content: item.content,
+            content: item.content.clone(),
             read_later: 0,
             read: 0,
             hide: 0,
             author: item.author,
             external_id: None,
             entry_type: feed.default_entry_type.clone(),
-            content_type: String::from("text/html"),
+            content_type,
         }
     }
 

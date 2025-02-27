@@ -183,6 +183,49 @@ pub async fn full_text_search(text: &String, app_handle: tauri::AppHandle) -> Ve
         .expect("Error loading feeds")
 }
 
+pub fn trim_feed_history(feed: Feed, app_handle: tauri::AppHandle) {
+    let conn = &mut establish_connection(&app_handle);
+
+    if feed.history_limit <= 0 {
+        return;
+    }
+
+    let article_count: i64 = articles::table
+        .filter(articles::feed_id.eq(feed.id))
+        .filter(articles::read_later.ne(1))
+        .count()
+        .get_result(conn)
+        .expect("Error counting articles");
+
+    if article_count <= feed.history_limit as i64 {
+        return;
+    }
+
+    let to_delete = article_count - feed.history_limit as i64;
+
+    let delete_ids: Vec<i32> = articles::table
+        .filter(articles::feed_id.eq(feed.id))
+        .filter(articles::read_later.ne(1))
+        .order(articles::pub_date.asc())
+        .select(articles::id)
+        .limit(to_delete)
+        .load(conn)
+        .expect("Error getting article IDs to delete");
+
+    let result = diesel::delete(articles::table)
+        .filter(articles::id.eq_any(delete_ids))
+        .execute(conn);
+
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:articles","Trimmed {} articles from feed {}", count, feed.id);
+        }
+        Err(e) => {
+            log::error!(target: "chaski:articles","Error trimming feed {} history: {}", feed.id, e);
+        }
+    }
+}
+
 pub async fn create_list(
     list_articles: Vec<NewArticle>,
     app_handle: tauri::AppHandle,

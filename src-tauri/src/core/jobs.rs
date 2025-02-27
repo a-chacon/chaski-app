@@ -62,6 +62,7 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
 
             let created_articles =
                 articles::create_list(limited_articles, app_handle.clone()).await;
+            articles::trim_feed_history(feed.clone(), app_handle.clone());
             notify_new_entries(app_handle.clone(), feed, created_articles);
         } else {
             log::info!(

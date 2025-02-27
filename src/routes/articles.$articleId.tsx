@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { ArticleInterface } from "../interfaces";
 import parse from "html-react-parser";
 import ArticleActions from "../components/ArticleActions";
+import ThumbnailOrMedia from "../components/ThumbnailOrMedia";
 import ArticleShare from "../components/ArticleShare";
-import { RiArrowLeftLine } from "@remixicon/react";
-import { getArticle, updateArticleAsRead } from "../helpers/articlesData";
+import { RiArrowLeftLine, RiImportLine } from "@remixicon/react";
+import { Tooltip, Button } from "@heroui/react";
+import { getArticle, updateArticleAsRead, scrapeAndUpdateArticle } from "../helpers/articlesData";
 import { useAppContext } from "../AppContext";
 
 export const Route = createFileRoute("/articles/$articleId")({
@@ -17,6 +19,7 @@ function Article() {
   const { articleId } = Route.useParams();
   const [article, setArticle] = useState<ArticleInterface>();
   const { setSideBarOpen } = useAppContext();
+  const [isFetchingContent, setIsFetchingContent] = useState(false);
 
   const {
     currentTheme,
@@ -40,7 +43,7 @@ function Article() {
     article && (
       <MainSectionLayout>
         <div className="flex flex-col p-4 mx-auto max-w-prose">
-          <div className="mx-2 flex justify-between bg-primary-100 border border-primary-500 sticky top-3 p-2 rounded-xl shadow-xl">
+          <div className="mx-2 flex justify-between bg-primary-100 border border-primary-500 sticky top-3 p-1.5 rounded-xl shadow-xl">
             <div className="flex flex-row">
               <ArticleActions
                 compact={false}
@@ -48,9 +51,41 @@ function Article() {
                 setArticle={setArticle}
                 backAfterAction={true}
               >
-                <a href="#" onClick={() => history.back()}>
+                <Button
+                  color="primary"
+                  variant="flat"
+                  isIconOnly
+                  size="sm"
+                  onPress={() => history.back()}
+                >
                   <RiArrowLeftLine className="text-primary-500" />
-                </a>
+                </Button>
+
+                <Tooltip content="Fetch original article content">
+                  <Button
+                    color="primary"
+                    variant="light"
+                    isLoading={isFetchingContent}
+                    isIconOnly
+                    size="sm"
+                    onPress={() => {
+                      setIsFetchingContent(true);
+                      scrapeAndUpdateArticle(article.id!)
+                        .then(updatedArticle => {
+                          setArticle({
+                            ...article,
+                            ...updatedArticle
+                          });
+                        })
+                        .catch(error => {
+                          console.error("Failed to refresh article:", error);
+                        })
+                        .finally(() => setIsFetchingContent(false));
+                    }}
+                  >
+                    <RiImportLine className="w-6" />
+                  </Button>
+                </Tooltip>
               </ArticleActions>
             </div>
             <ArticleShare article={article} />
@@ -74,15 +109,12 @@ function Article() {
               <h1 className="text-xl md:text-3xl font-semibold">
                 {article.title}
               </h1>
-              <span>Author: {article.author ? article.author : ""}</span>
             </div>
-            {article.image && (
-              <img
-                src={article.image}
-                alt={article.title}
-                className="my-auto rounded-xl"
-              />
-            )}
+
+            <ThumbnailOrMedia
+              article={article}
+            />
+
           </div>
           <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
             <p className="py-6 line-clamp-3">

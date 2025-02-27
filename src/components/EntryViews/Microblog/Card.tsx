@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { Tooltip } from "@heroui/react";
 import { RiExternalLinkLine } from "@remixicon/react";
 import { useAppContext } from "../../../AppContext";
+import ThumbnailOrMedia from "../../ThumbnailOrMedia";
 import { updateArticleAsRead } from "../../../helpers/articlesData";
 
 interface CommentCardProps {
@@ -28,7 +29,7 @@ const layoutStyles: LayoutStyles = {
   },
 };
 
-const CommentCard: React.FC<CommentCardProps> = ({
+const MicroblogCard: React.FC<CommentCardProps> = ({
   article: inputArticle,
 }) => {
   const [article, setArticle] = useState(inputArticle);
@@ -51,7 +52,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
   return (
     <div
       key={article.id}
-      className={`p-2 py-4 mb-6 rounded-xl border-default-500 ${article.read ? "opacity-75" : ""} ${article.hide ? "hidden" : ""}`}
+      className={`p-2 py-4 mb-6 rounded-xl border-default-500 max-w-prose mx-auto ${article.read ? "opacity-75" : ""} ${article.hide ? "hidden" : ""}`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
     >
@@ -91,26 +92,9 @@ const CommentCard: React.FC<CommentCardProps> = ({
             {article.description}
           </p>
 
-          {article.image && (
-            <div className="w-full">
-              {article.content_type?.startsWith('image/') && (
-                <img
-                  className="rounded-xl object-cover w-full h-auto aspect-video"
-                  src={article.image}
-                  alt={article.title}
-                />
-              )}
-              {article.content_type?.startsWith('video/') && (
-                <video
-                  className="rounded-xl object-cover w-full h-auto aspect-video"
-                  controls
-                >
-                  <source src={article.image} type={article.content_type} />
-                  Your browser does not support the video tag.
-                </video>
-              )}
-            </div>
-          )}
+          <ThumbnailOrMedia
+            article={article}
+          />
         </div>
 
         <div className={`flex justify-end ${isHovering ? 'visible' : 'invisible'}`}>
@@ -130,5 +114,4 @@ const CommentCard: React.FC<CommentCardProps> = ({
   );
 };
 
-export default CommentCard;
-
+export default MicroblogCard;

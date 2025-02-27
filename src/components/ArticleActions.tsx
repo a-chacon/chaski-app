@@ -7,7 +7,7 @@ import {
   RiCloseLine
 } from "@remixicon/react";
 import { ArticleInterface } from "../interfaces";
-import { Tooltip } from "@heroui/react";
+import { Tooltip, Button, Link } from "@heroui/react";
 import {
   updateArticleAsRead,
   updateArticleAsUnRead,
@@ -128,16 +128,25 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
     if (compact) {
       return (
         <Tooltip content="Hide">
-          <button onClick={() => handleHideArticle(article)}>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            onPress={() => handleHideArticle(article)}
+          >
             <RiCloseLine className="w-6" />
-          </button>
+          </Button>
         </Tooltip>
       )
     } else {
       return (
         <Tooltip content={"Visit Website: " + article.link} className="w-80">
-          <a href={article.link} target="_blank">
-            <RiExternalLinkLine className="w-6"></RiExternalLinkLine>
+          <a
+            href={article.link}
+            target="_blank"
+          >
+            <RiExternalLinkLine className="w-6" />
           </a>
         </Tooltip>
       )
@@ -145,34 +154,58 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
   }
 
   return (
-    <div className={"flex gap-2 " + className}>
+    <div className={"flex items-center gap-1 " + className}>
       {children}
 
       {!readLater ? (
         <Tooltip content="Mark for Read Later">
-          <button onClick={() => handleMarkReadLater(article)}>
-            <RiBookmarkLine className="w-6"></RiBookmarkLine>
-          </button>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            onPress={() => handleMarkReadLater(article)}
+          >
+            <RiBookmarkLine className="w-6" />
+          </Button>
         </Tooltip>
       ) : (
         <Tooltip content="Unmark Read Later">
-          <button onClick={() => handleUnMarkReadLater(article)}>
-            <RiBookmarkFill className="w-6"></RiBookmarkFill>
-          </button>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            onPress={() => handleUnMarkReadLater(article)}
+          >
+            <RiBookmarkFill className="w-6" />
+          </Button>
         </Tooltip>
       )}
 
       {read ? (
         <Tooltip content="Mark as unRead">
-          <button onClick={() => handleMarkAsUnread(article)}>
-            <RiCheckDoubleLine className="w-6"></RiCheckDoubleLine>
-          </button>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            onPress={() => handleMarkAsUnread(article)}
+          >
+            <RiCheckDoubleLine className="w-6" />
+          </Button>
         </Tooltip>
       ) : (
         <Tooltip content="Mark as Read">
-          <button onClick={() => handleMarkAsRead(article)}>
-            <RiCheckLine className="w-6"></RiCheckLine>
-          </button>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            onPress={() => handleMarkAsRead(article)}
+          >
+            <RiCheckLine className="w-6" />
+          </Button>
         </Tooltip>
       )}
 

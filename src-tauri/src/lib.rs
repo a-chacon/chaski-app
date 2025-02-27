@@ -142,6 +142,7 @@ pub fn run() {
             commands::accounts::full_sync,
             commands::accounts::show_account,
             commands::accounts::destroy_account,
+            commands::articles::scrape_and_update_article
         ])
         .run(ctx)
         .expect("error while building tauri application");

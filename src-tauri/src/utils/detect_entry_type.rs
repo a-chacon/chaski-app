@@ -27,11 +27,11 @@ struct EntryTypeDetector {
 impl EntryTypeDetector {
     fn new() -> Self {
         let patterns = vec![
-            EntryTypePattern::new(r"(@[^/]+\.rss)", "comment"),
-            EntryTypePattern::new(r"(twitter\.com|x\.com|nitter\.net|bsky\.app)", "comment"),
+            EntryTypePattern::new(r"(@[^/]+\.rss)", "microblog"),
+            EntryTypePattern::new(r"(twitter\.com|x\.com|nitter\.net|bsky\.app)", "microblog"),
             EntryTypePattern::new(r"(instagram\.com|pixelfed\.social|pixelfed\.org)", "image"),
             EntryTypePattern::new(r"(youtube\.com|youtu\.be|vimeo\.com)", "video"),
-            EntryTypePattern::new(r"/status/|/post/", "comment"),
+            EntryTypePattern::new(r"/status/|/post/", "microblog"),
             EntryTypePattern::new(r"/photo/|/image/", "image"),
             EntryTypePattern::new(r"/video/|/watch", "video"),
         ];
@@ -77,11 +77,11 @@ mod tests {
         // Test social media patterns
         assert_eq!(
             detect_entry_type("https://twitter.com/user/status/123"),
-            "comment"
+            "microblog"
         );
         assert_eq!(
             detect_entry_type("https://x.com/user/status/123"),
-            "comment"
+            "microblog"
         );
         assert_eq!(detect_entry_type("https://instagram.com/p/abc123"), "image");
         assert_eq!(
@@ -97,21 +97,21 @@ mod tests {
         // Test Mastodon patterns
         assert_eq!(
             detect_entry_type("https://mastodon.social/@user/123"),
-            "comment"
+            "microblog"
         );
         assert_eq!(
             detect_entry_type("https://example.com/@username.rss"),
-            "comment"
+            "microblog"
         );
         assert_eq!(
             detect_entry_type("https://mastodon.example.com/users/username"),
-            "comment"
+            "microblog"
         );
 
         // Test path-based detection
         assert_eq!(
             detect_entry_type("https://example.com/status/123"),
-            "comment"
+            "microblog"
         );
         assert_eq!(detect_entry_type("https://example.com/photo/123"), "image");
         assert_eq!(detect_entry_type("https://example.com/video/123"), "video");

@@ -116,3 +116,26 @@ export const updateArticleAsReadAndHide = async (article: ArticleInterface) => {
     return article;
   }
 };
+
+export const scrapeAndUpdateArticle = async (articleId: number): Promise<ArticleInterface> => {
+  try {
+    const message = await invoke<string>("scrape_and_update_article", {
+      articleId: articleId
+    });
+
+    const response: { success: boolean; message: string; data?: ArticleInterface } = JSON.parse(message);
+
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+
+    if (!response.data) {
+      throw new Error("Article data not found in response");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error scraping and updating article:", error);
+    throw error instanceof Error ? error : new Error("Failed to scrape and update article");
+  }
+};

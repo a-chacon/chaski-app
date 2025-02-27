@@ -22,10 +22,10 @@ pub async fn complete_article(mut article: NewArticle) -> NewArticle {
                     .description
                     .unwrap_or(article.description.unwrap_or_default()),
             );
-            article.image = Some(
+            article.thumbnail = Some(
                 article_page_data
                     .image
-                    .unwrap_or(article.image.unwrap_or_default()),
+                    .unwrap_or(article.thumbnail.unwrap_or_default()),
             );
             article.content = Some(
                 article_page_data

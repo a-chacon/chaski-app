@@ -29,7 +29,7 @@ export interface ArticleInterface {
   id?: number;
   title: string;
   link: string;
-  image: string;
+  thumbnail: string;
   pub_date: Date;
   description: string;
   content: string;
@@ -39,7 +39,8 @@ export interface ArticleInterface {
   author: string;
   feed?: FeedInterface;
   entry_type: string;
-  content_type: string;
+  media_content_url?: string;
+  media_content_type?: string;
 }
 
 export interface FilterInterface {

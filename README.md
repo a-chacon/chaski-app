@@ -31,10 +31,9 @@
 - **Privacy First**: No ads, telemetry, or any data leaving your device.
 - **Auto-discovery of RSS/Atom**: The app will automatically find the URL when possible.
 - **Modern UI**: A clean, soft, and modern interface that helps you focus on reading without distractions.
-- **Dark/Light Mode**: Switch between dark and light modes for optimal viewing.
-- **Multiple Themes**: Choose from multiple themes to customize your reading experience.
+- **Dark/Light Mode**: Switch between dark and light modes over multiple themes for optimal viewing.
 - **Import/Export OPML**: Import and export your feeds in OPML format.
-- **Organize Feeds in Folders**: Categorize your feeds for better organization.
+- **Organize Feeds by Accounts and Folders**: Categorize your feeds for better organization.
 - **Customizable Filters**: Configure custom filters for each feed.
 - **New Entry Notifications**: Get notified when new content is available.
 - **Configurable Fonts**: Choose and customize your preferred fonts for reading.
@@ -53,7 +52,8 @@
   - [ ] Video Content
   - [ ] Podcast Content
   - [ ] Image Content
-  - [ x] Article Content
+  - [x] Article Content
+  - [x] Microblog Content
 
 - [ ] **Multiple Accounts Support** (In Progress)
 
@@ -80,9 +80,8 @@
 
 - [ ] **Offline Mode Enhancements**
 
-  - [ ] Improve offline article caching
-  - [ ] Add offline reading indicators
-  - [ ] Implement background sync
+  - [ ] Improve offline article caching (Images).
+  - [x] Pull complete article. (If the page use JavaScript then it will fail)
 
 - [ ] **Multilingual Support**
 

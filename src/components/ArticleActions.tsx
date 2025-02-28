@@ -7,7 +7,7 @@ import {
   RiCloseLine
 } from "@remixicon/react";
 import { ArticleInterface } from "../interfaces";
-import { Tooltip, Button, Link } from "@heroui/react";
+import { Tooltip, Button } from "@heroui/react";
 import {
   updateArticleAsRead,
   updateArticleAsUnRead,

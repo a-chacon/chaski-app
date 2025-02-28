@@ -61,6 +61,7 @@ pub struct Feed {
     pub updated_at: NaiveDateTime,
     pub account_id: Option<i32>,
     pub external_id: Option<String>,
+    pub default_entry_type: String,
 }
 
 #[derive(QueryableByName, Queryable, Debug, Serialize)]
@@ -92,6 +93,7 @@ pub struct NewFeed {
     pub update_interval_minutes: i32,
     pub account_id: Option<i32>,
     pub external_id: Option<String>,
+    pub default_entry_type: String,
 }
 
 #[derive(
@@ -112,7 +114,7 @@ pub struct Article {
     pub id: i32,
     pub title: Option<String>,
     pub link: String,
-    pub image: Option<String>,
+    pub thumbnail: Option<String>,
     pub pub_date: Option<NaiveDateTime>,
     pub description: Option<String>,
     pub content: Option<String>,
@@ -124,6 +126,9 @@ pub struct Article {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub external_id: Option<String>,
+    pub entry_type: String,
+    pub media_content_url: Option<String>,
+    pub media_content_type: Option<String>,
 }
 
 #[derive(Insertable, Debug)]
@@ -131,7 +136,7 @@ pub struct Article {
 pub struct NewArticle {
     pub title: Option<String>,
     pub link: String,
-    pub image: Option<String>,
+    pub thumbnail: Option<String>,
     pub pub_date: Option<NaiveDateTime>,
     pub description: Option<String>,
     pub content: Option<String>,
@@ -141,6 +146,9 @@ pub struct NewArticle {
     pub author: Option<String>,
     pub feed_id: i32,
     pub external_id: Option<String>,
+    pub entry_type: String,
+    pub media_content_url: Option<String>,
+    pub media_content_type: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Queryable, Selectable, Serialize)]
@@ -149,7 +157,7 @@ pub struct ShortArticle {
     pub id: i32,
     pub title: Option<String>,
     pub link: String,
-    pub image: Option<String>,
+    pub thumbnail: Option<String>,
     pub pub_date: Option<NaiveDateTime>,
     pub description: Option<String>,
     pub read_later: i32,
@@ -158,6 +166,9 @@ pub struct ShortArticle {
     pub feed_id: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub entry_type: String,
+    pub media_content_url: Option<String>,
+    pub media_content_type: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -254,6 +265,7 @@ impl From<rss::Channel> for NewFeed {
             update_interval_minutes: update_interval,
             account_id: None,
             external_id: None,
+            default_entry_type: String::from("article"),
         }
     }
 }
@@ -283,25 +295,56 @@ impl From<atom_syndication::Feed> for NewFeed {
             update_interval_minutes: update_interval,
             account_id: None,
             external_id: None,
+            default_entry_type: String::from("article"),
         }
     }
 }
 
 impl NewArticle {
     pub fn from_feed_and_item(feed: &Feed, item: rss::Item) -> Self {
+        let mut media_content_url = None;
+        let mut media_content_type = Some(String::from("image/png"));
+        let mut thumbnail = None;
+
+        let extensions = item.extensions();
+        if let Some(media_map) = extensions.get("media") {
+            // Check for media:content
+            if let Some(contents) = media_map.get("content") {
+                if let Some(first_content) = contents.first() {
+                    if let Some(url) = first_content.attrs.get("url").cloned() {
+                        media_content_url = Some(url);
+                        if let Some(media_type) = first_content.attrs.get("type").cloned() {
+                            media_content_type = Some(media_type);
+                        }
+                    }
+                }
+            }
+
+            if let Some(thumbnails) = media_map.get("thumbnail") {
+                if let Some(first_thumbnail) = thumbnails.first() {
+                    if let Some(thumbnail_url) = first_thumbnail.attrs.get("url").cloned() {
+                        thumbnail = Some(thumbnail_url);
+                    }
+                }
+            }
+        }
+
         NewArticle {
             feed_id: feed.id,
             title: item.title,
             link: item.link.unwrap_or(feed.link.clone()),
-            image: Some(String::from("")),
+            thumbnail,
             pub_date: parse_rfc822_to_naive_datetime(item.pub_date),
             description: crate::core::common::remove_html_tags(item.description),
-            content: item.content,
+            content: item.content.clone(),
             read_later: 0,
             read: 0,
             hide: 0,
             author: item.author,
             external_id: None,
+            entry_type: feed.default_entry_type.clone(),
+            media_content_url,
+            media_content_type,
         }
     }
 
@@ -310,7 +353,7 @@ impl NewArticle {
             feed_id: feed.id,
             title: Some(entry.title.value),
             link: entry.links.into_iter().nth(0).unwrap().href,
-            image: Some(String::from("")),
+            thumbnail: Some(String::from("")),
             pub_date: entry.published.map(|dt| dt.naive_utc()),
             description: crate::core::common::remove_html_tags(
                 Some(entry.summary.unwrap_or_default().value).clone(),
@@ -319,8 +362,11 @@ impl NewArticle {
             read_later: 0,
             read: 0,
             hide: 0,
-            author: Some(String::from("aa")), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
+            author: Some(feed.title.clone()), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
             external_id: None,
+            entry_type: feed.default_entry_type.clone(),
+            media_content_url: None,
+            media_content_type: None,
         }
     }
 }

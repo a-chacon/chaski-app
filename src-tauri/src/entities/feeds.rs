@@ -64,6 +64,9 @@ pub fn create_feed(
         new_feed.last_fetch = None;
     }
 
+    new_feed.default_entry_type =
+        crate::utils::detect_entry_type::detect_entry_type(&new_feed.link).to_string();
+
     let created_feed = diesel::insert_into(feeds::table)
         .values(&new_feed)
         .returning(Feed::as_returning())

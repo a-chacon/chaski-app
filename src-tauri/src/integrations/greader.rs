@@ -352,6 +352,7 @@ impl GReaderClient {
                     update_interval_minutes: 60,
                     account_id: None,
                     external_id: Some(sub.id),
+                    default_entry_type: String::from("article"),
                 }
             })
             .collect();

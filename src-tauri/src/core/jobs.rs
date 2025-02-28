@@ -22,10 +22,10 @@ pub async fn complete_article(mut article: NewArticle) -> NewArticle {
                     .description
                     .unwrap_or(article.description.unwrap_or_default()),
             );
-            article.image = Some(
+            article.thumbnail = Some(
                 article_page_data
                     .image
-                    .unwrap_or(article.image.unwrap_or_default()),
+                    .unwrap_or(article.thumbnail.unwrap_or_default()),
             );
             article.content = Some(
                 article_page_data
@@ -54,7 +54,6 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
             found_articles,
             filters::index(filter_filters, app_handle.clone()),
         );
-
         let limit = feed.entry_limit.max(0) as usize;
         let limited_articles = final_articles.into_iter().take(limit).collect::<Vec<_>>();
 
@@ -63,6 +62,7 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
 
             let created_articles =
                 articles::create_list(limited_articles, app_handle.clone()).await;
+            articles::trim_feed_history(feed.clone(), app_handle.clone());
             notify_new_entries(app_handle.clone(), feed, created_articles);
         } else {
             log::info!(

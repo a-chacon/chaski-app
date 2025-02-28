@@ -22,13 +22,14 @@ export interface FeedInterface {
   notifications_enabled: number;
   unread_count: number;
   account_id: number;
+  default_entry_type: string;
 }
 
 export interface ArticleInterface {
   id?: number;
   title: string;
   link: string;
-  image: string;
+  thumbnail: string;
   pub_date: Date;
   description: string;
   content: string;
@@ -37,6 +38,9 @@ export interface ArticleInterface {
   hide: number;
   author: string;
   feed?: FeedInterface;
+  entry_type: string;
+  media_content_url?: string;
+  media_content_type?: string;
 }
 
 export interface FilterInterface {

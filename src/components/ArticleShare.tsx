@@ -66,7 +66,7 @@ const ArticleShare: React.FC<ArticleShareProps> = ({
   };
 
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={`flex gap-2 items-center ${className}`}>
       <button onClick={onOpen}>
         <RiMastodonFill className="w-6" />
       </button>

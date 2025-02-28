@@ -26,7 +26,7 @@ diesel::table! {
         id -> Integer,
         title -> Nullable<Text>,
         link -> Text,
-        image -> Nullable<Text>,
+        thumbnail -> Nullable<Text>,
         pub_date -> Nullable<Timestamp>,
         description -> Nullable<Text>,
         content -> Nullable<Text>,
@@ -38,6 +38,9 @@ diesel::table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         external_id -> Nullable<Text>,
+        entry_type -> Text,
+        media_content_url -> Nullable<Text>,
+        media_content_type -> Nullable<Text>,
     }
 }
 
@@ -83,6 +86,7 @@ diesel::table! {
         updated_at -> Timestamp,
         account_id -> Nullable<Integer>,
         external_id -> Nullable<Text>,
+        default_entry_type -> Text,
     }
 }
 

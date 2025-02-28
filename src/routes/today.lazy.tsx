@@ -5,7 +5,7 @@ import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
 import { useEffect } from "react";
 import { ArticleInterface } from "../interfaces";
 import { invoke } from "@tauri-apps/api/core";
-import IndexArticles from "../components/IndexArticles";
+import EntriesList from "../components/EntriesList";
 import moment from "moment";
 import { useArticles } from "../IndexArticlesContext";
 import { updateAllArticlesAsRead } from "../helpers/feedsData";
@@ -81,19 +81,19 @@ export default function Today() {
                 isIconOnly
                 variant="light"
                 size="sm"
-                onClick={handleUpdateArticlesAsRead}
+                onPress={handleUpdateArticlesAsRead}
               >
                 <RiCheckDoubleLine></RiCheckDoubleLine>
               </Button>
             </Tooltip>
             <Tooltip content="Reload The Page's Articles">
-              <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
+              <Button color="primary" isIconOnly variant="light" size="sm" onPress={handleReloadButton}>
                 <RiRefreshLine></RiRefreshLine>
               </Button>
             </Tooltip>
           </div>
         </div>
-        <IndexArticles
+        <EntriesList
           key="index"
           articles={articles}
           fetchArticles={fetchArticles}

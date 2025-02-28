@@ -15,6 +15,7 @@ mod entities {
 
 mod utils {
     pub(crate) mod article_extractor;
+    pub(crate) mod detect_entry_type;
     pub(crate) mod notifications;
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;
@@ -141,6 +142,7 @@ pub fn run() {
             commands::accounts::full_sync,
             commands::accounts::show_account,
             commands::accounts::destroy_account,
+            commands::articles::scrape_and_update_article
         ])
         .run(ctx)
         .expect("error while building tauri application");

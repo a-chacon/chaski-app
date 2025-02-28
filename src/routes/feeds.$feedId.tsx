@@ -4,7 +4,7 @@ import moment from "moment";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import IndexArticles from "../components/IndexArticles";
+import EntriesList from "../components/EntriesList";
 import FeedSiteActions from "../components/FeedSiteActions";
 import { Button, Spinner, Snippet, Tooltip } from "@heroui/react";
 import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
@@ -149,7 +149,7 @@ export default function Feed() {
             </div>
           </div>
         </div>
-        <IndexArticles
+        <EntriesList
           articles={articles}
           key={feed?.id}
           fetchArticles={fetchArticles}

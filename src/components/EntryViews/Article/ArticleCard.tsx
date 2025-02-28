@@ -1,12 +1,12 @@
-import { ArticleInterface } from "../interfaces";
+import { ArticleInterface } from "../../../interfaces";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import moment from "moment";
-import ArticleActions from "./ArticleActions";
-import { useAppContext } from "../AppContext";
-import {
-  updateArticleAsRead,
-} from "../helpers/articlesData";
+import ArticleActions from "../../ArticleActions";
+import { useAppContext } from "../../../AppContext";
+import ThumbnailOrMedia from "../../ThumbnailOrMedia";
+import { updateArticleAsRead } from "../../../helpers/articlesData";
+
 
 interface ArticleCardProps {
   article: ArticleInterface;
@@ -104,32 +104,23 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
             <p className="leading-6 text-sm">
               {moment.utc(article.pub_date).fromNow()}
             </p>
-            {isHovering && (
-              <ArticleActions
-                className=""
-                article={article}
-                setArticle={setArticle}
-              >
-              </ArticleActions>
-            )}
+            <ArticleActions
+              className={`${isHovering ? 'visible' : 'invisible'}`}
+              article={article}
+              setArticle={setArticle}
+            >
+            </ArticleActions>
           </div>
         </div>
 
-        {article.image && (
-          <Link
-            to="/articles/$articleId"
-            params={{ articleId: article.id?.toString() || "" }}
-            className={imageWrapper}
-          >
-            <img
-              className="rounded-xl object-cover w-full h-auto aspect-video"
-              src={article.image}
-              alt={article.title}
-            />
-          </Link>
-        )}
+        <div className={`${imageWrapper}`}>
+          <ThumbnailOrMedia
+            article={article}
+          />
+        </div>
+
       </div>
-    </div>
+    </div >
   );
 };
 

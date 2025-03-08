@@ -9,9 +9,14 @@ import { RiUserLine } from "@remixicon/react";
 import { save } from "@tauri-apps/plugin-dialog";
 import { exportOPML } from "../helpers/feedsData";
 import { useNavigate } from "@tanstack/react-router";
+import { useDisclosure } from "@heroui/react";
+import FeedbackModal from "./FeedbackModal";
+import { RiFeedbackLine } from "@remixicon/react";
 
 export default function UserMenu() {
   const navigate = useNavigate();
+  const feedbackModalState = useDisclosure();
+
   const handleDropDownMenuKey = async (key: string) => {
     switch (key) {
       case "export_opml":
@@ -27,6 +32,9 @@ export default function UserMenu() {
         break;
       case "about":
         navigate({ to: "/about" });
+        break;
+      case "feedback":
+        feedbackModalState.onOpen();
         break;
       default:
         console.log("Unknown action");
@@ -55,8 +63,21 @@ export default function UserMenu() {
           <DropdownItem key="about">
             About Chaski
           </DropdownItem>
+          <DropdownItem key="feedback" >
+            <div className="flex gap-2 items-center">
+              <span>
+                Feedback
+              </span>
+              <RiFeedbackLine></RiFeedbackLine>
+            </div>
+          </DropdownItem>
         </DropdownMenu>
-      </Dropdown>
+      </Dropdown >
+
+      <FeedbackModal
+        isOpen={feedbackModalState.isOpen}
+        onOpenChange={feedbackModalState.onOpenChange}
+      />
     </>
   );
 }

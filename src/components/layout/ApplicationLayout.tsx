@@ -4,12 +4,15 @@ import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
 import { AccountInterface, ConfigurationInterface } from "../../interfaces";
 import { load } from '@tauri-apps/plugin-store';
+import FeedbackModal from "../FeedbackModal";
 import { indexAccounts } from "../../helpers/accountsData";
+import { useDisclosure } from "@heroui/react";
 import {
   indexConfigurations,
   updateConfiguration,
 } from "../../helpers/configurationsData";
 import { NotificationProvider } from "../../NotificationContext";
+import { Alert, Button } from "@heroui/react";
 
 interface ApplicationProps {
   children: React.ReactNode;
@@ -29,6 +32,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
+  const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
+  const feedbackModalState = useDisclosure();
 
   const handleSetCurrentFont = (font: string) => {
     if (font === "") {
@@ -103,12 +108,16 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
 
   useEffect(() => {
     setCurrentConfigurations();
-
     checkViewport();
+
+    const feedbackTimer = setTimeout(() => {
+      setShowFeedbackAlert(true);
+    }, 30 * 60 * 1000); // 30 minutes
 
     window.addEventListener("resize", checkViewport);
     return () => {
       window.removeEventListener("resize", checkViewport);
+      clearTimeout(feedbackTimer);
     };
   }, []);
 
@@ -219,6 +228,43 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
           <SideBar hidden={!sideBarOpen} />
 
           {children}
+          {showFeedbackAlert && (
+            <div className="fixed bottom-4 right-4 z-50">
+              <Alert
+                color="warning"
+                description="You've been using the application for a while. Would you like to give us your feedback?"
+                endContent={
+                  <div className="flex gap-2">
+                    <Button
+                      color="warning"
+                      size="sm"
+                      variant="flat"
+                      onPress={() => {
+                        feedbackModalState.onOpen();
+                        setShowFeedbackAlert(false);
+                      }}
+                    >
+                      Give feedback
+                    </Button>
+                    <Button
+                      color="default"
+                      size="sm"
+                      variant="flat"
+                      onPress={() => setShowFeedbackAlert(false)}
+                    >
+                      Cerrar
+                    </Button>
+                  </div>
+                }
+                title="How is your experience going?"
+                variant="faded"
+              />
+            </div>
+          )}
+          <FeedbackModal
+            isOpen={feedbackModalState.isOpen}
+            onOpenChange={feedbackModalState.onOpenChange}
+          />
         </div>
       </NotificationProvider>
     </AppContext.Provider>

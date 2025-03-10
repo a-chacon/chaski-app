@@ -2,13 +2,12 @@
   <br>
   <a href="https://chaski.a-chacon.com"><img src="http://chaski.a-chacon.com/chaski.png" alt="Chaski App Logo" width="200"></a>
   <br>
-  Chaski
+  Chaski App
   <br>
 </h1>
 
 <h4 align="center">
-  A beautifully designed, privacy-focused feed reader that keeps you updated.<br/> Build on the top of
-  <a href="https://tauri.app/" target="_blank">Tauri</a>.
+  Chaski is a content aggregator that helps you focus on what matters.<br/> Build on the top of <a href="https://tauri.app/" target="_blank">Tauri</a>.
 </h4>
 
 <p align="center">

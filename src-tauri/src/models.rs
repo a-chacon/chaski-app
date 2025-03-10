@@ -353,7 +353,7 @@ impl NewArticle {
             feed_id: feed.id,
             title: Some(entry.title.value),
             link: entry.links.into_iter().nth(0).unwrap().href,
-            thumbnail: Some(String::from("")),
+            thumbnail: None,
             pub_date: entry.published.map(|dt| dt.naive_utc()),
             description: crate::core::common::remove_html_tags(
                 Some(entry.summary.unwrap_or_default().value).clone(),

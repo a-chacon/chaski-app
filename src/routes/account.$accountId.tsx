@@ -107,7 +107,7 @@ export default function RouteComponent() {
     try {
       const message = await invoke<string>('list_articles', {
         page,
-        items: 10,
+        items: 20,
         filters: { account_id_eq: parseInt(accountId), read_eq: 0 },
       })
 

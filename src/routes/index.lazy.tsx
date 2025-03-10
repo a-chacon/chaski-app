@@ -30,7 +30,7 @@ export default function App() {
     try {
       const message = await invoke<string>('list_articles', {
         page: page,
-        items: 10,
+        items: 20,
       })
 
       const new_articles: ArticleInterface[] = JSON.parse(message)

@@ -5,6 +5,7 @@ import MicroblogCard from "./EntryViews/Microblog/Card";
 import ArticleCard from "./EntryViews/Article/ArticleCard";
 import ArticleLayoutSwitch from "./ArticlesLayoutSwitch";
 import { useAppContext } from "../AppContext";
+import React, { useMemo } from "react";
 
 interface EntriesListProps {
   articles: ArticleInterface[];
@@ -20,25 +21,27 @@ function EntriesList({
   header,
 }: EntriesListProps) {
   const { articlesLayout: display } = useAppContext();
+  const gridClass = useMemo(() =>
+    display === "card" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "",
+    [display]
+  );
 
-  const GiphyEmbed = () => {
-    return (
-      <div className="mx-auto col-span-3">
-        <div className="pb-6 text-center">
-          <h5 className="text-2xl font-semibold pb-2">
-            We've reached the end of the road…
-          </h5>
-          <p>But don’t fret, our Chasquis are already off to bring more!</p>
-        </div>
+  const GiphyEmbed = React.memo(() => (
+    <div className="mx-auto col-span-3">
+      <div className="pb-6 text-center">
+        <h5 className="text-2xl font-semibold pb-2">
+          We've reached the end of the road…
+        </h5>
+        <p>But don’t fret, our Chasquis are already off to bring more!</p>
       </div>
-    );
-  };
+    </div>
+  ));
 
   return (
     <div key="articles">
       <ArticleLayoutSwitch></ArticleLayoutSwitch>
       <InfiniteScroll
-        dataLength={articles.length} //This is important field to render the next data
+        dataLength={articles.length}
         next={fetchArticles}
         hasMore={hasMore}
         loader={
@@ -47,39 +50,11 @@ function EntriesList({
           </div>
         }
         scrollableTarget="mainDiv"
-        endMessage={GiphyEmbed()}
-        className={
-          display == "card"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            : ""
-        }
+        endMessage={<GiphyEmbed />}
+        className={gridClass}
       >
         {articles.map((article) => {
           switch (article.entry_type) {
-            // case 'podcast':
-            //   return (
-            //     <PodcastCard
-            //       key={article.id}
-            //       article={article}
-            //       header={header}
-            //     />
-            //   );
-            // case 'image':
-            //   return (
-            //     <ImageCard
-            //       key={article.id}
-            //       article={article}
-            //       header={header}
-            //     />
-            //   );
-            // case 'video':
-            //   return (
-            //     <VideoCard
-            //       key={article.id}
-            //       article={article}
-            //       header={header}
-            //     />
-            //   );
             case 'microblog':
               return (
                 <MicroblogCard

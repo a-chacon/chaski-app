@@ -32,7 +32,7 @@ export default function Folder() {
     try {
       const message = await invoke<string>('list_articles', {
         page,
-        items: 10,
+        items: 20,
         filters: { folder_eq: folderName, read_eq: 0, account_id_eq: accountId },
       })
 

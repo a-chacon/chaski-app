@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import React, { createContext, useState, useContext, ReactNode, useEffect, useMemo, useRef } from "react";
 import { ArticleInterface } from "./interfaces";
 
 interface ArticlesContextType {
@@ -20,21 +20,23 @@ export const useArticles = (path?: string): ArticlesContextType => {
     throw new Error("useArticles must be used within an ArticlesProvider");
   }
 
-  // If path is provided and is different from current path, reset the context
+  const prevPathRef = useRef<string | undefined>();
+
   useEffect(() => {
     if (path && context.path !== path) {
       context.setArticles([]);
       context.setPage(1);
       context.setHasMore(true);
       context.setPath(path);
+      prevPathRef.current = path;
     }
-  }, [path, context]);
+  }, [path]);
 
   return context;
 };
 
 interface ArticlesProviderProps {
-  children: ReactNode; // Add the children prop here
+  children: ReactNode;
 }
 
 export const ArticlesProvider: React.FC<ArticlesProviderProps> = ({ children }) => {
@@ -43,19 +45,19 @@ export const ArticlesProvider: React.FC<ArticlesProviderProps> = ({ children }) 
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [path, setPath] = useState<string>("");
 
+  const contextValue = useMemo(() => ({
+    path,
+    articles,
+    page,
+    hasMore,
+    setArticles,
+    setPage,
+    setHasMore,
+    setPath,
+  }), [path, articles, page, hasMore]);
+
   return (
-    <ArticlesContext.Provider
-      value={{
-        path,
-        articles,
-        page,
-        hasMore,
-        setArticles,
-        setPage,
-        setHasMore,
-        setPath,
-      }}
-    >
+    <ArticlesContext.Provider value={contextValue}>
       {children}
     </ArticlesContext.Provider>
   );

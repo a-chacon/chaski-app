@@ -25,7 +25,7 @@ export default function ReadLater() {
     try {
       const message = await invoke<string>('list_articles', {
         page: page,
-        items: 10,
+        items: 20,
         filters: {
           read_later_eq: 1
         }

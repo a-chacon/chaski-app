@@ -29,7 +29,7 @@ export default function Today() {
     try {
       const message = await invoke<string>("list_articles", {
         page: page,
-        items: 10,
+        items: 20,
         filters: {
           pub_date_eq: moment().local().format("YYYY-MM-DD"),
           read_eq: 0

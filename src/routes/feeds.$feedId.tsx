@@ -44,7 +44,7 @@ export default function Feed() {
     try {
       const message = await invoke<string>("list_articles", {
         page,
-        items: 10,
+        items: 20,
         filters: { feed_id_eq: parseInt(feedId), read_eq: 0 },
       });
 

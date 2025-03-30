@@ -350,6 +350,7 @@ impl GReaderClient {
                     items_count: None,
                     folder: Some(folder),
                     update_interval_minutes: 60,
+                    notifications_enabled: 0,
                     account_id: None,
                     external_id: Some(sub.id),
                     default_entry_type: String::from("article"),

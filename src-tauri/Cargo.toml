@@ -1,6 +1,6 @@
 [package]
 name = "chaski"
-version = "0.5.0"
+version = "0.5.1"
 description = "A beautifully designed, privacy-focused feed reader that keeps you updated."
 authors = ["a-chacon"]
 edition = "2021"

@@ -18,8 +18,7 @@ interface VerticalHeaderProps { };
 const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
   const { addNotification } = useNotification();
   const { setSideBarOpen, sideBarOpen } = useAppContext();
-  const toggleSidebar = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+  const toggleSidebar = () => {
     setSideBarOpen((prev) => !prev);
   };
 
@@ -50,7 +49,7 @@ const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
             variant="flat"
             isIconOnly
             className={`rounded-full items-center h-10 w-10 flex justify-center ${sideBarOpen ? "text-primary-500" : ""}`}
-            onClick={toggleSidebar}
+            onPress={toggleSidebar}
           >
             {sideBarOpen ? (
               <RiSidebarFoldLine className="p-0.5" />

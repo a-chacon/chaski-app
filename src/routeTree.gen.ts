@@ -10,223 +10,118 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as FoldersFolderNameRouteImport } from './routes/folders.$folderName'
+import { Route as FeedsFeedIdRouteImport } from './routes/feeds.$feedId'
+import { Route as ArticlesArticleIdRouteImport } from './routes/articles.$articleId'
+import { Route as AccountAccountIdRouteImport } from './routes/account.$accountId'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as FoldersFolderNameImport } from './routes/folders.$folderName'
-import { Route as FeedsFeedIdImport } from './routes/feeds.$feedId'
-import { Route as ArticlesArticleIdImport } from './routes/articles.$articleId'
-import { Route as AccountAccountIdImport } from './routes/account.$accountId'
+const TodayLazyRouteImport = createFileRoute('/today')()
+const Read_laterLazyRouteImport = createFileRoute('/read_later')()
+const OnboardingLazyRouteImport = createFileRoute('/onboarding')()
+const New_feedLazyRouteImport = createFileRoute('/new_feed')()
+const ConfigurationsLazyRouteImport = createFileRoute('/configurations')()
+const AboutLazyRouteImport = createFileRoute('/about')()
 
-// Create Virtual Routes
-
-const TodayLazyImport = createFileRoute('/today')()
-const ReadlaterLazyImport = createFileRoute('/read_later')()
-const OnboardingLazyImport = createFileRoute('/onboarding')()
-const NewfeedLazyImport = createFileRoute('/new_feed')()
-const ConfigurationsLazyImport = createFileRoute('/configurations')()
-const AboutLazyImport = createFileRoute('/about')()
-
-// Create/Update Routes
-
-const TodayLazyRoute = TodayLazyImport.update({
+const TodayLazyRoute = TodayLazyRouteImport.update({
   id: '/today',
   path: '/today',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/today.lazy').then((d) => d.Route))
-
-const ReadlaterLazyRoute = ReadlaterLazyImport.update({
+const Read_laterLazyRoute = Read_laterLazyRouteImport.update({
   id: '/read_later',
   path: '/read_later',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/read_later.lazy').then((d) => d.Route))
-
-const OnboardingLazyRoute = OnboardingLazyImport.update({
+const OnboardingLazyRoute = OnboardingLazyRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/onboarding.lazy').then((d) => d.Route))
-
-const NewfeedLazyRoute = NewfeedLazyImport.update({
+const New_feedLazyRoute = New_feedLazyRouteImport.update({
   id: '/new_feed',
   path: '/new_feed',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/new_feed.lazy').then((d) => d.Route))
-
-const ConfigurationsLazyRoute = ConfigurationsLazyImport.update({
+const ConfigurationsLazyRoute = ConfigurationsLazyRouteImport.update({
   id: '/configurations',
   path: '/configurations',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/configurations.lazy').then((d) => d.Route),
 )
-
-const AboutLazyRoute = AboutLazyImport.update({
+const AboutLazyRoute = AboutLazyRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const FoldersFolderNameRoute = FoldersFolderNameImport.update({
+const FoldersFolderNameRoute = FoldersFolderNameRouteImport.update({
   id: '/folders/$folderName',
   path: '/folders/$folderName',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const FeedsFeedIdRoute = FeedsFeedIdImport.update({
+const FeedsFeedIdRoute = FeedsFeedIdRouteImport.update({
   id: '/feeds/$feedId',
   path: '/feeds/$feedId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ArticlesArticleIdRoute = ArticlesArticleIdImport.update({
+const ArticlesArticleIdRoute = ArticlesArticleIdRouteImport.update({
   id: '/articles/$articleId',
   path: '/articles/$articleId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountAccountIdRoute = AccountAccountIdImport.update({
+const AccountAccountIdRoute = AccountAccountIdRouteImport.update({
   id: '/account/$accountId',
   path: '/account/$accountId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/configurations': {
-      id: '/configurations'
-      path: '/configurations'
-      fullPath: '/configurations'
-      preLoaderRoute: typeof ConfigurationsLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/new_feed': {
-      id: '/new_feed'
-      path: '/new_feed'
-      fullPath: '/new_feed'
-      preLoaderRoute: typeof NewfeedLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/read_later': {
-      id: '/read_later'
-      path: '/read_later'
-      fullPath: '/read_later'
-      preLoaderRoute: typeof ReadlaterLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/today': {
-      id: '/today'
-      path: '/today'
-      fullPath: '/today'
-      preLoaderRoute: typeof TodayLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/$accountId': {
-      id: '/account/$accountId'
-      path: '/account/$accountId'
-      fullPath: '/account/$accountId'
-      preLoaderRoute: typeof AccountAccountIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/articles/$articleId': {
-      id: '/articles/$articleId'
-      path: '/articles/$articleId'
-      fullPath: '/articles/$articleId'
-      preLoaderRoute: typeof ArticlesArticleIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/feeds/$feedId': {
-      id: '/feeds/$feedId'
-      path: '/feeds/$feedId'
-      fullPath: '/feeds/$feedId'
-      preLoaderRoute: typeof FeedsFeedIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/folders/$folderName': {
-      id: '/folders/$folderName'
-      path: '/folders/$folderName'
-      fullPath: '/folders/$folderName'
-      preLoaderRoute: typeof FoldersFolderNameImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
-  '/new_feed': typeof NewfeedLazyRoute
+  '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
-  '/read_later': typeof ReadlaterLazyRoute
+  '/read_later': typeof Read_laterLazyRoute
   '/today': typeof TodayLazyRoute
   '/account/$accountId': typeof AccountAccountIdRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
-  '/new_feed': typeof NewfeedLazyRoute
+  '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
-  '/read_later': typeof ReadlaterLazyRoute
+  '/read_later': typeof Read_laterLazyRoute
   '/today': typeof TodayLazyRoute
   '/account/$accountId': typeof AccountAccountIdRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
-  '/new_feed': typeof NewfeedLazyRoute
+  '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
-  '/read_later': typeof ReadlaterLazyRoute
+  '/read_later': typeof Read_laterLazyRoute
   '/today': typeof TodayLazyRoute
   '/account/$accountId': typeof AccountAccountIdRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -269,14 +164,13 @@ export interface FileRouteTypes {
     | '/folders/$folderName'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutLazyRoute: typeof AboutLazyRoute
   ConfigurationsLazyRoute: typeof ConfigurationsLazyRoute
-  NewfeedLazyRoute: typeof NewfeedLazyRoute
+  New_feedLazyRoute: typeof New_feedLazyRoute
   OnboardingLazyRoute: typeof OnboardingLazyRoute
-  ReadlaterLazyRoute: typeof ReadlaterLazyRoute
+  Read_laterLazyRoute: typeof Read_laterLazyRoute
   TodayLazyRoute: typeof TodayLazyRoute
   AccountAccountIdRoute: typeof AccountAccountIdRoute
   ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
@@ -284,76 +178,101 @@ export interface RootRouteChildren {
   FoldersFolderNameRoute: typeof FoldersFolderNameRoute
 }
 
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/today': {
+      id: '/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof TodayLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/read_later': {
+      id: '/read_later'
+      path: '/read_later'
+      fullPath: '/read_later'
+      preLoaderRoute: typeof Read_laterLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new_feed': {
+      id: '/new_feed'
+      path: '/new_feed'
+      fullPath: '/new_feed'
+      preLoaderRoute: typeof New_feedLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configurations': {
+      id: '/configurations'
+      path: '/configurations'
+      fullPath: '/configurations'
+      preLoaderRoute: typeof ConfigurationsLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/folders/$folderName': {
+      id: '/folders/$folderName'
+      path: '/folders/$folderName'
+      fullPath: '/folders/$folderName'
+      preLoaderRoute: typeof FoldersFolderNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feeds/$feedId': {
+      id: '/feeds/$feedId'
+      path: '/feeds/$feedId'
+      fullPath: '/feeds/$feedId'
+      preLoaderRoute: typeof FeedsFeedIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/$articleId': {
+      id: '/articles/$articleId'
+      path: '/articles/$articleId'
+      fullPath: '/articles/$articleId'
+      preLoaderRoute: typeof ArticlesArticleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/$accountId': {
+      id: '/account/$accountId'
+      path: '/account/$accountId'
+      fullPath: '/account/$accountId'
+      preLoaderRoute: typeof AccountAccountIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
+}
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutLazyRoute: AboutLazyRoute,
   ConfigurationsLazyRoute: ConfigurationsLazyRoute,
-  NewfeedLazyRoute: NewfeedLazyRoute,
+  New_feedLazyRoute: New_feedLazyRoute,
   OnboardingLazyRoute: OnboardingLazyRoute,
-  ReadlaterLazyRoute: ReadlaterLazyRoute,
+  Read_laterLazyRoute: Read_laterLazyRoute,
   TodayLazyRoute: TodayLazyRoute,
   AccountAccountIdRoute: AccountAccountIdRoute,
   ArticlesArticleIdRoute: ArticlesArticleIdRoute,
   FeedsFeedIdRoute: FeedsFeedIdRoute,
   FoldersFolderNameRoute: FoldersFolderNameRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/about",
-        "/configurations",
-        "/new_feed",
-        "/onboarding",
-        "/read_later",
-        "/today",
-        "/account/$accountId",
-        "/articles/$articleId",
-        "/feeds/$feedId",
-        "/folders/$folderName"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/about": {
-      "filePath": "about.lazy.tsx"
-    },
-    "/configurations": {
-      "filePath": "configurations.lazy.tsx"
-    },
-    "/new_feed": {
-      "filePath": "new_feed.lazy.tsx"
-    },
-    "/onboarding": {
-      "filePath": "onboarding.lazy.tsx"
-    },
-    "/read_later": {
-      "filePath": "read_later.lazy.tsx"
-    },
-    "/today": {
-      "filePath": "today.lazy.tsx"
-    },
-    "/account/$accountId": {
-      "filePath": "account.$accountId.tsx"
-    },
-    "/articles/$articleId": {
-      "filePath": "articles.$articleId.tsx"
-    },
-    "/feeds/$feedId": {
-      "filePath": "feeds.$feedId.tsx"
-    },
-    "/folders/$folderName": {
-      "filePath": "folders.$folderName.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

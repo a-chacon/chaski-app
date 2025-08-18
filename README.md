@@ -21,6 +21,8 @@
   <a href="#license">License</a>
 </p>
 
+**Disclaimer:** This project will only receive critical updates and bug fixes from me. No new features will be added unless they come via a PR (following the project's principles of keeping it simple).
+
 ## Support
 
 <a href="https://www.buymeacoffee.com/achacon" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

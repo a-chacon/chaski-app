@@ -1,6 +1,5 @@
 use crate::entities::feeds::FeedsFilters;
 use crate::models::{Feed, NewFeed};
-use serde_json::json;
 use tauri::command;
 
 #[command]

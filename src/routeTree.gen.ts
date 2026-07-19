@@ -12,38 +12,28 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FoldersFolderNameRouteImport } from './routes/folders.$folderName'
-import { Route as FeedsFeedIdRouteImport } from './routes/feeds.$feedId'
-import { Route as ArticlesArticleIdRouteImport } from './routes/articles.$articleId'
 import { Route as AccountAccountIdRouteImport } from './routes/account.$accountId'
+import { Route as ArticlesArticleIdRouteImport } from './routes/articles.$articleId'
+import { Route as FeedsFeedIdRouteImport } from './routes/feeds.$feedId'
+import { Route as FoldersFolderNameRouteImport } from './routes/folders.$folderName'
 
-const TodayLazyRouteImport = createFileRoute('/today')()
-const Read_laterLazyRouteImport = createFileRoute('/read_later')()
-const OnboardingLazyRouteImport = createFileRoute('/onboarding')()
-const New_feedLazyRouteImport = createFileRoute('/new_feed')()
-const ConfigurationsLazyRouteImport = createFileRoute('/configurations')()
 const AboutLazyRouteImport = createFileRoute('/about')()
+const ConfigurationsLazyRouteImport = createFileRoute('/configurations')()
+const New_feedLazyRouteImport = createFileRoute('/new_feed')()
+const OnboardingLazyRouteImport = createFileRoute('/onboarding')()
+const Read_laterLazyRouteImport = createFileRoute('/read_later')()
+const TodayLazyRouteImport = createFileRoute('/today')()
 
-const TodayLazyRoute = TodayLazyRouteImport.update({
-  id: '/today',
-  path: '/today',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/today.lazy').then((d) => d.Route))
-const Read_laterLazyRoute = Read_laterLazyRouteImport.update({
-  id: '/read_later',
-  path: '/read_later',
+} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+const AboutLazyRoute = AboutLazyRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/read_later.lazy').then((d) => d.Route))
-const OnboardingLazyRoute = OnboardingLazyRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/onboarding.lazy').then((d) => d.Route))
-const New_feedLazyRoute = New_feedLazyRouteImport.update({
-  id: '/new_feed',
-  path: '/new_feed',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/new_feed.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
 const ConfigurationsLazyRoute = ConfigurationsLazyRouteImport.update({
   id: '/configurations',
   path: '/configurations',
@@ -51,24 +41,29 @@ const ConfigurationsLazyRoute = ConfigurationsLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/configurations.lazy').then((d) => d.Route),
 )
-const AboutLazyRoute = AboutLazyRouteImport.update({
-  id: '/about',
-  path: '/about',
+const New_feedLazyRoute = New_feedLazyRouteImport.update({
+  id: '/new_feed',
+  path: '/new_feed',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+} as any).lazy(() => import('./routes/new_feed.lazy').then((d) => d.Route))
+const OnboardingLazyRoute = OnboardingLazyRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-const FoldersFolderNameRoute = FoldersFolderNameRouteImport.update({
-  id: '/folders/$folderName',
-  path: '/folders/$folderName',
+} as any).lazy(() => import('./routes/onboarding.lazy').then((d) => d.Route))
+const Read_laterLazyRoute = Read_laterLazyRouteImport.update({
+  id: '/read_later',
+  path: '/read_later',
   getParentRoute: () => rootRouteImport,
-} as any)
-const FeedsFeedIdRoute = FeedsFeedIdRouteImport.update({
-  id: '/feeds/$feedId',
-  path: '/feeds/$feedId',
+} as any).lazy(() => import('./routes/read_later.lazy').then((d) => d.Route))
+const TodayLazyRoute = TodayLazyRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/today.lazy').then((d) => d.Route))
+const AccountAccountIdRoute = AccountAccountIdRouteImport.update({
+  id: '/account/$accountId',
+  path: '/account/$accountId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArticlesArticleIdRoute = ArticlesArticleIdRouteImport.update({
@@ -76,9 +71,14 @@ const ArticlesArticleIdRoute = ArticlesArticleIdRouteImport.update({
   path: '/articles/$articleId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountAccountIdRoute = AccountAccountIdRouteImport.update({
-  id: '/account/$accountId',
-  path: '/account/$accountId',
+const FeedsFeedIdRoute = FeedsFeedIdRouteImport.update({
+  id: '/feeds/$feedId',
+  path: '/feeds/$feedId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoldersFolderNameRoute = FoldersFolderNameRouteImport.update({
+  id: '/folders/$folderName',
+  path: '/folders/$folderName',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -180,39 +180,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/today': {
-      id: '/today'
-      path: '/today'
-      fullPath: '/today'
-      preLoaderRoute: typeof TodayLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/read_later': {
-      id: '/read_later'
-      path: '/read_later'
-      fullPath: '/read_later'
-      preLoaderRoute: typeof Read_laterLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/new_feed': {
-      id: '/new_feed'
-      path: '/new_feed'
-      fullPath: '/new_feed'
-      preLoaderRoute: typeof New_feedLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configurations': {
-      id: '/configurations'
-      path: '/configurations'
-      fullPath: '/configurations'
-      preLoaderRoute: typeof ConfigurationsLazyRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -222,25 +194,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/configurations': {
+      id: '/configurations'
+      path: '/configurations'
+      fullPath: '/configurations'
+      preLoaderRoute: typeof ConfigurationsLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/folders/$folderName': {
-      id: '/folders/$folderName'
-      path: '/folders/$folderName'
-      fullPath: '/folders/$folderName'
-      preLoaderRoute: typeof FoldersFolderNameRouteImport
+    '/new_feed': {
+      id: '/new_feed'
+      path: '/new_feed'
+      fullPath: '/new_feed'
+      preLoaderRoute: typeof New_feedLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/feeds/$feedId': {
-      id: '/feeds/$feedId'
-      path: '/feeds/$feedId'
-      fullPath: '/feeds/$feedId'
-      preLoaderRoute: typeof FeedsFeedIdRouteImport
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/read_later': {
+      id: '/read_later'
+      path: '/read_later'
+      fullPath: '/read_later'
+      preLoaderRoute: typeof Read_laterLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/today': {
+      id: '/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof TodayLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/$accountId': {
+      id: '/account/$accountId'
+      path: '/account/$accountId'
+      fullPath: '/account/$accountId'
+      preLoaderRoute: typeof AccountAccountIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/articles/$articleId': {
@@ -250,11 +243,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesArticleIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/$accountId': {
-      id: '/account/$accountId'
-      path: '/account/$accountId'
-      fullPath: '/account/$accountId'
-      preLoaderRoute: typeof AccountAccountIdRouteImport
+    '/feeds/$feedId': {
+      id: '/feeds/$feedId'
+      path: '/feeds/$feedId'
+      fullPath: '/feeds/$feedId'
+      preLoaderRoute: typeof FeedsFeedIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/folders/$folderName': {
+      id: '/folders/$folderName'
+      path: '/folders/$folderName'
+      fullPath: '/folders/$folderName'
+      preLoaderRoute: typeof FoldersFolderNameRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

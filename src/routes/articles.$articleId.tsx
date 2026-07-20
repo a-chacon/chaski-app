@@ -1,14 +1,14 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArticleInterface } from "../interfaces";
 import parse from "html-react-parser";
 import ArticleActions from "../components/ArticleActions";
 import ThumbnailOrMedia from "../components/ThumbnailOrMedia";
 import ArticleShare from "../components/ArticleShare";
-import { RiArrowLeftLine, RiImportLine } from "@remixicon/react";
-import { Tooltip, Button } from "@heroui/react";
-import { getArticle, updateArticleAsRead, scrapeAndUpdateArticle } from "../helpers/articlesData";
+import { RiArrowLeftLine } from "@remixicon/react";
+import { Button, Spinner } from "@heroui/react";
+import { getArticle, updateArticleAsRead } from "../helpers/articlesData";
 import { useAppContext } from "../AppContext";
 
 export const Route = createFileRoute("/articles/$articleId")({
@@ -18,26 +18,44 @@ export const Route = createFileRoute("/articles/$articleId")({
 function Article() {
   const { articleId } = Route.useParams();
   const [article, setArticle] = useState<ArticleInterface>();
-  const { setSideBarOpen } = useAppContext();
-  const [isFetchingContent, setIsFetchingContent] = useState(false);
-
-  const {
-    currentTheme,
-  } = useAppContext();
+  const [isLoadingArticle, setIsLoadingArticle] = useState(true);
+  const { setSideBarOpen, currentTheme } = useAppContext();
 
   useEffect(() => {
-    setSideBarOpen(false);
-    getArticle(parseInt(articleId)).then((article) => {
-      if (article) {
+    const loadArticle = async () => {
+      setSideBarOpen(false);
+      setIsLoadingArticle(true);
+
+      try {
+        const article = await getArticle(parseInt(articleId));
+        if (!article) {
+          return;
+        }
+
         setArticle(article);
         updateArticleAsRead(article);
+      } finally {
+        setIsLoadingArticle(false);
       }
-    });
+    };
+
+    loadArticle();
   }, [articleId]);
 
   const { history } = useRouter();
 
   const isDarkTheme = (theme: string) => theme.endsWith('-dark');
+
+  if (isLoadingArticle) {
+    return (
+      <MainSectionLayout>
+        <div className="h-full w-full flex items-center justify-center gap-2 text-sm opacity-80">
+          <Spinner size="sm" color="default" />
+          Loading article...
+        </div>
+      </MainSectionLayout>
+    );
+  }
 
   return (
     article && (
@@ -61,31 +79,7 @@ function Article() {
                   <RiArrowLeftLine className="text-primary-500" />
                 </Button>
 
-                <Tooltip content="Fetch original article content">
-                  <Button
-                    color="primary"
-                    variant="light"
-                    isLoading={isFetchingContent}
-                    isIconOnly
-                    size="sm"
-                    onPress={() => {
-                      setIsFetchingContent(true);
-                      scrapeAndUpdateArticle(article.id!)
-                        .then(updatedArticle => {
-                          setArticle({
-                            ...article,
-                            ...updatedArticle
-                          });
-                        })
-                        .catch(error => {
-                          console.error("Failed to refresh article:", error);
-                        })
-                        .finally(() => setIsFetchingContent(false));
-                    }}
-                  >
-                    <RiImportLine className="w-6" />
-                  </Button>
-                </Tooltip>
+
               </ArticleActions>
             </div>
             <ArticleShare article={article} />
@@ -116,6 +110,8 @@ function Article() {
             />
 
           </div>
+
+
           <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
             <p className="py-6 line-clamp-3">
               {parse(article.description || "")}

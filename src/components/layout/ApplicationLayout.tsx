@@ -21,7 +21,7 @@ interface ApplicationProps {
 
 const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [sideBarOpen, setSideBarOpen] = useState(false);
-  const [articlesLayout, setArticlesLayout] = useState<string>("side");
+  const [articlesLayout, setArticlesLayout] = useState<string>("list");
   const [currentTheme, setCurrentTheme] = useState<string>("AUTO");
   const [isMobile, setIsMobile] = useState(false);
   const [configurations, setConfigurations] = useState<
@@ -33,6 +33,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
+  const [currentArticleScrapeMode, setCurrentArticleScrapeMode] = useState<string>("ON_DEMAND");
   const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
   const feedbackModalState = useDisclosure();
   const isTauriApp = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -69,6 +70,16 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     }
 
     setCurrentMarkAsReadOnHover(mark_as_read_on_hover);
+  };
+
+  const handleSetCurrentArticleScrapeMode = (mode: string) => {
+    let configuration = configurations.find((x) => x.name === "ARTICLE_SCRAPE_MODE");
+    if (configuration && configuration.value !== mode) {
+      configuration.value = mode;
+      updateConfiguration(configuration);
+    }
+
+    setCurrentArticleScrapeMode(mode);
   };
 
   const handleSetCurrentFontSize = (font_size: number) => {
@@ -129,6 +140,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentConfigFontSize();
     getCurrentConfigFontSpace();
     getCurrentConfigMarkAsReadOnHover();
+    getCurrentConfigArticleScrapeMode();
     getCurrentAccounts();
   }, [configurations]);
 
@@ -147,6 +159,15 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       handleSetMarkAsReadOnHover(result.value === "true");
     } else {
       handleSetMarkAsReadOnHover(false);
+    }
+  };
+
+  const getCurrentConfigArticleScrapeMode = () => {
+    let result = configurations.find((x) => x.name === "ARTICLE_SCRAPE_MODE");
+    if (result) {
+      handleSetCurrentArticleScrapeMode(result.value);
+    } else {
+      handleSetCurrentArticleScrapeMode("ON_DEMAND");
     }
   };
 
@@ -219,12 +240,14 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         handleSetCurrentFontSpace,
         currentMarkAsReadOnHover,
         handleSetMarkAsReadOnHover,
+        currentArticleScrapeMode,
+        handleSetCurrentArticleScrapeMode,
         setAccounts,
         accounts
       }}
     >
       <NotificationProvider>
-        <div className="h-screen p-[2px]">
+        <div className="h-screen ">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
             {isTauriApp && <WindowTitlebar />}
 

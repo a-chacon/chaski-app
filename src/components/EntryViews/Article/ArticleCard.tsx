@@ -4,123 +4,125 @@ import { Link } from "@tanstack/react-router";
 import moment from "moment";
 import ArticleActions from "../../ArticleActions";
 import { useAppContext } from "../../../AppContext";
-import ThumbnailOrMedia from "../../ThumbnailOrMedia";
 import { updateArticleAsRead } from "../../../helpers/articlesData";
-
 
 interface ArticleCardProps {
   article: ArticleInterface;
   header: boolean;
 }
 
-interface LayoutStyles {
-  [key: string]: {
-    container: string;
-    imageWrapper: string;
-    textWrapper: string;
-  };
-}
-
-const layoutStyles: LayoutStyles = {
-  side: {
-    container: "flex flex-row gap-2",
-    imageWrapper: "w-1/3",
-    textWrapper: "w-2/3",
-  },
-  card: {
-    container: "flex flex-col-reverse gap-2",
-    imageWrapper: "w-full",
-    textWrapper: "w-full",
-  },
-};
-
 const ArticleCard: React.FC<ArticleCardProps> = ({
   article: inputArticle,
-  header,
 }) => {
   const [article, setArticle] = useState(inputArticle);
   const [isHovering, setIsHovering] = useState(false);
-  const {
-    currentMarkAsReadOnHover
-  } = useAppContext();
+  const { currentMarkAsReadOnHover, articlesLayout: display } = useAppContext();
 
-  const { articlesLayout: display } = useAppContext();
+  const isCompact = display === "compact";
+  const isGrid = display === "grid";
 
   const handleMouseOver = () => {
     setIsHovering(true);
   };
 
-
   const handleMouseOut = () => {
     setIsHovering(false);
 
-    if (currentMarkAsReadOnHover && article.read == 0 && article.read_later !== 1) {
+    if (currentMarkAsReadOnHover && article.read === 0 && article.read_later !== 1) {
       updateArticleAsRead(article);
     }
   };
 
-  const { container, imageWrapper, textWrapper } =
-    layoutStyles[display] || layoutStyles.card;
+  if (isCompact) {
+    return (
+      <div
+        key={article.id}
+        className={`px-2 py-2 border-b border-default-200 ${article.read ? "opacity-75" : ""} ${article.hide ? "hidden" : ""}`}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
+      >
+        <div className="flex items-center gap-2">
+          {article.feed && (
+            <Link
+              to="/feeds/$feedId"
+              params={{ feedId: article.feed.id!.toString() }}
+              className="shrink-0 flex items-center gap-2 min-w-0 max-w-[30%]"
+            >
+              <img
+                alt={article.feed.title}
+                className="h-4 w-4 object-cover rounded-sm"
+                src={article.feed.icon}
+              />
+              <span className="text-xs opacity-80 truncate">{article.feed.title}</span>
+            </Link>
+          )}
+
+          <Link
+            to="/articles/$articleId"
+            params={{ articleId: article.id?.toString() || "" }}
+            className="min-w-0 flex-1"
+          >
+            <h3 className="text-sm font-medium truncate">
+              {article.title?.trim() || article.description?.trim() || "Untitled article"}
+            </h3>
+          </Link>
+
+          <ArticleActions
+            className={`${isHovering ? "visible" : "invisible"} shrink-0`}
+            article={article}
+            setArticle={setArticle}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       key={article.id}
-      className={`p-2 py-4 mb-6 rounded-xl border-default-500 ${article.read ? "opacity-75" : ""} ${article.hide ? "hidden" : ""} `}
+      className={`p-2 rounded-xl  ${article.read ? "opacity-75" : ""} ${article.hide ? "hidden" : ""}`}
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
     >
-      {header && (
+      {article.feed && (
         <Link
           to="/feeds/$feedId"
-          params={{ feedId: article.feed!.id!.toString() }}
-          className="flex gap-2 items-center pb-2"
+          params={{ feedId: article.feed.id!.toString() }}
+          className="flex gap-2 items-center pb-1"
         >
           <img
-            alt={article.feed?.title}
-            className="h-5 w-5 object-cover"
-            src={article.feed?.icon}
+            alt={article.feed.title}
+            className="h-5 w-5 object-cover rounded-sm"
+            src={article.feed.icon}
           />
-          <span className="text-sm line-clamp-1">{article.feed?.title}</span>
+          <span className="text-sm line-clamp-1">{article.feed.title}</span>
         </Link>
       )}
-      <div
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
-        className={`${container} py-2 h-full`}
+
+      <Link
+        to="/articles/$articleId"
+        params={{ articleId: article.id?.toString() || "" }}
       >
-        <div className={`${textWrapper} flex flex-col flex-grow`}>
-          <Link
-            to="/articles/$articleId"
-            params={{ articleId: article.id?.toString() || "" }}
-          >
-            <h3 className="text-lg md:text-xl font-semibold mb-2">
-              {article.title}
-            </h3>
-            <div className="hidden md:block opacity-75">
-              <p className="mb-2 line-clamp-2 text-sm">
-                {article.description || ""}
-              </p>
-            </div>
-          </Link>
-          <div className="flex justify-between pt-2 mt-auto">
-            <p className="leading-6 text-sm">
-              {moment.utc(article.pub_date).fromNow()}
-            </p>
-            <ArticleActions
-              className={`${isHovering ? 'visible' : 'invisible'}`}
-              article={article}
-              setArticle={setArticle}
-            >
-            </ArticleActions>
-          </div>
-        </div>
+        <h3 className="text-base md:text-lg line-clamp-2 font-semibold mb-1">
+          {article.title}
+        </h3>
 
-        <div className={`${imageWrapper}`}>
-          <ThumbnailOrMedia
-            article={article}
-          />
-        </div>
+        <p className={`opacity-75 text-sm ${isGrid ? "line-clamp-3" : "line-clamp-2"}`}>
+          {article.description || ""}
+        </p>
+      </Link>
 
+      <div className="flex justify-between items-center pt-1 mt-1">
+        <p className="leading-6 text-sm opacity-80">
+          {moment.utc(article.pub_date).fromNow()}
+        </p>
+        <ArticleActions
+          className={`${isHovering ? "visible" : "invisible"}`}
+          article={article}
+          setArticle={setArticle}
+        />
       </div>
-    </div >
+    </div>
   );
 };
 

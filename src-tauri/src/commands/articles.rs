@@ -1,5 +1,6 @@
+use crate::core::jobs::complete_article;
 use crate::entities::articles::ArticlesFilters;
-use crate::models::Article;
+use crate::models::{Article, NewArticle};
 use tauri::command;
 
 #[command]
@@ -24,7 +25,38 @@ pub async fn list_articles(
 pub async fn show_article(article_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command show_article. article_id: {article_id:?}");
 
-    let result = crate::entities::articles::show(article_id, app_handle);
+    let mut result = crate::entities::articles::show(article_id, app_handle.clone());
+
+    if let Some(article_with_feed) = result.as_mut() {
+        let scrape_mode = crate::entities::configurations::find_by_name(
+            "ARTICLE_SCRAPE_MODE",
+            app_handle.clone(),
+        )
+        .map(|configuration| configuration.value)
+        .unwrap_or(String::from("ON_DEMAND"));
+
+        let has_content = article_with_feed
+            .article
+            .content
+            .as_ref()
+            .map(|content| !content.trim().is_empty())
+            .unwrap_or(false);
+
+        if scrape_mode == "ON_DEMAND" && !has_content {
+            let completed_article =
+                complete_article(NewArticle::from(&article_with_feed.article)).await;
+
+            article_with_feed.article.title = completed_article.title;
+            article_with_feed.article.description = completed_article.description;
+            article_with_feed.article.content = completed_article.content;
+
+            article_with_feed.article = crate::entities::articles::update(
+                article_id,
+                article_with_feed.article.clone(),
+                app_handle.clone(),
+            );
+        }
+    }
 
     match serde_json::to_string(&result) {
         Ok(json_string) => Ok(json_string),
@@ -35,10 +67,23 @@ pub async fn show_article(article_id: i32, app_handle: tauri::AppHandle) -> Resu
 #[command]
 pub async fn update_article(
     article_id: i32,
-    article: Article,
+    mut article: Article,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command update_article. article_id: {article_id:?}");
+
+    let has_content = article
+        .content
+        .as_ref()
+        .map(|content| !content.trim().is_empty())
+        .unwrap_or(false);
+
+    if article.read_later == 1 && !has_content {
+        let completed_article = complete_article(NewArticle::from(&article)).await;
+        article.title = completed_article.title;
+        article.description = completed_article.description;
+        article.content = completed_article.content;
+    }
 
     let result = crate::entities::articles::update(article_id, article, app_handle);
 
@@ -63,55 +108,4 @@ pub async fn update_articles_as_read_by_feed_id(
     log::debug!(target: "chaski:commands","Command update_articles_as_read_by_feed. feed_id: {feed_id:?}");
     crate::entities::articles::update_all_as_read_by_feed_id(feed_id, app_handle);
     Ok(())
-}
-
-#[command]
-pub async fn scrape_and_update_article(
-    article_id: i32,
-    app_handle: tauri::AppHandle,
-) -> Result<String, ()> {
-    log::debug!(target: "chaski:commands","Command scrape_and_update_article. article_id: {article_id:?}");
-
-    let mut current_article = match crate::entities::articles::show(article_id, app_handle.clone())
-    {
-        Some(article_with_feed) => article_with_feed.article,
-        None => {
-            let response = serde_json::json!({
-                "success": false,
-                "message": format!("Article with id {} not found", article_id),
-                "data": null
-            });
-            return Ok(response.to_string());
-        }
-    };
-
-    let scraped_data = match crate::utils::scrape::scrape_article_data(&current_article.link).await
-    {
-        Ok(data) => data,
-        Err(e) => {
-            let response = serde_json::json!({
-                "success": false,
-                "message": format!("Failed to scrape article: {}", e),
-                "data": null
-            });
-            return Ok(response.to_string());
-        }
-    };
-
-    if let Some(image) = scraped_data.image {
-        current_article.thumbnail = Some(image);
-    }
-    if let Some(content) = scraped_data.content {
-        current_article.content = Some(content);
-    }
-
-    let result = crate::entities::articles::update(article_id, current_article, app_handle);
-
-    let response = serde_json::json!({
-        "success": true,
-        "message": "Article updated successfully",
-        "data": result
-    });
-
-    Ok(response.to_string())
 }

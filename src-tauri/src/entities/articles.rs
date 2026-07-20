@@ -1,3 +1,4 @@
+use crate::core::jobs::complete_article;
 use crate::db::establish_connection;
 use crate::models::{
     Article, ArticleWithFeed, Feed, NewArticle, ShortArticle, ShortArticleWithFeed,
@@ -7,7 +8,6 @@ use diesel::prelude::*;
 use diesel::sql_query;
 use serde::Deserialize;
 
-use crate::core::jobs::complete_article;
 use crate::schema::articles;
 use crate::schema::articles::dsl::*;
 use crate::schema::feeds;
@@ -244,11 +244,13 @@ pub async fn create_list(
         .filter(|article| !existing_links.contains(&article.link))
         .collect();
 
+    let scrape_mode =
+        crate::entities::configurations::find_by_name("ARTICLE_SCRAPE_MODE", app_handle.clone())
+            .map(|configuration| configuration.value)
+            .unwrap_or(String::from("ON_DEMAND"));
+
     for mut new_article in filtered_articles {
-        if new_article.entry_type == "article"
-            && (new_article.thumbnail.is_none() || new_article.media_content_url.is_none())
-            && new_article.content.is_none()
-        {
+        if scrape_mode == "ALWAYS" && new_article.content.is_none() {
             new_article = complete_article(new_article).await;
         }
 

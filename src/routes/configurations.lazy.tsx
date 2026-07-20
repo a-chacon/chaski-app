@@ -19,7 +19,9 @@ export default function Configurations() {
     currentFontSpace,
     handleSetCurrentFontSpace,
     currentMarkAsReadOnHover,
-    handleSetMarkAsReadOnHover
+    handleSetMarkAsReadOnHover,
+    currentArticleScrapeMode,
+    handleSetCurrentArticleScrapeMode,
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
@@ -140,6 +142,14 @@ export default function Configurations() {
                 <div className="flex flex-col gap-4">
                   <Switch isSelected={currentMarkAsReadOnHover} onValueChange={handleSetMarkAsReadOnHover} >
                     Mark as Read on hover.
+                  </Switch>
+                  <Switch
+                    isSelected={currentArticleScrapeMode === "ALWAYS"}
+                    onValueChange={(enabled) =>
+                      handleSetCurrentArticleScrapeMode(enabled ? "ALWAYS" : "ON_DEMAND")
+                    }
+                  >
+                    Download articles always (otherwise scrape on demand)
                   </Switch>
                   <Switch isSelected={autostartState} onValueChange={handleAutostartChange} >
                     Autostart Application

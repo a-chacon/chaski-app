@@ -1,0 +1,1 @@
+DELETE FROM configurations WHERE name = 'ARTICLE_SCRAPE_MODE';

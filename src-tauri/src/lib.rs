@@ -14,8 +14,6 @@ mod entities {
 }
 
 mod utils {
-    pub(crate) mod article_extractor;
-    pub(crate) mod detect_entry_type;
     pub(crate) mod notifications;
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;
@@ -102,9 +100,11 @@ pub fn run() {
             accounts::spawn_greaderapi_accounts_sync_loop(handler_clone_for_accounts);
             Ok(())
         })
-        .on_window_event(|window, event| if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-            window.hide().unwrap();
-            api.prevent_close();
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                window.hide().unwrap();
+                api.prevent_close();
+            }
         })
         .invoke_handler(tauri::generate_handler![
             commands::feeds::fetch_site_feeds,
@@ -137,8 +137,7 @@ pub fn run() {
             commands::accounts::create_account,
             commands::accounts::full_sync,
             commands::accounts::show_account,
-            commands::accounts::destroy_account,
-            commands::articles::scrape_and_update_article
+            commands::accounts::destroy_account
         ])
         .run(ctx)
         .expect("error while building tauri application");

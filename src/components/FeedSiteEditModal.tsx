@@ -8,8 +8,7 @@ import {
   Input,
   Switch,
   Textarea,
-  Select,
-  SelectItem,
+
 } from "@heroui/react";
 import { FeedInterface } from "../interfaces";
 import FolderField from "./FolderField";
@@ -42,9 +41,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     feed.notifications_enabled == 1,
   );
-  const [defaultEntryType, setDefaultEntryType] = useState(
-    feed.default_entry_type || 'article'
-  );
+
 
   const onSave = async () => {
     feed.title = title;
@@ -53,7 +50,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
     feed.history_limit = historyLimit;
     feed.update_interval_minutes = updateIntervalMinutes;
     feed.notifications_enabled = notificationsEnabled ? 1 : 0;
-    feed.default_entry_type = defaultEntryType;
+    feed.default_entry_type = "article";
     let response = await updateFeed(feed);
     if (response.success) {
       setFeed(response.data);
@@ -119,16 +116,6 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
                 Notifications Enabled
               </Switch>
 
-              <Select
-                label="Default Entry Type"
-                selectedKeys={[defaultEntryType]}
-                onSelectionChange={(keys) => setDefaultEntryType(Array.from(keys)[0] as string)}
-                variant="underlined"
-                description="This change apply for new entries only."
-              >
-                <SelectItem key="article">Article</SelectItem>
-                <SelectItem key="microblog">Microblog</SelectItem>
-              </Select>
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onCloseModal}>

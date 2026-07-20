@@ -102,12 +102,9 @@ pub fn run() {
             accounts::spawn_greaderapi_accounts_sync_loop(handler_clone_for_accounts);
             Ok(())
         })
-        .on_window_event(|window, event| match event {
-            tauri::WindowEvent::CloseRequested { api, .. } => {
-                window.hide().unwrap();
-                api.prevent_close();
-            }
-            _ => {}
+        .on_window_event(|window, event| if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            window.hide().unwrap();
+            api.prevent_close();
         })
         .invoke_handler(tauri::generate_handler![
             commands::feeds::fetch_site_feeds,

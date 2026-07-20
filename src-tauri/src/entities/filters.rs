@@ -42,11 +42,10 @@ pub fn apply_filters(articles: Vec<NewArticle>, filters_to_apply: Vec<Filter>) -
                                 return false; // Short-circuit: if any filter fails, skip the item
                             }
                         }
-                        "OR" => {
-                            if matches {
+                        "OR"
+                            if matches => {
                                 return true; // Short-circuit: if any filter passes, keep the item
                             }
-                        }
                         _ => {}
                     }
                 }

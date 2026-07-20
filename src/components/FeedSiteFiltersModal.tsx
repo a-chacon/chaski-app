@@ -17,6 +17,7 @@ import {
   indexFilters,
 } from "../helpers/filtersData";
 
+
 interface FeedSiteFiltersModalProps {
   feed: FeedInterface;
   isOpen: boolean;

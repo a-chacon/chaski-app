@@ -10,6 +10,7 @@ import { useState } from "react";
 import GReaderForm from "./NewAccountForms/GReaderForm";
 import { RiArrowGoBackLine } from "@remixicon/react";
 
+
 interface NewAccountModalInterface {
   isOpen: boolean;
   onOpen: () => void;

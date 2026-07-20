@@ -5,6 +5,7 @@ import { AppContext } from "../../AppContext";
 import { AccountInterface, ConfigurationInterface } from "../../interfaces";
 import { load } from '@tauri-apps/plugin-store';
 import FeedbackModal from "../FeedbackModal";
+import WindowTitlebar from "../WindowTitlebar";
 import { indexAccounts } from "../../helpers/accountsData";
 import { useDisclosure } from "@heroui/react";
 import {
@@ -34,6 +35,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
   const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
   const feedbackModalState = useDisclosure();
+  const isTauriApp = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
   const handleSetCurrentFont = (font: string) => {
     if (font === "") {
@@ -222,49 +224,55 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       }}
     >
       <NotificationProvider>
-        <div className="relative h-screen flex flex-col-reverse md:flex-row p-2 gap-2">
-          <Header />
+        <div className="h-screen p-[2px]">
+          <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
+            {isTauriApp && <WindowTitlebar />}
 
-          <SideBar hidden={!sideBarOpen} />
+            <div className="relative min-h-0 flex-1 flex flex-col-reverse md:flex-row p-2 gap-2">
+              <Header />
 
-          {children}
-          {showFeedbackAlert && (
-            <div className="fixed bottom-4 right-4 z-50">
-              <Alert
-                color="warning"
-                description="You've been using the application for a while. Would you like to give us your feedback?"
-                endContent={
-                  <div className="flex gap-2">
-                    <Button
-                      color="warning"
-                      size="sm"
-                      variant="flat"
-                      onPress={() => {
-                        feedbackModalState.onOpen();
-                        setShowFeedbackAlert(false);
-                      }}
-                    >
-                      Give feedback
-                    </Button>
-                    <Button
-                      color="default"
-                      size="sm"
-                      variant="flat"
-                      onPress={() => setShowFeedbackAlert(false)}
-                    >
-                      Cerrar
-                    </Button>
-                  </div>
-                }
-                title="How is your experience going?"
-                variant="faded"
+              <SideBar hidden={!sideBarOpen} />
+
+              {children}
+              {showFeedbackAlert && (
+                <div className="fixed bottom-4 right-4 z-50">
+                  <Alert
+                    color="warning"
+                    description="You've been using the application for a while. Would you like to give us your feedback?"
+                    endContent={
+                      <div className="flex gap-2">
+                        <Button
+                          color="warning"
+                          size="sm"
+                          variant="flat"
+                          onPress={() => {
+                            feedbackModalState.onOpen();
+                            setShowFeedbackAlert(false);
+                          }}
+                        >
+                          Give feedback
+                        </Button>
+                        <Button
+                          color="default"
+                          size="sm"
+                          variant="flat"
+                          onPress={() => setShowFeedbackAlert(false)}
+                        >
+                          Cerrar
+                        </Button>
+                      </div>
+                    }
+                    title="How is your experience going?"
+                    variant="faded"
+                  />
+                </div>
+              )}
+              <FeedbackModal
+                isOpen={feedbackModalState.isOpen}
+                onOpenChange={feedbackModalState.onOpenChange}
               />
             </div>
-          )}
-          <FeedbackModal
-            isOpen={feedbackModalState.isOpen}
-            onOpenChange={feedbackModalState.onOpenChange}
-          />
+          </div>
         </div>
       </NotificationProvider>
     </AppContext.Provider>

@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://chaski.a-chacon.com"><img src="http://chaski.a-chacon.com/chaski.png" alt="Chaski App Logo" width="200"></a>
+  <a href="https://chaski.a-chacon.com"><img src="https://raw.githubusercontent.com/a-chacon/chaski-app/main/docs/images/chaski.png" alt="Chaski App Logo" width="200"></a>
   <br>
   Chaski App
   <br>
@@ -20,8 +20,6 @@
   <a href="#contributing">Contribute</a> •
   <a href="#license">License</a>
 </p>
-
-**Disclaimer:** This project will only receive critical updates and bug fixes from me. No new features will be added unless they come via a PR (following the project's principles of keeping it simple).
 
 ## Support
 

@@ -4,8 +4,6 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const appWindow = getCurrentWindow();
 
-const titlebarButtonClass =
-  "h-8 w-8 inline-flex items-center justify-center rounded-md text-foreground-700 hover:bg-default-200 transition-colors";
 
 const WindowTitlebar: React.FC = () => {
   return (

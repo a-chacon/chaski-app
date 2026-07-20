@@ -11,6 +11,18 @@ pub fn index(app_handle: tauri::AppHandle) -> Vec<Configuration> {
         .expect("Error loading configurations")
 }
 
+pub fn find_by_name(
+    configuration_name: &str,
+    app_handle: tauri::AppHandle,
+) -> Option<Configuration> {
+    configurations
+        .filter(name.eq(configuration_name))
+        .select(Configuration::as_select())
+        .first(&mut establish_connection(&app_handle))
+        .optional()
+        .unwrap_or(None)
+}
+
 pub fn update(
     configuration_id: i32,
     mut configuration: Configuration,

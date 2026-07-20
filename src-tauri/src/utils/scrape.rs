@@ -7,10 +7,9 @@ use reqwest::{
 };
 use rss::Channel;
 use scraper::{Html, Selector};
+use std::error::Error;
 use std::io::Cursor;
 use tokio::time::{sleep, Duration};
-
-use super::article_extractor;
 
 fn build_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
@@ -303,33 +302,62 @@ pub async fn scrape_feed_articles(feed: &Feed) -> Result<Vec<NewArticle>, ()> {
 }
 
 #[derive(Debug)]
-pub struct ActicleData {
+pub struct ArticleContentData {
     pub title: Option<String>,
     pub description: Option<String>,
-    pub image: Option<String>,
     pub content: Option<String>,
 }
 
-pub async fn scrape_article_data(url: &str) -> Result<ActicleData, Box<dyn std::error::Error>> {
-    let parsed_url = Url::parse(url)?;
+pub async fn scrape_article_content(url: &str) -> Result<ArticleContentData, Box<dyn Error>> {
     let client = create_async_client()?;
-    let res = client.get(url).send().await?;
+    let response = client.get(url).send().await?;
 
-    if res.status().is_success() {
-        let body = res.text().await?;
-
-        Ok(ActicleData {
-            title: article_extractor::extract_title(&body),
-            description: article_extractor::extract_description(&body),
-            image: article_extractor::extract_cover(&body),
-            content: article_extractor::extract_content(&body, &parsed_url),
-        })
-    } else {
-        Ok(ActicleData {
-            image: None,
-            content: None,
+    if !response.status().is_success() {
+        return Ok(ArticleContentData {
             title: None,
             description: None,
-        })
+            content: None,
+        });
     }
+
+    let body = response.text().await?;
+    let document = Html::parse_document(&body);
+
+    let title = Selector::parse("title")
+        .ok()
+        .and_then(|selector| document.select(&selector).next())
+        .map(|node| node.text().collect::<String>().trim().to_string())
+        .filter(|value| !value.is_empty());
+
+    let description = Selector::parse("meta[name='description']")
+        .ok()
+        .and_then(|selector| document.select(&selector).next())
+        .and_then(|node| node.value().attr("content"))
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty());
+
+    let content = ["article", "main", "body"].iter().find_map(|tag| {
+        Selector::parse(tag).ok().and_then(|selector| {
+            document.select(&selector).next().and_then(|node| {
+                let text = node
+                    .text()
+                    .map(|chunk| chunk.trim())
+                    .filter(|chunk| !chunk.is_empty())
+                    .collect::<Vec<_>>()
+                    .join("\n\n");
+
+                if text.is_empty() {
+                    None
+                } else {
+                    Some(text)
+                }
+            })
+        })
+    });
+
+    Ok(ArticleContentData {
+        title,
+        description,
+        content,
+    })
 }

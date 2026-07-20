@@ -303,6 +303,28 @@ impl From<atom_syndication::Feed> for NewFeed {
     }
 }
 
+impl From<&Article> for NewArticle {
+    fn from(article: &Article) -> Self {
+        NewArticle {
+            title: article.title.clone(),
+            link: article.link.clone(),
+            thumbnail: article.thumbnail.clone(),
+            pub_date: article.pub_date,
+            description: article.description.clone(),
+            content: article.content.clone(),
+            read_later: article.read_later,
+            read: article.read,
+            hide: article.hide,
+            author: article.author.clone(),
+            feed_id: article.feed_id,
+            external_id: article.external_id.clone(),
+            entry_type: article.entry_type.clone(),
+            media_content_url: article.media_content_url.clone(),
+            media_content_type: article.media_content_type.clone(),
+        }
+    }
+}
+
 impl NewArticle {
     pub fn from_feed_and_item(feed: &Feed, item: rss::Item) -> Self {
         let mut media_content_url = None;

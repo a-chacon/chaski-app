@@ -64,8 +64,7 @@ pub fn create_feed(
         new_feed.last_fetch = None;
     }
 
-    new_feed.default_entry_type =
-        crate::utils::detect_entry_type::detect_entry_type(&new_feed.link).to_string();
+    new_feed.default_entry_type = String::from("article");
 
     let created_feed = diesel::insert_into(feeds::table)
         .values(&new_feed)
@@ -122,18 +121,18 @@ pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec
     let conn = &mut establish_connection(&app_handle);
 
     let mut query = r#"
-        SELECT 
-            feeds.id, 
-            feeds.title, 
-            feeds.folder, 
+        SELECT
+            feeds.id,
+            feeds.title,
+            feeds.folder,
             feeds.icon,
             COALESCE(COUNT(articles.id), 0) AS unread_count
-        FROM 
+        FROM
             feeds
-        LEFT JOIN 
-            articles 
-        ON 
-            articles.feed_id = feeds.id 
+        LEFT JOIN
+            articles
+        ON
+            articles.feed_id = feeds.id
             AND articles.read = 0
     "#
     .to_string();
@@ -145,7 +144,7 @@ pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec
     }
     query.push_str(
         r#"
-        GROUP BY 
+        GROUP BY
             feeds.id, feeds.title, feeds.folder, feeds.icon
     "#,
     );

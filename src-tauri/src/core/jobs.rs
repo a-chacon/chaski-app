@@ -3,38 +3,28 @@ use crate::entities::filters;
 use crate::entities::filters::FilterFilters;
 use crate::models::{Feed, NewArticle};
 use crate::utils::notifications::notify_new_entries;
-use crate::utils::scrape::scrape_article_data;
-use crate::utils::scrape::scrape_feed_articles;
+use crate::utils::scrape::{scrape_article_content, scrape_feed_articles};
 use chrono::Utc;
 
 pub async fn complete_article(mut article: NewArticle) -> NewArticle {
-    let result = scrape_article_data(&article.link).await;
+    let result = scrape_article_content(&article.link).await;
 
     match result {
         Ok(article_page_data) => {
-            article.title = Some(
-                article_page_data
-                    .title
-                    .unwrap_or(article.title.unwrap_or_default()),
-            );
-            article.description = Some(
-                article_page_data
-                    .description
-                    .unwrap_or(article.description.unwrap_or_default()),
-            );
-            article.thumbnail = Some(
-                article_page_data
-                    .image
-                    .unwrap_or(article.thumbnail.unwrap_or_default()),
-            );
-            article.content = Some(
-                article_page_data
-                    .content
-                    .unwrap_or(article.content.unwrap_or_default()),
-            );
+            if let Some(title) = article_page_data.title {
+                article.title = Some(title);
+            }
+
+            if let Some(description) = article_page_data.description {
+                article.description = Some(description);
+            }
+
+            if let Some(content) = article_page_data.content {
+                article.content = Some(content);
+            }
         }
         Err(_e) => {
-            println!("Error article page data");
+            println!("Error scraping article content");
         }
     }
 

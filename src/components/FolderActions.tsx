@@ -18,6 +18,7 @@ import { renameFolder, deleteFolder } from "../helpers/foldersData";
 import { useNotification } from "../NotificationContext";
 import { AccountInterface } from "../interfaces";
 
+
 interface FolderActionsProps {
   account: AccountInterface;
   folder: string;

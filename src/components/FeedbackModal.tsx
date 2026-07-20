@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react";
 
+
 declare global {
   interface Window {
     Tally?: {

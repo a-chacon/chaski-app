@@ -36,7 +36,11 @@
       {
         "title": "Chaski",
         "width": 1200,
-        "height": 720
+        "height": 720,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "backgroundColor": "#00000000"
       }
     ],
     "security": {

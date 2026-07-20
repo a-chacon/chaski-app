@@ -15,6 +15,7 @@ import { fullTextSearch } from "../helpers/searchData";
 import { SearchResultsInterface } from "../interfaces";
 import { Link } from "@tanstack/react-router";
 
+
 export default function SearchModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [value, setValue] = useState("");

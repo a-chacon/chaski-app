@@ -33,8 +33,8 @@ export default function Folder() {
     try {
       const message = await invoke<string>('list_entries', {
         page,
-        items: 20,
-        filters: { folder_eq: folderName, read_eq: 0, account_id_eq: accountId },
+        items: 50,
+        filters: { folder_eq: folderName, account_id_eq: accountId },
       })
 
       const new_entries: EntryInterface[] = JSON.parse(message)

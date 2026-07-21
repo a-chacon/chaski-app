@@ -39,7 +39,7 @@ export default function ReadLater() {
 
       const message = await invoke<string>('list_entries', {
         page: page,
-        items: 20,
+        items: 50,
         filters: {
           read_later_eq: 1,
           account_id_eq: currentAccount.id,

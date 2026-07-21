@@ -12,7 +12,6 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AccountAccountIdRouteImport } from './routes/account.$accountId'
 import { Route as EntriesEntryIdRouteImport } from './routes/entries.$entryId'
 import { Route as FeedsFeedIdRouteImport } from './routes/feeds.$feedId'
 import { Route as FoldersFolderNameRouteImport } from './routes/folders.$folderName'
@@ -55,11 +54,6 @@ const Read_laterLazyRoute = Read_laterLazyRouteImport.update({
   path: '/read_later',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/read_later.lazy').then((d) => d.Route))
-const AccountAccountIdRoute = AccountAccountIdRouteImport.update({
-  id: '/account/$accountId',
-  path: '/account/$accountId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EntriesEntryIdRoute = EntriesEntryIdRouteImport.update({
   id: '/entries/$entryId',
   path: '/entries/$entryId',
@@ -83,7 +77,6 @@ export interface FileRoutesByFullPath {
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
-  '/account/$accountId': typeof AccountAccountIdRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
@@ -95,7 +88,6 @@ export interface FileRoutesByTo {
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
-  '/account/$accountId': typeof AccountAccountIdRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
@@ -108,7 +100,6 @@ export interface FileRoutesById {
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
-  '/account/$accountId': typeof AccountAccountIdRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
   '/folders/$folderName': typeof FoldersFolderNameRoute
@@ -122,7 +113,6 @@ export interface FileRouteTypes {
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
-    | '/account/$accountId'
     | '/entries/$entryId'
     | '/feeds/$feedId'
     | '/folders/$folderName'
@@ -134,7 +124,6 @@ export interface FileRouteTypes {
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
-    | '/account/$accountId'
     | '/entries/$entryId'
     | '/feeds/$feedId'
     | '/folders/$folderName'
@@ -146,7 +135,6 @@ export interface FileRouteTypes {
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
-    | '/account/$accountId'
     | '/entries/$entryId'
     | '/feeds/$feedId'
     | '/folders/$folderName'
@@ -159,7 +147,6 @@ export interface RootRouteChildren {
   New_feedLazyRoute: typeof New_feedLazyRoute
   OnboardingLazyRoute: typeof OnboardingLazyRoute
   Read_laterLazyRoute: typeof Read_laterLazyRoute
-  AccountAccountIdRoute: typeof AccountAccountIdRoute
   EntriesEntryIdRoute: typeof EntriesEntryIdRoute
   FeedsFeedIdRoute: typeof FeedsFeedIdRoute
   FoldersFolderNameRoute: typeof FoldersFolderNameRoute
@@ -209,13 +196,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Read_laterLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/$accountId': {
-      id: '/account/$accountId'
-      path: '/account/$accountId'
-      fullPath: '/account/$accountId'
-      preLoaderRoute: typeof AccountAccountIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/entries/$entryId': {
       id: '/entries/$entryId'
       path: '/entries/$entryId'
@@ -247,7 +227,6 @@ const rootRouteChildren: RootRouteChildren = {
   New_feedLazyRoute: New_feedLazyRoute,
   OnboardingLazyRoute: OnboardingLazyRoute,
   Read_laterLazyRoute: Read_laterLazyRoute,
-  AccountAccountIdRoute: AccountAccountIdRoute,
   EntriesEntryIdRoute: EntriesEntryIdRoute,
   FeedsFeedIdRoute: FeedsFeedIdRoute,
   FoldersFolderNameRoute: FoldersFolderNameRoute,

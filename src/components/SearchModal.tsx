@@ -52,9 +52,10 @@ export default function SearchModal() {
     <>
       <Button
         onPress={onOpen}
-        variant="flat"
+        variant="light"
+        size="sm"
         isIconOnly
-        className="rounded-full items-center h-10 w-10 flex justify-center"
+        aria-label="Search feeds and entries"
       >
         <RiSearchLine className="p-0.5" />
       </Button>

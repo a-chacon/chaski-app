@@ -13,11 +13,14 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { RiAddLine, RiCheckLine, RiCloseLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
+import { RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
+import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import NewAccountModal from "./NewAccountModal";
 import { AccountInterface } from "../interfaces";
 import { deleteAccount } from "../helpers/accountsData";
+import SearchModal from "./SearchModal";
+import UserMenu from "./UserMenu";
 
 const appWindow = getCurrentWindow();
 
@@ -31,6 +34,8 @@ const WindowTitlebar: React.FC = () => {
     setAccounts,
     currentAccount,
     setCurrentAccount,
+    sideBarOpen,
+    setSideBarOpen,
   } = useAppContext();
 
   const openDeleteModal = (account: AccountInterface) => {
@@ -57,14 +62,55 @@ const WindowTitlebar: React.FC = () => {
 
   return (
     <div className="h-10 border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none">
+      <div className="flex items-center gap-1 text-primary-500">
+        <Tooltip content={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"} delay={300}>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            aria-label={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            onPress={() => setSideBarOpen((prev) => !prev)}
+          >
+            {sideBarOpen ? <RiSidebarFoldLine /> : <RiSidebarUnfoldLine />}
+          </Button>
+        </Tooltip>
+        <Tooltip content="Application menu" delay={300}>
+          <div>
+            <UserMenu />
+          </div>
+        </Tooltip>
+
+        <Tooltip content="Search feeds and entries" delay={300}>
+          <div>
+            <SearchModal />
+          </div>
+        </Tooltip>
+
+        <Tooltip content="Add new feed" delay={300}>
+          <Button
+            color="primary"
+            variant="light"
+            isIconOnly
+            size="sm"
+            aria-label="Add new feed"
+          >
+            <Link
+              to="/new_feed"
+              activeProps={{
+                className: "text-primary-500",
+              }}
+            >
+              <RiAddCircleLine />
+            </Link>
+          </Button>
+        </Tooltip>
+      </div>
+
       <div
         data-tauri-drag-region
-        className="flex-1 h-full flex items-center px-2 text-sm text-foreground-600"
-      >
-        <span data-tauri-drag-region className="font-medium text-primary-500">
-          Chaski
-        </span>
-      </div>
+        className="flex-1 h-full"
+      />
 
       <div className="flex items-center gap-1 text-primary-500">
         <Popover placement="bottom-end">
@@ -127,6 +173,7 @@ const WindowTitlebar: React.FC = () => {
             </div>
           </PopoverContent>
         </Popover>
+
 
         <Button
           color="primary"

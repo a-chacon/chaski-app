@@ -166,7 +166,7 @@ export default {
         "blue-dark": {
           "extend": "dark",
           "colors": {
-            "background": "#000e1b",
+            "background": "#000814",
             "foreground": "#ffffff",
             "primary": {
               "50": "#000e1b",
@@ -189,7 +189,7 @@ export default {
         "yellow-dark": {
           "extend": "dark",
           "colors": {
-            "background": "#1c1200",
+            "background": "#120b00",
             "foreground": "#ffffff",
             "primary": {
               "50": "#1c1200",
@@ -209,30 +209,11 @@ export default {
           }
         },
 
-        "yellow-dark": {
-          extend: "dark",
-          colors: {
-            primary: {
-              50: "#9f7a00",
-              100: "#b98c00",
-              200: "#d29f00",
-              300: "#e6b700",
-              400: "#f7c800",
-              500: "#f9d128",
-              600: "#fbd95b",
-              700: "#fddf8e",
-              800: "#fef0c1",
-              900: "#fff8e3",
-              DEFAULT: "#f7c800",
-              foreground: "#ffffff",
-            },
-            focus: "#e6b700",
-          },
-        },
+
         "red-dark": {
           "extend": "dark",
           "colors": {
-            "background": "#1c0303",
+            "background": "#140202",
             "foreground": "#ffffff",
             "primary": {
               "50": "#1c0303",
@@ -278,7 +259,7 @@ export default {
         "purple-dark": {
           "extend": "dark",
           "colors": {
-            "background": "#0e0718",
+            "background": "#090412",
             "foreground": "#ffffff",
             "primary": {
               "50": "#0e0718",
@@ -301,7 +282,7 @@ export default {
         "green-dark": {
           "extend": "dark",
           "colors": {
-            "background": "#0a1100",
+            "background": "#070d00",
             "foreground": "#ffffff",
             "primary": {
               "50": "#0a1100",

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Header from "../Header";
 import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
 import { AccountInterface, ConfigurationInterface } from "../../interfaces";
@@ -12,15 +11,26 @@ import {
   indexConfigurations,
   updateConfiguration,
 } from "../../helpers/configurationsData";
-import { NotificationProvider } from "../../NotificationContext";
+import { NotificationProvider, useNotification } from "../../NotificationContext";
 import { Alert, Button } from "@heroui/react";
+import updater from "../../helpers/updater";
 
 interface ApplicationProps {
   children: React.ReactNode;
 }
 
+const UpdaterBootstrap: React.FC = () => {
+  const { addNotification } = useNotification();
+
+  useEffect(() => {
+    updater(addNotification);
+  }, [addNotification]);
+
+  return null;
+};
+
 const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
-  const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [sideBarOpen, setSideBarOpen] = useState(true);
   const [entriesLayout, setEntriesLayout] = useState<string>("list");
   const [currentTheme, setCurrentTheme] = useState<string>("AUTO");
   const [isMobile, setIsMobile] = useState(false);
@@ -109,11 +119,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   };
 
   const checkViewport = () => {
-    if (window.innerWidth < 768) {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
+    const mobileViewport = window.innerWidth < 768;
+    setIsMobile(mobileViewport);
   };
 
   const setCurrentConfigurations = async () => {
@@ -125,7 +132,10 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentConfigurations();
     getCurrentAccounts();
     getPersistedCurrentAccountId();
-    checkViewport();
+
+    const mobileViewport = window.innerWidth < 768;
+    setIsMobile(mobileViewport);
+    setSideBarOpen(!mobileViewport);
 
     const feedbackTimer = setTimeout(() => {
       setShowFeedbackAlert(true);
@@ -296,14 +306,18 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       }}
     >
       <NotificationProvider>
+        <UpdaterBootstrap />
+
         <div className="h-screen ">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
             {isTauriApp && <WindowTitlebar />}
 
-            <div className="relative min-h-0 flex-1 flex flex-col-reverse md:flex-row p-2 gap-2">
-              <Header />
-
-              <SideBar hidden={!sideBarOpen} />
+            <div className="relative min-h-0 flex-1 flex gap-2">
+              {sideBarOpen && (
+                <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5">
+                  <SideBar />
+                </div>
+              )}
 
               {children}
               {showFeedbackAlert && (

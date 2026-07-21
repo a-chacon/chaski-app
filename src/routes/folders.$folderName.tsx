@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
+import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import { Button, Tooltip } from '@heroui/react'
@@ -71,14 +72,15 @@ export default function Folder() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col p-4 max-w-screen-md mx-auto">
-        <div className="flex flex-col border-b py-4 justify-between items-start">
+      <div className="flex flex-col max-w-screen-md mx-auto">
+        <div className="flex flex-col py-8 justify-between items-start">
           <div className="flex flex-row justify-between w-full">
             <div className="flex flex-row">
               <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
             </div>
 
             <div className="flex flex-row items-center gap-2">
+              <EntryLayoutSwitch />
               <Tooltip content="Update All Entries of The Folder As Read">
                 <Button
                   isIconOnly

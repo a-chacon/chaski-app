@@ -22,7 +22,6 @@ const ConfigurationsLazyRouteImport = createFileRoute('/configurations')()
 const New_feedLazyRouteImport = createFileRoute('/new_feed')()
 const OnboardingLazyRouteImport = createFileRoute('/onboarding')()
 const Read_laterLazyRouteImport = createFileRoute('/read_later')()
-const TodayLazyRouteImport = createFileRoute('/today')()
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -56,11 +55,6 @@ const Read_laterLazyRoute = Read_laterLazyRouteImport.update({
   path: '/read_later',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/read_later.lazy').then((d) => d.Route))
-const TodayLazyRoute = TodayLazyRouteImport.update({
-  id: '/today',
-  path: '/today',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/today.lazy').then((d) => d.Route))
 const AccountAccountIdRoute = AccountAccountIdRouteImport.update({
   id: '/account/$accountId',
   path: '/account/$accountId',
@@ -89,7 +83,6 @@ export interface FileRoutesByFullPath {
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
-  '/today': typeof TodayLazyRoute
   '/account/$accountId': typeof AccountAccountIdRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
@@ -102,7 +95,6 @@ export interface FileRoutesByTo {
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
-  '/today': typeof TodayLazyRoute
   '/account/$accountId': typeof AccountAccountIdRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
@@ -116,7 +108,6 @@ export interface FileRoutesById {
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
-  '/today': typeof TodayLazyRoute
   '/account/$accountId': typeof AccountAccountIdRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
   '/feeds/$feedId': typeof FeedsFeedIdRoute
@@ -131,7 +122,6 @@ export interface FileRouteTypes {
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
-    | '/today'
     | '/account/$accountId'
     | '/entries/$entryId'
     | '/feeds/$feedId'
@@ -144,7 +134,6 @@ export interface FileRouteTypes {
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
-    | '/today'
     | '/account/$accountId'
     | '/entries/$entryId'
     | '/feeds/$feedId'
@@ -157,7 +146,6 @@ export interface FileRouteTypes {
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
-    | '/today'
     | '/account/$accountId'
     | '/entries/$entryId'
     | '/feeds/$feedId'
@@ -171,7 +159,6 @@ export interface RootRouteChildren {
   New_feedLazyRoute: typeof New_feedLazyRoute
   OnboardingLazyRoute: typeof OnboardingLazyRoute
   Read_laterLazyRoute: typeof Read_laterLazyRoute
-  TodayLazyRoute: typeof TodayLazyRoute
   AccountAccountIdRoute: typeof AccountAccountIdRoute
   EntriesEntryIdRoute: typeof EntriesEntryIdRoute
   FeedsFeedIdRoute: typeof FeedsFeedIdRoute
@@ -222,13 +209,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Read_laterLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/today': {
-      id: '/today'
-      path: '/today'
-      fullPath: '/today'
-      preLoaderRoute: typeof TodayLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/account/$accountId': {
       id: '/account/$accountId'
       path: '/account/$accountId'
@@ -267,7 +247,6 @@ const rootRouteChildren: RootRouteChildren = {
   New_feedLazyRoute: New_feedLazyRoute,
   OnboardingLazyRoute: OnboardingLazyRoute,
   Read_laterLazyRoute: Read_laterLazyRoute,
-  TodayLazyRoute: TodayLazyRoute,
   AccountAccountIdRoute: AccountAccountIdRoute,
   EntriesEntryIdRoute: EntriesEntryIdRoute,
   FeedsFeedIdRoute: FeedsFeedIdRoute,

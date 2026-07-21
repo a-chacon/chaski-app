@@ -9,7 +9,7 @@ const EntryLayoutSwitch: React.FC = () => {
   const { entriesLayout, setEntriesLayout } = useAppContext();
 
   return (
-    <div className="flex items-center gap-2 justify-end pt-4">
+    <div className="flex items-center gap-2 justify-end">
       <Button
         onPress={() => setEntriesLayout("list")}
         color={entriesLayout === "list" ? "primary" : "default"}

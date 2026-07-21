@@ -2,7 +2,6 @@ import { Spinner } from "@heroui/react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { EntryInterface } from "../interfaces";
 import EntryCard from "./EntryViews/Entry/EntryCard";
-import EntryLayoutSwitch from "./EntriesLayoutSwitch";
 import { useAppContext } from "../AppContext";
 import React, { useMemo } from "react";
 
@@ -30,12 +29,12 @@ function EntriesList({
       return "flex flex-col";
     }
 
-    return "flex flex-col";
+    return "flex flex-col gap-2";
   }, [display]);
 
   const EndMessage = React.memo(() => (
     <div className={`${display === "grid" ? "col-span-full" : ""} mx-auto`}>
-      <div className="pb-6 text-center">
+      <div className="p-6 text-center">
         <h5 className="text-2xl font-semibold pb-2">
           We've reached the end of the road…
         </h5>
@@ -46,7 +45,6 @@ function EntriesList({
 
   return (
     <div key="entries">
-      <EntryLayoutSwitch />
       <InfiniteScroll
         dataLength={entries.length}
         next={fetchEntries}

@@ -80,7 +80,7 @@ export default function RouteComponent() {
       setAccounts(prevAccounts =>
         prevAccounts.filter(acc => acc.id !== parseInt(accountId))
       );
-      navigate({ to: '/today' })
+      navigate({ to: '/' })
     } catch (error) {
       console.error('Error deleting account:', error);
     }

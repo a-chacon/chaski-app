@@ -58,7 +58,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
       {showButton && (
         <div>
           <Button
-            onClick={scrollToTop}
+            onPress={scrollToTop}
             variant="flat"
             color="primary"
             isIconOnly

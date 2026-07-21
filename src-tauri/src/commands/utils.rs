@@ -3,11 +3,17 @@ use serde_json::json;
 use tauri::command;
 
 #[command]
-pub async fn full_text_search(text: String, app_handle: tauri::AppHandle) -> Result<String, ()> {
+pub async fn full_text_search(
+    text: String,
+    account_id: Option<i32>,
+    app_handle: tauri::AppHandle,
+) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command full_text_search. text: {text:?}");
 
-    let entries = crate::entities::entries::full_text_search(&text, app_handle.clone()).await;
-    let feeds = crate::entities::feeds::full_text_search(&text, app_handle.clone()).await;
+    let entries =
+        crate::entities::entries::full_text_search(&text, account_id, app_handle.clone()).await;
+    let feeds =
+        crate::entities::feeds::full_text_search(&text, account_id, app_handle.clone()).await;
 
     let response = json!({
         "entries": entries,

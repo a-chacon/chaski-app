@@ -18,6 +18,7 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
 
   useEffect(() => {
     const fetchFeeds = async () => {
+      setLoading(true);
       const feeds = await indexFeeds(account.id!);
 
       const grouped = groupBy(feeds, (f) => f.folder);

@@ -1,27 +1,14 @@
-import { Button, useDisclosure, Tooltip } from "@heroui/react";
-import {
-  RiCalendarLine,
-  RiBookmarkFill,
-  RiAlignJustify,
-  RiAddCircleLine,
-  RiAccountBoxLine
-} from "@remixicon/react";
+import { RiBookmarkFill, RiAlignJustify } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
-import NewAccountModal from '../components/NewAccountModal';
-import AccountItem from "./SidebarItem/AccountItem";
+import AccountItemContent from "./SidebarItem/AccountItemContent";
 
 interface SideBarProps {
   hidden: boolean;
 }
 
 function SideBar({ hidden }: SideBarProps) {
-
-  const newAccountModal = useDisclosure()
-
-  const {
-    accounts,
-  } = useAppContext();
+  const { currentAccount } = useAppContext();
 
   const classes = `overflow-auto shadow md:border border-primary-100 shadow-xl md:rounded-3xl px-1 py-3 h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/3xl:w-1/5 absolute z-10 top-0 left-0 right-0 md:static ${hidden ? "hidden" : "block"}`;
 
@@ -50,30 +37,17 @@ function SideBar({ hidden }: SideBarProps) {
             Read Later
           </Link>
         </div>
-        <div className="px-3 flex flex-row justify-between items-center">
-          <div className="flex flex-row gap-2">
-            <RiAccountBoxLine />
-            <h5 className="font-bold" >
-              Accounts
-            </h5>
-          </div>
-          <Tooltip content="Add new account" delay={500} >
-            <Button variant="light" isIconOnly onPress={newAccountModal.onOpen} className="rounded-md">
-              <RiAddCircleLine></RiAddCircleLine>
-            </Button>
-          </Tooltip>
+
+        <div className="px-3 pb-1">
+          <h5 className="font-bold">{currentAccount ? currentAccount.name : "Feeds"}</h5>
         </div>
-        <NewAccountModal
-          isOpen={newAccountModal.isOpen}
-          onOpen={newAccountModal.onOpen}
-          onClose={newAccountModal.onClose}
-          onOpenChange={newAccountModal.onOpenChange}
-        />
 
         <div className="w-full relative flex flex-col gap-1 py-2">
-          {accounts.map((a) => {
-            return <AccountItem account={a} ></AccountItem>
-          })}
+          {currentAccount ? (
+            <AccountItemContent account={currentAccount} />
+          ) : (
+            <p className="px-3 text-sm text-foreground-500">No account selected. Add an account from the titlebar.</p>
+          )}
         </div>
       </div>
     </nav>

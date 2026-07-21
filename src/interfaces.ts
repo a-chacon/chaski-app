@@ -102,6 +102,8 @@ export interface AppContextInterface {
     React.SetStateAction<AccountInterface[]>
   >;
   accounts: AccountInterface[];
+  currentAccount: AccountInterface | null;
+  setCurrentAccount: React.Dispatch<React.SetStateAction<AccountInterface | null>>;
 }
 
 export interface SearchResultsInterface {

@@ -29,6 +29,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   >([]);
   const [accounts, setAccounts] = useState<
     AccountInterface[]>([]);
+  const [currentAccount, setCurrentAccount] = useState<AccountInterface | null>(null);
+  const [persistedCurrentAccountId, setPersistedCurrentAccountId] = useState<number | null>(null);
   const [currentFont, setCurrentFont] = useState<string>("font-opensans");
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
@@ -121,6 +123,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
 
   useEffect(() => {
     setCurrentConfigurations();
+    getCurrentAccounts();
+    getPersistedCurrentAccountId();
     checkViewport();
 
     const feedbackTimer = setTimeout(() => {
@@ -141,7 +145,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentConfigFontSpace();
     getCurrentConfigMarkAsReadOnHover();
     getCurrentConfigEntryScrapeMode();
-    getCurrentAccounts();
   }, [configurations]);
 
   const getCurrentAccounts = async () => {
@@ -151,6 +154,18 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     } catch (error) {
       console.error("Error fetching feeds:", error);
     }
+  };
+
+  const getPersistedCurrentAccountId = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const persistedAccount = await store.get<{ value: number | null }>('current-account-id');
+
+    if (typeof persistedAccount?.value === "number") {
+      setPersistedCurrentAccountId(persistedAccount.value);
+      return;
+    }
+
+    setPersistedCurrentAccountId(null);
   };
 
   const getCurrentConfigMarkAsReadOnHover = () => {
@@ -204,6 +219,38 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     handleSetCurrentTheme(currentTheme!.value);
   };
 
+  useEffect(() => {
+    if (accounts.length === 0) {
+      setCurrentAccount(null);
+      return;
+    }
+
+    const currentAccountStillExists = !!currentAccount &&
+      accounts.some((account) => account.id === currentAccount.id);
+
+    if (currentAccountStillExists) {
+      return;
+    }
+
+    const persistedAccount = accounts.find((account) => account.id === persistedCurrentAccountId);
+
+    if (persistedAccount) {
+      setCurrentAccount(persistedAccount);
+      return;
+    }
+
+    setCurrentAccount(accounts[0]);
+  }, [accounts, currentAccount, persistedCurrentAccountId]);
+
+  useEffect(() => {
+    const persistCurrentAccount = async () => {
+      const store = await load('settings.json', { autoSave: true });
+      await store.set('current-account-id', { value: currentAccount?.id ?? null });
+    };
+
+    persistCurrentAccount();
+  }, [currentAccount]);
+
   const handleSetCurrentTheme = async (newTheme: string) => {
     const store = await load('settings.json', { autoSave: true });
     const currentTheme = await store.get<{ value: string }>('theme');
@@ -243,7 +290,9 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         currentEntryScrapeMode,
         handleSetCurrentEntryScrapeMode,
         setAccounts,
-        accounts
+        accounts,
+        currentAccount,
+        setCurrentAccount
       }}
     >
       <NotificationProvider>

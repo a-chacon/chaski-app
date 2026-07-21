@@ -10,6 +10,7 @@ import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import { useNotification } from '../NotificationContext'
 import { updateAllEntriesAsRead } from '../helpers/feedsData'
+import { useAppContext } from '../AppContext'
 
 export const Route = createLazyFileRoute('/')({
   component: App,
@@ -17,6 +18,7 @@ export const Route = createLazyFileRoute('/')({
 
 export default function App() {
   const { addNotification } = useNotification()
+  const { currentAccount } = useAppContext()
   const { entries, setEntries, page, setPage, hasMore, setHasMore } =
     useEntries('/')
 
@@ -24,13 +26,27 @@ export default function App() {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page])
+  }, [page, currentAccount?.id])
+
+  useEffect(() => {
+    setEntries([])
+    setPage(1)
+    setHasMore(true)
+  }, [currentAccount?.id])
 
   const fetchEntries = async () => {
     try {
+      if (!currentAccount?.id) {
+        setHasMore(false)
+        return
+      }
+
       const message = await invoke<string>('list_entries', {
         page: page,
         items: 20,
+        filters: {
+          account_id_eq: currentAccount.id,
+        }
       })
 
       const new_entries: EntryInterface[] = JSON.parse(message)
@@ -50,6 +66,7 @@ export default function App() {
   const handleReloadButton = () => {
     setPage(1)
     setEntries([])
+    setHasMore(true)
 
     addNotification('Reloading', 'Entries are reloaded!', 'secondary')
   }

@@ -35,7 +35,7 @@ const VerticalHeader: React.FC<VerticalHeaderProps> = ({ }) => {
           className="rounded-full items-center h-10 w-10 flex justify-center"
         >
           <Link
-            to="/today"
+            to="/"
             activeProps={{
               className: "text-primary-500",
             }}

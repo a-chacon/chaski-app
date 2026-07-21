@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FeedInterface, EntryInterface } from "../interfaces";
 import moment from "moment";
+import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
@@ -85,8 +86,8 @@ export default function Feed() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col p-4 max-w-screen-md mx-auto">
-        <div className="flex flex-col border-b border-primary-500 py-4 justify-between items-start">
+      <div className="flex flex-col max-w-screen-md mx-auto">
+        <div className="flex flex-col py-8 justify-between items-start">
           <div className="flex flex-row justify-between w-full">
             <div className="flex flex-row">
               <img
@@ -97,12 +98,13 @@ export default function Feed() {
               <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
             </div>
             <div className="flex flex-row items-center gap-2">
+              <EntryLayoutSwitch />
               <Tooltip content="Update All Entries of The Feed As Read">
                 <Button
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onClick={handleUpdateAllEntriesAsRead}
+                  onPress={handleUpdateAllEntriesAsRead}
                 >
                   <RiCheckDoubleLine></RiCheckDoubleLine>
                 </Button>
@@ -112,7 +114,7 @@ export default function Feed() {
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onClick={handleRefreshEntries}
+                  onPress={handleRefreshEntries}
                 >
                   {refreshLoading ? (
                     <Spinner color="primary" size="sm" />

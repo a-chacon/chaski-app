@@ -70,7 +70,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
         feed.id = undefined;
         setIsSaved(false);
         addNotification("Feed Deleted", response.message, 'success');
-        navigate({ to: "/today" });
+        navigate({ to: "/" });
       } else {
         addNotification("Failed to delete feed", response.message, 'danger');
       }

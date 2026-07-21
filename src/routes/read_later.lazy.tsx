@@ -7,6 +7,7 @@ import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
+import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 
 export const Route = createLazyFileRoute('/read_later')({
   component: ReadLater,
@@ -52,13 +53,14 @@ export default function ReadLater() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col p-4 max-w-screen-md mx-auto">
-        <div className="flex border-b border-default-500 py-4 justify-between items-start">
+      <div className="flex flex-col max-w-screen-md mx-auto">
+        <div className="flex py-8 justify-between items-start">
           <div>
             <h1 className="text-3xl pt-2 font-bold">Read Later</h1>
             <h2 className="pt-1 pb-4">Curate your journey, one entry at a time.</h2>
           </div>
-          <div>
+          <div className="flex flex-row items-center gap-2">
+            <EntryLayoutSwitch />
             <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
               <RiRefreshLine></RiRefreshLine>
             </Button>

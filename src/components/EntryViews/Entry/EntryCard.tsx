@@ -80,23 +80,31 @@ const EntryCard: React.FC<EntryCardProps> = ({
   return (
     <div
       key={entry.id}
-      className={`p-2 rounded-xl  ${entry.read ? "opacity-75" : ""} ${entry.hide ? "hidden" : ""}`}
+      className={`rounded-xl ${entry.read ? "opacity-75" : ""} ${entry.hide ? "hidden" : ""}`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
     >
       {entry.feed && (
-        <Link
-          to="/feeds/$feedId"
-          params={{ feedId: entry.feed.id!.toString() }}
-          className="flex gap-2 items-center pb-1"
-        >
-          <img
-            alt={entry.feed.title}
-            className="h-5 w-5 object-cover rounded-sm"
-            src={entry.feed.icon}
+        <div className="flex justify-between items-center pt-1 mt-1">
+          <Link
+            to="/feeds/$feedId"
+            params={{ feedId: entry.feed.id!.toString() }}
+            className="flex gap-2 items-center pb-1"
+          >
+            <img
+              alt={entry.feed.title}
+              className="h-5 w-5 object-cover rounded-sm"
+              src={entry.feed.icon}
+            />
+            <span className="text-sm line-clamp-1">{entry.feed.title}</span>
+          </Link>
+
+          <EntryActions
+            className={`${isHovering ? "visible" : "invisible"}`}
+            entry={entry}
+            setEntry={setEntry}
           />
-          <span className="text-sm line-clamp-1">{entry.feed.title}</span>
-        </Link>
+        </div>
       )}
 
       <Link
@@ -116,11 +124,6 @@ const EntryCard: React.FC<EntryCardProps> = ({
         <p className="leading-6 text-sm opacity-80">
           {moment.utc(entry.pub_date).fromNow()}
         </p>
-        <EntryActions
-          className={`${isHovering ? "visible" : "invisible"}`}
-          entry={entry}
-          setEntry={setEntry}
-        />
       </div>
     </div>
   );

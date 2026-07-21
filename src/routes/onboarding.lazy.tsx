@@ -30,11 +30,13 @@ export default function Onboarding() {
     await store.set('onboarding-completed', { value: true });
   }
 
-  const goNext = () => {
+  const goNext = async () => {
     if (step + 1 == 5) {
-      complete()
+      await complete()
       navigate({ to: '/' })
+      return
     }
+
     setStep((prevStep) => Math.min(prevStep + 1, 4));
   }
 
@@ -126,12 +128,12 @@ export default function Onboarding() {
         </div>
 
         <div className="absolute bottom-10 flex justify-between w-full p-10">
-          <Button onClick={goBack}
+          <Button onPress={goBack}
             color="primary"
             variant="light"
             isDisabled={step === 1}
           >Back</Button>
-          <Button onClick={goNext}
+          <Button onPress={goNext}
             color="primary"
             variant="flat"
           >

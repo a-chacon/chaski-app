@@ -1,6 +1,7 @@
-import { createLazyFileRoute, Navigate } from '@tanstack/react-router'
+import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import { Button, Tooltip } from "@heroui/react"
+import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useEffect } from 'react'
 import { EntryInterface } from '../interfaces'
@@ -11,8 +12,7 @@ import { useNotification } from '../NotificationContext'
 import { updateAllEntriesAsRead } from '../helpers/feedsData'
 
 export const Route = createLazyFileRoute('/')({
-  component: () => <Navigate to="/today" />,
-  errorComponent: () => <Navigate to="/onboarding" />,
+  component: App,
 })
 
 export default function App() {
@@ -68,16 +68,17 @@ export default function App() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col p-4 max-w-screen-md mx-auto">
-        <div className="flex border-b border-default-500 py-4 justify-between items-start">
+      <div className="flex flex-col max-w-screen-md mx-auto">
+        <div className="flex py-8 justify-between items-start">
           <div>
-            <h1 className="text-3xl pt-2 font-bold">All</h1>
+            <h1 className="text-3xl pt-2 font-bold">All entries</h1>
             <h2 className="pt-1 pb-4">
               Explore the latest entries and updates from your favorite
               sources, all in one place.
             </h2>
           </div>
           <div className="flex flex-row items-center gap-2">
+            <EntryLayoutSwitch />
             <Tooltip content="Update All Entries As Read">
               <Button
                 isIconOnly

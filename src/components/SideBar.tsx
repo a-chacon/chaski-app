@@ -30,14 +30,14 @@ function SideBar({ hidden }: SideBarProps) {
       <div className="flex flex-col">
         <div className="px-1 flex flex-col py-6 gap-2">
           <Link
-            to="/today"
+            to="/"
             className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
             activeProps={{
               className: "bg-default/40"
             }}
           >
-            <RiCalendarLine className="h-5 opacity-90"></RiCalendarLine>
-            Today
+            <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
+            Entries
           </Link>
           <Link
             to="/read_later"
@@ -48,16 +48,6 @@ function SideBar({ hidden }: SideBarProps) {
           >
             <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
             Read Later
-          </Link>
-          <Link
-            to="/"
-            className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
-            activeProps={{
-              className: "bg-default/40"
-            }}
-          >
-            <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
-            All
           </Link>
         </div>
         <div className="px-3 flex flex-row justify-between items-center">

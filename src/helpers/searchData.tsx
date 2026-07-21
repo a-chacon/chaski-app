@@ -10,6 +10,6 @@ export const fullTextSearch = async (text: string) => {
     const result: SearchResultsInterface = JSON.parse(response);
     return result;
   } catch (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error fetching entries:", error);
   }
 };

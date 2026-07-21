@@ -6,7 +6,7 @@ import {
   RiLinkedinBoxFill,
   RiLinkUnlink,
 } from "@remixicon/react";
-import { ArticleInterface } from "../interfaces";
+import { EntryInterface } from "../interfaces";
 import {
   Modal,
   ModalContent,
@@ -22,19 +22,19 @@ import { useState } from "react";
 import { useNotification } from "../NotificationContext";
 
 
-interface ArticleShareProps {
-  article: ArticleInterface;
+interface EntryShareProps {
+  entry: EntryInterface;
   className?: string;
 }
 
-const ArticleShare: React.FC<ArticleShareProps> = ({
-  article,
+const EntryShare: React.FC<EntryShareProps> = ({
+  entry,
   className,
 }) => {
 
   const { addNotification } = useNotification();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { title, link, description } = article;
+  const { title, link, description } = entry;
   const [mastodonUrl, setMastodonUrl] = useState("");
 
   // Encode the title, description, and link for use in URLs
@@ -121,4 +121,4 @@ const ArticleShare: React.FC<ArticleShareProps> = ({
   );
 };
 
-export default ArticleShare;
+export default EntryShare;

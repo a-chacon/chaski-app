@@ -1,4 +1,4 @@
-import { ArticleInterface, AccountInterface } from '../interfaces'
+import { EntryInterface, AccountInterface } from '../interfaces'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { exportOPML } from "../helpers/feedsData";
@@ -18,7 +18,7 @@ import { RiRefreshLine, RiDownloadCloudLine, RiDeleteBinLine, RiDownloadLine } f
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import EntriesList from '../components/EntriesList';
 import { useAppContext } from "../AppContext";
-import { useArticles } from '../IndexArticlesContext'
+import { useEntries } from '../IndexEntriesContext'
 import { useNavigate } from '@tanstack/react-router';
 import { showAccount, fullSync, deleteAccount } from '../helpers/accountsData'
 import { indexFeeds } from '../helpers/feedsData';
@@ -28,8 +28,8 @@ export const Route = createFileRoute('/account/$accountId')({
 })
 export default function RouteComponent() {
   const { accountId } = Route.useParams()
-  const { articles, setArticles, page, setPage, hasMore, setHasMore } =
-    useArticles(accountId)
+  const { entries, setEntries, page, setPage, hasMore, setHasMore } =
+    useEntries(accountId)
   const [account, setAccount] = useState<AccountInterface | null>(null)
   const deleteModal = useDisclosure();
   const navigate = useNavigate({ from: '/' })
@@ -51,16 +51,16 @@ export default function RouteComponent() {
   }, [accountId])
 
   useEffect(() => {
-    if (page === 1 && articles.length == 0) {
-      fetchArticles()
+    if (page === 1 && entries.length == 0) {
+      fetchEntries()
     }
   }, [page])
 
   const handleReloadButton = async () => {
     setPage(1)
-    setArticles([])
+    setEntries([])
     setHasMore(true)
-    await fetchArticles()
+    await fetchEntries()
   }
 
   const handleFullSync = async () => {
@@ -103,25 +103,25 @@ export default function RouteComponent() {
     }
   };
 
-  const fetchArticles = async () => {
+  const fetchEntries = async () => {
     try {
-      const message = await invoke<string>('list_articles', {
+      const message = await invoke<string>('list_entries', {
         page,
         items: 20,
         filters: { account_id_eq: parseInt(accountId), read_eq: 0 },
       })
 
-      const new_articles: ArticleInterface[] = JSON.parse(message)
+      const new_entries: EntryInterface[] = JSON.parse(message)
 
-      setArticles((prevArticles) => [...prevArticles, ...new_articles])
+      setEntries((prevEntries) => [...prevEntries, ...new_entries])
 
-      if (new_articles.length === 0) {
+      if (new_entries.length === 0) {
         setHasMore(false)
       }
 
       setPage((prevPage) => prevPage + 1)
     } catch (error) {
-      console.error('Error fetching articles:', error)
+      console.error('Error fetching entries:', error)
     }
   }
 
@@ -151,7 +151,7 @@ export default function RouteComponent() {
             </div>
 
             <div className="flex flex-row items-center gap-2">
-              <Tooltip content="Reload Articles">
+              <Tooltip content="Reload Entries">
                 <Button
                   isIconOnly
                   variant="light"
@@ -228,8 +228,8 @@ export default function RouteComponent() {
         </div>
         <EntriesList
           key={accountId}
-          articles={articles}
-          fetchArticles={fetchArticles}
+          entries={entries}
+          fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
         />

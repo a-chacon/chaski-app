@@ -50,7 +50,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
     feed.history_limit = historyLimit;
     feed.update_interval_minutes = updateIntervalMinutes;
     feed.notifications_enabled = notificationsEnabled ? 1 : 0;
-    feed.default_entry_type = "article";
+    feed.default_entry_type = "entry";
     let response = await updateFeed(feed);
     if (response.success) {
       setFeed(response.data);

@@ -2,42 +2,42 @@ import { invoke } from "@tauri-apps/api/core";
 import { ApiResponse } from "../interfaces";
 import { FeedInterface } from "../interfaces";
 
-export const updateAllArticlesAsRead = async () => {
+export const updateAllEntriesAsRead = async () => {
   try {
-    await invoke<string>("update_articles_as_read");
+    await invoke<string>("update_entries_as_read");
   } catch (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error fetching entries:", error);
   }
 };
 
-export const updateArticlesAsReadByFolder = async (folder: string, account_id_eq: number) => {
+export const updateEntriesAsReadByFolder = async (folder: string, account_id_eq: number) => {
   try {
-    await invoke<string>("update_articles_as_read_by_folder", {
+    await invoke<string>("update_entries_as_read_by_folder", {
       accountId: account_id_eq,
       folder: folder,
     });
   } catch (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error fetching entries:", error);
   }
 };
 
-export const updateArticlesAsReadByFeedId = async (feed_id: number) => {
+export const updateEntriesAsReadByFeedId = async (feed_id: number) => {
   try {
-    await invoke<string>("update_articles_as_read_by_feed_id", {
+    await invoke<string>("update_entries_as_read_by_feed_id", {
       feedId: feed_id,
     });
   } catch (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error fetching entries:", error);
   }
 };
 
-export const refreshArticles = async (feed_id: number) => {
+export const refreshEntries = async (feed_id: number) => {
   try {
     await invoke<string>("collect_feed_content", {
       feedId: feed_id,
     });
   } catch (error) {
-    console.error("Error refreshing articles by feed:", error);
+    console.error("Error refreshing entries by feed:", error);
   }
 };
 

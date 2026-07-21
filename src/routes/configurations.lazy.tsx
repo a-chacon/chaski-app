@@ -20,8 +20,8 @@ export default function Configurations() {
     handleSetCurrentFontSpace,
     currentMarkAsReadOnHover,
     handleSetMarkAsReadOnHover,
-    currentArticleScrapeMode,
-    handleSetCurrentArticleScrapeMode,
+    currentEntryScrapeMode,
+    handleSetCurrentEntryScrapeMode,
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
@@ -144,12 +144,12 @@ export default function Configurations() {
                     Mark as Read on hover.
                   </Switch>
                   <Switch
-                    isSelected={currentArticleScrapeMode === "ALWAYS"}
+                    isSelected={currentEntryScrapeMode === "ALWAYS"}
                     onValueChange={(enabled) =>
-                      handleSetCurrentArticleScrapeMode(enabled ? "ALWAYS" : "ON_DEMAND")
+                      handleSetCurrentEntryScrapeMode(enabled ? "ALWAYS" : "ON_DEMAND")
                     }
                   >
-                    Download articles always (otherwise scrape on demand)
+                    Download entries always (otherwise scrape on demand)
                   </Switch>
                   <Switch isSelected={autostartState} onValueChange={handleAutostartChange} >
                     Autostart Application

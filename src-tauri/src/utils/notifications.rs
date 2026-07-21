@@ -1,7 +1,7 @@
-use crate::models::{Article, Feed};
+use crate::models::{Entry, Feed};
 use tauri_plugin_notification::NotificationExt;
 
-pub fn notify_new_entries(app_handle: tauri::AppHandle, feed: &Feed, entries: Vec<Article>) {
+pub fn notify_new_entries(app_handle: tauri::AppHandle, feed: &Feed, entries: Vec<Entry>) {
     if entries.is_empty() || feed.notifications_enabled == 0 {
         return;
     }

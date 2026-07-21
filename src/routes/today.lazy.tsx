@@ -3,12 +3,12 @@ import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { Button, Tooltip } from "@heroui/react";
 import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
 import { useEffect } from "react";
-import { ArticleInterface } from "../interfaces";
+import { EntryInterface } from "../interfaces";
 import { invoke } from "@tauri-apps/api/core";
 import EntriesList from "../components/EntriesList";
 import moment from "moment";
-import { useArticles } from "../IndexArticlesContext";
-import { updateAllArticlesAsRead } from "../helpers/feedsData";
+import { useEntries } from "../IndexEntriesContext";
+import { updateAllEntriesAsRead } from "../helpers/feedsData";
 import { useNotification } from "../NotificationContext";
 
 export const Route = createLazyFileRoute("/today")({
@@ -17,17 +17,17 @@ export const Route = createLazyFileRoute("/today")({
 
 export default function Today() {
   const { addNotification } = useNotification();
-  const { articles, setArticles, page, setPage, hasMore, setHasMore } = useArticles("/today");
+  const { entries, setEntries, page, setPage, hasMore, setHasMore } = useEntries("/today");
 
   useEffect(() => {
-    if (page === 1 && articles.length == 0) {
-      fetchArticles();
+    if (page === 1 && entries.length == 0) {
+      fetchEntries();
     }
   }, [page]);
 
-  const fetchArticles = async () => {
+  const fetchEntries = async () => {
     try {
-      const message = await invoke<string>("list_articles", {
+      const message = await invoke<string>("list_entries", {
         page: page,
         items: 20,
         filters: {
@@ -36,34 +36,34 @@ export default function Today() {
         },
       });
 
-      const new_articles: ArticleInterface[] = JSON.parse(message);
+      const new_entries: EntryInterface[] = JSON.parse(message);
 
-      setArticles((prevArticles) => [...prevArticles, ...new_articles]);
+      setEntries((prevEntries) => [...prevEntries, ...new_entries]);
 
-      if (new_articles.length === 0) {
+      if (new_entries.length === 0) {
         setHasMore(false);
       }
 
       setPage((prevPage) => prevPage + 1);
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      console.error("Error fetching entries:", error);
     }
   };
 
   const handleReloadButton = () => {
     setPage(1);
-    setArticles([]);
+    setEntries([]);
   }
 
-  const handleUpdateArticlesAsRead = async () => {
-    await updateAllArticlesAsRead();
-    resetArticleList();
+  const handleUpdateEntriesAsRead = async () => {
+    await updateAllEntriesAsRead();
+    resetEntryList();
 
     addNotification("Updated", 'All entries were updated as read!', 'primary');
   };
 
-  const resetArticleList = () => {
-    setArticles([]);
+  const resetEntryList = () => {
+    setEntries([]);
     setPage(1);
   };
 
@@ -76,17 +76,17 @@ export default function Today() {
             <h2 className="pt-1 pb-4">The insights you need to keep ahead</h2>
           </div>
           <div className="flex flex-row items-center gap-2">
-            <Tooltip content="Update All Articles As Read">
+            <Tooltip content="Update All Entries As Read">
               <Button
                 isIconOnly
                 variant="light"
                 size="sm"
-                onPress={handleUpdateArticlesAsRead}
+                onPress={handleUpdateEntriesAsRead}
               >
                 <RiCheckDoubleLine></RiCheckDoubleLine>
               </Button>
             </Tooltip>
-            <Tooltip content="Reload The Page's Articles">
+            <Tooltip content="Reload The Page's Entries">
               <Button color="primary" isIconOnly variant="light" size="sm" onPress={handleReloadButton}>
                 <RiRefreshLine></RiRefreshLine>
               </Button>
@@ -95,8 +95,8 @@ export default function Today() {
         </div>
         <EntriesList
           key="index"
-          articles={articles}
-          fetchArticles={fetchArticles}
+          entries={entries}
+          fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
         />

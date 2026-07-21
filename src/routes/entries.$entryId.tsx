@@ -1,72 +1,72 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { useEffect, useState } from "react";
-import { ArticleInterface } from "../interfaces";
+import { EntryInterface } from "../interfaces";
 import parse from "html-react-parser";
-import ArticleActions from "../components/ArticleActions";
+import EntryActions from "../components/EntryActions";
 import ThumbnailOrMedia from "../components/ThumbnailOrMedia";
-import ArticleShare from "../components/ArticleShare";
+import EntryShare from "../components/EntryShare";
 import { RiArrowLeftLine } from "@remixicon/react";
 import { Button, Spinner } from "@heroui/react";
-import { getArticle, updateArticleAsRead } from "../helpers/articlesData";
+import { getEntry, updateEntryAsRead } from "../helpers/entriesData";
 import { useAppContext } from "../AppContext";
 
-export const Route = createFileRoute("/articles/$articleId")({
-  component: Article,
+export const Route = createFileRoute("/entries/$entryId")({
+  component: Entry,
 });
 
-function Article() {
-  const { articleId } = Route.useParams();
-  const [article, setArticle] = useState<ArticleInterface>();
-  const [isLoadingArticle, setIsLoadingArticle] = useState(true);
+function Entry() {
+  const { entryId } = Route.useParams();
+  const [entry, setEntry] = useState<EntryInterface>();
+  const [isLoadingEntry, setIsLoadingEntry] = useState(true);
   const { setSideBarOpen, currentTheme } = useAppContext();
 
   useEffect(() => {
-    const loadArticle = async () => {
+    const loadEntry = async () => {
       setSideBarOpen(false);
-      setIsLoadingArticle(true);
+      setIsLoadingEntry(true);
 
       try {
-        const article = await getArticle(parseInt(articleId));
-        if (!article) {
+        const entry = await getEntry(parseInt(entryId));
+        if (!entry) {
           return;
         }
 
-        setArticle(article);
-        updateArticleAsRead(article);
+        setEntry(entry);
+        updateEntryAsRead(entry);
       } finally {
-        setIsLoadingArticle(false);
+        setIsLoadingEntry(false);
       }
     };
 
-    loadArticle();
-  }, [articleId]);
+    loadEntry();
+  }, [entryId]);
 
   const { history } = useRouter();
 
   const isDarkTheme = (theme: string) => theme.endsWith('-dark');
 
-  if (isLoadingArticle) {
+  if (isLoadingEntry) {
     return (
       <MainSectionLayout>
         <div className="h-full w-full flex items-center justify-center gap-2 text-sm opacity-80">
           <Spinner size="sm" color="default" />
-          Loading article...
+          Loading entry...
         </div>
       </MainSectionLayout>
     );
   }
 
   return (
-    article && (
+    entry && (
       <MainSectionLayout>
         <div className="flex flex-col p-4 mx-auto max-w-prose">
           <div className="mx-2 flex justify-between bg-primary-100 border border-primary-500 sticky top-3 p-1.5 rounded-xl shadow-xl">
             <div className="flex flex-row">
-              <ArticleActions
+              <EntryActions
                 compact={false}
-                article={article}
-                setArticle={setArticle}
+                entry={entry}
+                setEntry={setEntry}
                 backAfterAction={true}
               >
                 <Button
@@ -80,33 +80,33 @@ function Article() {
                 </Button>
 
 
-              </ArticleActions>
+              </EntryActions>
             </div>
-            <ArticleShare article={article} />
+            <EntryShare entry={entry} />
           </div>
           <div className="flex flex-col justify-between w-full">
             <Link
               to="/feeds/$feedId"
-              params={{ feedId: article.feed!.id!.toString() }}
+              params={{ feedId: entry.feed!.id!.toString() }}
               className="flex gap-2 items-center pt-6"
             >
               <img
-                alt={article.feed?.title}
+                alt={entry.feed?.title}
                 className="h-5 w-5 object-cover"
-                src={article.feed?.icon}
+                src={entry.feed?.icon}
               />
               <span className="text-sm line-clamp-1">
-                {article.feed?.title}
+                {entry.feed?.title}
               </span>
             </Link>
             <div className="flex flex-col py-6">
               <h1 className="text-xl md:text-3xl font-semibold">
-                {article.title}
+                {entry.title}
               </h1>
             </div>
 
             <ThumbnailOrMedia
-              article={article}
+              entry={entry}
             />
 
           </div>
@@ -114,10 +114,10 @@ function Article() {
 
           <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
             <p className="py-6 line-clamp-3">
-              {parse(article.description || "")}
+              {parse(entry.description || "")}
             </p>
             <hr />
-            {parse(article.content || "")}
+            {parse(entry.content || "")}
           </div>
         </div>
       </MainSectionLayout>
@@ -125,4 +125,4 @@ function Article() {
   );
 }
 
-export default Article;
+export default Entry;

@@ -6,11 +6,11 @@ use tauri::command;
 pub async fn full_text_search(text: String, app_handle: tauri::AppHandle) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command full_text_search. text: {text:?}");
 
-    let articles = crate::entities::articles::full_text_search(&text, app_handle.clone()).await;
+    let entries = crate::entities::entries::full_text_search(&text, app_handle.clone()).await;
     let feeds = crate::entities::feeds::full_text_search(&text, app_handle.clone()).await;
 
     let response = json!({
-        "articles": articles,
+        "entries": entries,
         "feeds": feeds,
     });
 

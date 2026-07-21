@@ -2,7 +2,7 @@ use crate::db::establish_connection;
 use crate::models::Account;
 use crate::models::NewAccount;
 use crate::schema::accounts::dsl::*;
-use crate::schema::{articles, feeds, filters};
+use crate::schema::{entries, feeds, filters};
 use diesel::prelude::*;
 use tokio::time::{sleep, Duration};
 
@@ -41,7 +41,7 @@ pub fn destroy(account_id_eq: i32, app_handle: tauri::AppHandle) -> Result<(), S
             .filter(feeds::account_id.eq(account_id_eq))
             .load(conn)?;
 
-        diesel::delete(articles::table.filter(articles::feed_id.eq_any(&feed_ids)))
+        diesel::delete(entries::table.filter(entries::feed_id.eq_any(&feed_ids)))
             .execute(conn)?;
 
         diesel::delete(filters::table.filter(filters::feed_id.eq_any(&feed_ids))).execute(conn)?;

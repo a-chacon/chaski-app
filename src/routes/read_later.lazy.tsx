@@ -3,27 +3,27 @@ import MainSectionLayout from '../components/layout/MainSectionLayout'
 import { Button } from "@heroui/react"
 import { RiRefreshLine } from '@remixicon/react'
 import { useEffect } from 'react'
-import { ArticleInterface } from '../interfaces'
+import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
-import { useArticles } from '../IndexArticlesContext'
+import { useEntries } from '../IndexEntriesContext'
 
 export const Route = createLazyFileRoute('/read_later')({
   component: ReadLater,
 })
 
 export default function ReadLater() {
-  const { articles, setArticles, page, setPage, hasMore, setHasMore } = useArticles("/read_later");
+  const { entries, setEntries, page, setPage, hasMore, setHasMore } = useEntries("/read_later");
 
   useEffect(() => {
-    if (page === 1 && articles.length == 0) {
-      fetchArticles()
+    if (page === 1 && entries.length == 0) {
+      fetchEntries()
     }
   }, [page])
 
-  const fetchArticles = async () => {
+  const fetchEntries = async () => {
     try {
-      const message = await invoke<string>('list_articles', {
+      const message = await invoke<string>('list_entries', {
         page: page,
         items: 20,
         filters: {
@@ -31,23 +31,23 @@ export default function ReadLater() {
         }
       })
 
-      const new_articles: ArticleInterface[] = JSON.parse(message)
+      const new_entries: EntryInterface[] = JSON.parse(message)
 
-      setArticles((prevArticles) => [...prevArticles, ...new_articles])
+      setEntries((prevEntries) => [...prevEntries, ...new_entries])
 
-      if (new_articles.length === 0) {
+      if (new_entries.length === 0) {
         setHasMore(false)
       }
 
       setPage((prevPage) => prevPage + 1)
     } catch (error) {
-      console.error('Error fetching articles:', error)
+      console.error('Error fetching entries:', error)
     }
   }
 
   const handleReloadButton = () => {
     setPage(1);
-    setArticles([]);
+    setEntries([]);
   }
 
   return (
@@ -56,7 +56,7 @@ export default function ReadLater() {
         <div className="flex border-b border-default-500 py-4 justify-between items-start">
           <div>
             <h1 className="text-3xl pt-2 font-bold">Read Later</h1>
-            <h2 className="pt-1 pb-4">Curate your journey, one article at a time.</h2>
+            <h2 className="pt-1 pb-4">Curate your journey, one entry at a time.</h2>
           </div>
           <div>
             <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
@@ -66,8 +66,8 @@ export default function ReadLater() {
         </div>
         <EntriesList
           key="index"
-          articles={articles}
-          fetchArticles={fetchArticles}
+          entries={entries}
+          fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
         />

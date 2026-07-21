@@ -3,7 +3,7 @@ use crate::db::establish_connection;
 use crate::integrations::greader::GReaderClient;
 use crate::models::Account;
 use crate::models::{Feed, IndexFeed, NewFeed};
-use crate::schema::articles;
+use crate::schema::entries;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
 use chrono::Utc;
@@ -64,7 +64,7 @@ pub fn create_feed(
         new_feed.last_fetch = None;
     }
 
-    new_feed.default_entry_type = String::from("article");
+    new_feed.default_entry_type = String::from("entry");
 
     let created_feed = diesel::insert_into(feeds::table)
         .values(&new_feed)
@@ -113,7 +113,7 @@ pub fn destroy(feed_id: i32, app_handle: tauri::AppHandle) {
     let conn = &mut establish_connection(&app_handle);
 
     let _ = diesel::delete(filters::table.filter(filters::feed_id.eq(feed_id))).execute(conn);
-    let _ = diesel::delete(articles::table.filter(articles::feed_id.eq(feed_id))).execute(conn);
+    let _ = diesel::delete(entries::table.filter(entries::feed_id.eq(feed_id))).execute(conn);
     let _ = diesel::delete(feeds.filter(id.eq(feed_id))).execute(conn);
 }
 
@@ -126,14 +126,14 @@ pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec
             feeds.title,
             feeds.folder,
             feeds.icon,
-            COALESCE(COUNT(articles.id), 0) AS unread_count
+            COALESCE(COUNT(entries.id), 0) AS unread_count
         FROM
             feeds
         LEFT JOIN
-            articles
+            entries
         ON
-            articles.feed_id = feeds.id
-            AND articles.read = 0
+            entries.feed_id = feeds.id
+            AND entries.read = 0
     "#
     .to_string();
 
@@ -171,9 +171,9 @@ pub fn delete_list(feed_ids: Vec<i32>, app_handle: tauri::AppHandle) {
         .execute(conn)
         .expect("Error deleting related filters");
 
-    diesel::delete(articles::table.filter(articles::feed_id.eq_any(&feed_ids)))
+    diesel::delete(entries::table.filter(entries::feed_id.eq_any(&feed_ids)))
         .execute(conn)
-        .expect("Error deleting related articles");
+        .expect("Error deleting related entries");
 
     diesel::delete(feeds.filter(id.eq_any(feed_ids)))
         .execute(conn)

@@ -6,7 +6,7 @@ mod core;
 mod db;
 mod entities {
     pub(crate) mod accounts;
-    pub(crate) mod articles;
+    pub(crate) mod entries;
     pub(crate) mod configurations;
     pub(crate) mod feeds;
     pub(crate) mod filters;
@@ -111,14 +111,14 @@ pub fn run() {
             commands::feeds::create_feed,
             commands::feeds::index_feeds,
             commands::feeds::destroy_feed,
-            commands::articles::list_articles,
+            commands::entries::list_entries,
             commands::folders::list_folders,
-            commands::articles::show_article,
-            commands::articles::update_article,
+            commands::entries::show_entry,
+            commands::entries::update_entry,
             commands::feeds::update_feed,
-            commands::articles::update_articles_as_read,
-            commands::folders::update_articles_as_read_by_folder,
-            commands::articles::update_articles_as_read_by_feed_id,
+            commands::entries::update_entries_as_read,
+            commands::folders::update_entries_as_read_by_folder,
+            commands::entries::update_entries_as_read_by_feed_id,
             commands::feeds::collect_feed_content,
             commands::utils::full_text_search,
             commands::utils::get_env,
@@ -149,7 +149,7 @@ fn configure_default_app_settings(app: &mut tauri::App) {
     let default_settings: HashMap<&str, serde_json::Value> = [
         ("onboarding-completed", json!({ "value": false })),
         ("theme", json!({ "value": "orange-dark" })),
-        ("articles-layout", json!({ "value": "list" })),
+        ("entries-layout", json!({ "value": "list" })),
         ("app-mode", json!({ "value": "local" })),
     ]
     .iter()

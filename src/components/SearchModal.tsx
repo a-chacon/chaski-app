@@ -21,12 +21,12 @@ export default function SearchModal() {
   const [value, setValue] = useState("");
   const [results, setResults] = useState<SearchResultsInterface>({
     feeds: [],
-    articles: [],
+    entries: [],
   });
 
   useEffect(() => {
     setValue("");
-    setResults({ feeds: [], articles: [] });
+    setResults({ feeds: [], entries: [] });
   }, [isOpen]);
 
   const handleInputChange = async (input: string) => {
@@ -38,6 +38,8 @@ export default function SearchModal() {
       }
     }
   };
+
+  const entries = results.entries ?? [];
 
   return (
     <>
@@ -84,7 +86,7 @@ export default function SearchModal() {
                 />
               </ModalHeader>
               <ModalBody>
-                {results.feeds.length === 0 && results.articles.length === 0 ? (
+                {results.feeds.length === 0 && entries.length === 0 ? (
                   <p className="p-10 text-center">No results found.</p>
                 ) : (
                   <>
@@ -114,20 +116,20 @@ export default function SearchModal() {
                       ))}
                     </ul>
 
-                    <h2 className="font-semibold">Articles</h2>
+                    <h2 className="font-semibold">Entries</h2>
                     <ul>
-                      {results.articles.map((article) => (
-                        <li key={article.id} className="py-2">
+                      {entries.map((entry) => (
+                        <li key={entry.id} className="py-2">
                           <Link
-                            to="/articles/$articleId"
-                            params={{ articleId: article.id?.toString() || "" }}
+                            to="/entries/$entryId"
+                            params={{ entryId: entry.id?.toString() || "" }}
                             onClick={() => {
                               onClose();
                             }}
                           >
                             <Card>
                               <CardBody>
-                                <p className="line-clamp-1">{article.title}</p>
+                                <p className="line-clamp-1">{entry.title}</p>
                               </CardBody>
                             </Card>
                           </Link>

@@ -1,4 +1,4 @@
-use crate::models::{Feed, NewArticle, NewFeed};
+use crate::models::{Feed, NewEntry, NewFeed};
 use chrono::NaiveDateTime;
 use reqwest::{
     header::{HeaderMap, HeaderValue, ACCEPT, CACHE_CONTROL, CONNECTION, REFERER, USER_AGENT},
@@ -257,7 +257,7 @@ async fn autodiscover_feeds(
     Ok(())
 }
 
-pub async fn scrape_feed_articles(feed: &Feed) -> Result<Vec<NewArticle>, ()> {
+pub async fn scrape_feed_entries(feed: &Feed) -> Result<Vec<NewEntry>, ()> {
     let client = create_async_client().unwrap();
     let feed_response = match client.get(&feed.link).send().await {
         Ok(response) => response,
@@ -266,7 +266,7 @@ pub async fn scrape_feed_articles(feed: &Feed) -> Result<Vec<NewArticle>, ()> {
             return Ok(Vec::new());
         }
     };
-    let mut new_articles = Vec::new();
+    let mut new_entries = Vec::new();
 
     if feed_response.status().is_success() {
         let feed_body_bytes = feed_response.bytes().await.unwrap();
@@ -280,40 +280,40 @@ pub async fn scrape_feed_articles(feed: &Feed) -> Result<Vec<NewArticle>, ()> {
             let channel = Channel::read_from(cursor).unwrap();
 
             for item in channel.items {
-                new_articles.push(NewArticle::from_feed_and_item(feed, item));
+                new_entries.push(NewEntry::from_feed_and_item(feed, item));
             }
         } else if feed_body_str.contains("<feed") {
             let atom_syndication_feed = atom_syndication::Feed::read_from(cursor).unwrap();
 
             for entry in atom_syndication_feed.entries {
-                new_articles.push(NewArticle::from_feed_and_entry(feed, entry))
+                new_entries.push(NewEntry::from_feed_and_entry(feed, entry))
             }
         }
     }
 
-    new_articles.sort_by(|a, b| {
+    new_entries.sort_by(|a, b| {
         let pub_date_a = a.pub_date.unwrap_or(NaiveDateTime::MIN);
         let pub_date_b = b.pub_date.unwrap_or(NaiveDateTime::MIN);
 
         pub_date_b.cmp(&pub_date_a)
     });
 
-    Ok(new_articles)
+    Ok(new_entries)
 }
 
 #[derive(Debug)]
-pub struct ArticleContentData {
+pub struct EntryContentData {
     pub title: Option<String>,
     pub description: Option<String>,
     pub content: Option<String>,
 }
 
-pub async fn scrape_article_content(url: &str) -> Result<ArticleContentData, Box<dyn Error>> {
+pub async fn scrape_entry_content(url: &str) -> Result<EntryContentData, Box<dyn Error>> {
     let client = create_async_client()?;
     let response = client.get(url).send().await?;
 
     if !response.status().is_success() {
-        return Ok(ArticleContentData {
+        return Ok(EntryContentData {
             title: None,
             description: None,
             content: None,
@@ -336,7 +336,7 @@ pub async fn scrape_article_content(url: &str) -> Result<ArticleContentData, Box
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty());
 
-    let content = ["article", "main", "body"].iter().find_map(|tag| {
+    let content = ["entry", "main", "body"].iter().find_map(|tag| {
         Selector::parse(tag).ok().and_then(|selector| {
             document.select(&selector).next().and_then(|node| {
                 let text = node
@@ -355,7 +355,7 @@ pub async fn scrape_article_content(url: &str) -> Result<ArticleContentData, Box
         })
     });
 
-    Ok(ArticleContentData {
+    Ok(EntryContentData {
         title,
         description,
         content,

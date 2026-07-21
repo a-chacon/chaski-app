@@ -1,5 +1,5 @@
 use crate::db::establish_connection;
-use crate::models::{Filter, NewArticle, NewFilter};
+use crate::models::{Filter, NewEntry, NewFilter};
 use crate::schema::filters::dsl::*;
 use diesel::prelude::*;
 use serde::Deserialize;
@@ -26,13 +26,13 @@ pub fn index(filter_filters: Option<FilterFilters>, app_handle: tauri::AppHandle
         .expect("Error loading Filters")
 }
 
-pub fn apply_filters(articles: Vec<NewArticle>, filters_to_apply: Vec<Filter>) -> Vec<NewArticle> {
-    articles
+pub fn apply_filters(entries: Vec<NewEntry>, filters_to_apply: Vec<Filter>) -> Vec<NewEntry> {
+    entries
         .into_iter()
-        .filter(|new_article| {
+        .filter(|new_entry| {
             let mut results = Vec::new();
             for (i, filter) in filters_to_apply.iter().enumerate() {
-                let matches = matches_filter(new_article, filter);
+                let matches = matches_filter(new_entry, filter);
                 results.push(matches);
 
                 if i < filters_to_apply.len() - 1 {
@@ -56,11 +56,11 @@ pub fn apply_filters(articles: Vec<NewArticle>, filters_to_apply: Vec<Filter>) -
         .collect()
 }
 
-fn matches_filter(article: &NewArticle, filter: &Filter) -> bool {
+fn matches_filter(entry: &NewEntry, filter: &Filter) -> bool {
     let field_value = match filter.field.as_str() {
-        "LINK" => Some(article.link.as_str()),
-        "TITLE" => article.title.as_deref(),
-        "DESCRIPTION" => article.description.as_deref(),
+        "LINK" => Some(entry.link.as_str()),
+        "TITLE" => entry.title.as_deref(),
+        "DESCRIPTION" => entry.description.as_deref(),
         _ => None,
     };
 

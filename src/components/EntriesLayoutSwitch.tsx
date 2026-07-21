@@ -5,25 +5,25 @@ import { Button } from "@heroui/react";
 import { RiLayoutGridLine, RiListUnordered, RiLayoutHorizontalLine } from '@remixicon/react'
 
 
-const ArticleLayoutSwitch: React.FC = () => {
-  const { articlesLayout, setArticlesLayout } = useAppContext();
+const EntryLayoutSwitch: React.FC = () => {
+  const { entriesLayout, setEntriesLayout } = useAppContext();
 
   return (
     <div className="flex items-center gap-2 justify-end pt-4">
       <Button
-        onPress={() => setArticlesLayout("list")}
-        color={articlesLayout === "list" ? "primary" : "default"}
+        onPress={() => setEntriesLayout("list")}
+        color={entriesLayout === "list" ? "primary" : "default"}
         aria-label="List View"
         size="sm"
         isIconOnly
-        variant={articlesLayout === "list" ? "flat" : "light"}
+        variant={entriesLayout === "list" ? "flat" : "light"}
       >
         <RiListUnordered></RiListUnordered>
       </Button>
       <Button
-        onPress={() => setArticlesLayout("compact")}
-        color={articlesLayout === "compact" ? "primary" : "default"}
-        variant={articlesLayout === "compact" ? "flat" : "light"}
+        onPress={() => setEntriesLayout("compact")}
+        color={entriesLayout === "compact" ? "primary" : "default"}
+        variant={entriesLayout === "compact" ? "flat" : "light"}
         aria-label="Compact View"
         isIconOnly
         size="sm"
@@ -31,9 +31,9 @@ const ArticleLayoutSwitch: React.FC = () => {
         <RiLayoutHorizontalLine></RiLayoutHorizontalLine>
       </Button>
       <Button
-        onPress={() => setArticlesLayout("grid")}
-        color={articlesLayout === "grid" ? "primary" : "default"}
-        variant={articlesLayout === "grid" ? "flat" : "light"}
+        onPress={() => setEntriesLayout("grid")}
+        color={entriesLayout === "grid" ? "primary" : "default"}
+        variant={entriesLayout === "grid" ? "flat" : "light"}
         aria-label="Grid View"
         isIconOnly
         size="sm"
@@ -44,4 +44,4 @@ const ArticleLayoutSwitch: React.FC = () => {
   );
 };
 
-export default ArticleLayoutSwitch;
+export default EntryLayoutSwitch;

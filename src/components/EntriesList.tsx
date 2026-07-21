@@ -1,25 +1,25 @@
 import { Spinner } from "@heroui/react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { ArticleInterface } from "../interfaces";
-import ArticleCard from "./EntryViews/Article/ArticleCard";
-import ArticleLayoutSwitch from "./ArticlesLayoutSwitch";
+import { EntryInterface } from "../interfaces";
+import EntryCard from "./EntryViews/Entry/EntryCard";
+import EntryLayoutSwitch from "./EntriesLayoutSwitch";
 import { useAppContext } from "../AppContext";
 import React, { useMemo } from "react";
 
 interface EntriesListProps {
-  articles: ArticleInterface[];
-  fetchArticles: () => Promise<void>;
+  entries: EntryInterface[];
+  fetchEntries: () => Promise<void>;
   hasMore: boolean;
   header: boolean;
 }
 
 function EntriesList({
-  articles,
-  fetchArticles,
+  entries,
+  fetchEntries,
   hasMore,
   header,
 }: EntriesListProps) {
-  const { articlesLayout: display } = useAppContext();
+  const { entriesLayout: display } = useAppContext();
 
   const listClass = useMemo(() => {
     if (display === "grid") {
@@ -45,11 +45,11 @@ function EntriesList({
   ));
 
   return (
-    <div key="articles">
-      <ArticleLayoutSwitch />
+    <div key="entries">
+      <EntryLayoutSwitch />
       <InfiniteScroll
-        dataLength={articles.length}
-        next={fetchArticles}
+        dataLength={entries.length}
+        next={fetchEntries}
         hasMore={hasMore}
         loader={
           <div className="flex justify-center p-6">
@@ -60,10 +60,10 @@ function EntriesList({
         endMessage={<EndMessage />}
         className={listClass}
       >
-        {articles.map((article) => (
-          <ArticleCard
-            key={article.id}
-            article={article}
+        {entries.map((entry) => (
+          <EntryCard
+            key={entry.id}
+            entry={entry}
             header={header}
           />
         ))}

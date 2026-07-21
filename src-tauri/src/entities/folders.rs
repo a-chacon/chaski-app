@@ -1,5 +1,5 @@
 use crate::db::establish_connection;
-use crate::schema::articles;
+use crate::schema::entries;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
 use diesel::prelude::*;
@@ -41,7 +41,7 @@ pub fn delete(folder_account_id: i32, folder_name: String, app_handle: tauri::Ap
         let _ = diesel::delete(filters::table.filter(filters::feed_id.eq_any(&feed_ids)))
             .execute(conn)?;
 
-        let _ = diesel::delete(articles::table.filter(articles::feed_id.eq_any(&feed_ids)))
+        let _ = diesel::delete(entries::table.filter(entries::feed_id.eq_any(&feed_ids)))
             .execute(conn)?;
 
         let _ = diesel::delete(

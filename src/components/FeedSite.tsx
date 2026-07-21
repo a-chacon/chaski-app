@@ -47,7 +47,7 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
           <p className="font-semibold text-small">
             {currentFeed.items_count}
           </p>
-          <p className="text-small">Articles</p>
+          <p className="text-small">Entries</p>
         </div>
         <div className="flex gap-1">
           {currentFeed.kind === "rss" ? (

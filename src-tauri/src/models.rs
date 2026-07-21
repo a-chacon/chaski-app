@@ -1,4 +1,4 @@
-use super::schema::{accounts, article_tags, articles, configurations, feeds, filters, tags};
+use super::schema::{accounts, entry_tags, entries, configurations, feeds, filters, tags};
 use crate::core::common::{calculate_default_fetch_interval, parse_rfc822_to_naive_datetime};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
@@ -110,8 +110,8 @@ pub struct NewFeed {
     Clone,
 )]
 #[diesel(belongs_to(Feed))]
-#[diesel(table_name = articles)]
-pub struct Article {
+#[diesel(table_name = entries)]
+pub struct Entry {
     pub id: i32,
     pub title: Option<String>,
     pub link: String,
@@ -133,8 +133,8 @@ pub struct Article {
 }
 
 #[derive(Insertable, Debug)]
-#[diesel(table_name = articles)]
-pub struct NewArticle {
+#[diesel(table_name = entries)]
+pub struct NewEntry {
     pub title: Option<String>,
     pub link: String,
     pub thumbnail: Option<String>,
@@ -153,8 +153,8 @@ pub struct NewArticle {
 }
 
 #[derive(Debug, PartialEq, Queryable, Selectable, Serialize)]
-#[diesel(table_name = articles)]
-pub struct ShortArticle {
+#[diesel(table_name = entries)]
+pub struct ShortEntry {
     pub id: i32,
     pub title: Option<String>,
     pub link: String,
@@ -173,33 +173,33 @@ pub struct ShortArticle {
 }
 
 #[derive(Serialize)]
-pub struct ShortArticleWithFeed {
+pub struct ShortEntryWithFeed {
     #[serde(flatten)]
-    pub article: ShortArticle,
+    pub entry: ShortEntry,
     pub feed: Feed,
 }
 
 #[derive(Serialize)]
-pub struct ArticleWithFeed {
+pub struct EntryWithFeed {
     #[serde(flatten)]
-    pub article: Article,
+    pub entry: Entry,
     pub feed: Feed,
 }
 
 #[derive(Debug, Queryable, Insertable, AsChangeset)]
-#[diesel(belongs_to(Article))]
+#[diesel(belongs_to(Entry))]
 #[diesel(table_name = tags)]
 pub struct Tag {
     pub id: i32,
     pub value: String,
-    pub article_id: i32,
+    pub entry_id: i32,
 }
 
-// Define the ArticleTag model (for many-to-many relationships)
+// Define the EntryTag model (for many-to-many relationships)
 #[derive(Debug, Queryable, Insertable)]
-#[diesel(table_name = article_tags)]
-pub struct ArticleTag {
-    pub article_id: i32,
+#[diesel(table_name = entry_tags)]
+pub struct EntryTag {
+    pub entry_id: i32,
     pub tag_id: i32,
 }
 
@@ -267,7 +267,7 @@ impl From<rss::Channel> for NewFeed {
             notifications_enabled: 0,
             account_id: None,
             external_id: None,
-            default_entry_type: String::from("article"),
+            default_entry_type: String::from("entry"),
         }
     }
 }
@@ -298,34 +298,34 @@ impl From<atom_syndication::Feed> for NewFeed {
             notifications_enabled: 0,
             account_id: None,
             external_id: None,
-            default_entry_type: String::from("article"),
+            default_entry_type: String::from("entry"),
         }
     }
 }
 
-impl From<&Article> for NewArticle {
-    fn from(article: &Article) -> Self {
-        NewArticle {
-            title: article.title.clone(),
-            link: article.link.clone(),
-            thumbnail: article.thumbnail.clone(),
-            pub_date: article.pub_date,
-            description: article.description.clone(),
-            content: article.content.clone(),
-            read_later: article.read_later,
-            read: article.read,
-            hide: article.hide,
-            author: article.author.clone(),
-            feed_id: article.feed_id,
-            external_id: article.external_id.clone(),
-            entry_type: article.entry_type.clone(),
-            media_content_url: article.media_content_url.clone(),
-            media_content_type: article.media_content_type.clone(),
+impl From<&Entry> for NewEntry {
+    fn from(entry: &Entry) -> Self {
+        NewEntry {
+            title: entry.title.clone(),
+            link: entry.link.clone(),
+            thumbnail: entry.thumbnail.clone(),
+            pub_date: entry.pub_date,
+            description: entry.description.clone(),
+            content: entry.content.clone(),
+            read_later: entry.read_later,
+            read: entry.read,
+            hide: entry.hide,
+            author: entry.author.clone(),
+            feed_id: entry.feed_id,
+            external_id: entry.external_id.clone(),
+            entry_type: entry.entry_type.clone(),
+            media_content_url: entry.media_content_url.clone(),
+            media_content_type: entry.media_content_type.clone(),
         }
     }
 }
 
-impl NewArticle {
+impl NewEntry {
     pub fn from_feed_and_item(feed: &Feed, item: rss::Item) -> Self {
         let mut media_content_url = None;
         let mut media_content_type = Some(String::from("image/png"));
@@ -354,7 +354,7 @@ impl NewArticle {
             }
         }
 
-        NewArticle {
+        NewEntry {
             feed_id: feed.id,
             title: item.title,
             link: item.link.unwrap_or(feed.link.clone()),
@@ -374,7 +374,7 @@ impl NewArticle {
     }
 
     pub fn from_feed_and_entry(feed: &Feed, entry: atom_syndication::Entry) -> Self {
-        NewArticle {
+        NewEntry {
             feed_id: feed.id,
             title: Some(entry.title.value),
             link: entry.links.into_iter().nth(0).unwrap().href,

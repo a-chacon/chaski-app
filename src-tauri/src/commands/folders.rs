@@ -13,13 +13,13 @@ pub async fn list_folders(account_id: i32, app_handle: tauri::AppHandle) -> Resu
 }
 
 #[command]
-pub async fn update_articles_as_read_by_folder(
+pub async fn update_entries_as_read_by_folder(
     folder: String,
     account_id: i32,
     app_handle: tauri::AppHandle,
 ) -> Result<(), ()> {
-    log::debug!(target: "chaski:commands","Command update_articles_as_read_by_folder. folder: {folder:?}");
-    crate::entities::articles::update_all_as_read_by_folder(folder, account_id, app_handle);
+    log::debug!(target: "chaski:commands","Command update_entries_as_read_by_folder. folder: {folder:?}");
+    crate::entities::entries::update_all_as_read_by_folder(folder, account_id, app_handle);
     Ok(())
 }
 

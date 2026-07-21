@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FeedInterface, ArticleInterface } from "../interfaces";
+import { FeedInterface, EntryInterface } from "../interfaces";
 import moment from "moment";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
@@ -8,9 +8,9 @@ import EntriesList from "../components/EntriesList";
 import FeedSiteActions from "../components/FeedSiteActions";
 import { Button, Spinner, Snippet, Tooltip } from "@heroui/react";
 import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
-import { updateArticlesAsReadByFeedId, refreshArticles } from "../helpers/feedsData";
+import { updateEntriesAsReadByFeedId, refreshEntries } from "../helpers/feedsData";
 import { getFeed } from "../helpers/feedsData";
-import { useArticles } from "../IndexArticlesContext";
+import { useEntries } from "../IndexEntriesContext";
 import { useNotification } from "../NotificationContext";
 
 export const Route = createFileRoute("/feeds/$feedId")({
@@ -20,8 +20,8 @@ export const Route = createFileRoute("/feeds/$feedId")({
 export default function Feed() {
   const { addNotification } = useNotification();
   const { feedId } = Route.useParams();
-  const { articles, setArticles, page, setPage, hasMore, setHasMore } =
-    useArticles(feedId);
+  const { entries, setEntries, page, setPage, hasMore, setHasMore } =
+    useEntries(feedId);
 
   const [feed, setFeed] = useState<FeedInterface | undefined>(undefined);
   const [refreshLoading, setRefreshLoading] = useState(false);
@@ -35,51 +35,51 @@ export default function Feed() {
   }, [feedId]);
 
   useEffect(() => {
-    if (page === 1 && articles.length == 0) {
-      fetchArticles();
+    if (page === 1 && entries.length == 0) {
+      fetchEntries();
     }
   }, [page]);
 
-  const fetchArticles = async () => {
+  const fetchEntries = async () => {
     try {
-      const message = await invoke<string>("list_articles", {
+      const message = await invoke<string>("list_entries", {
         page,
         items: 20,
         filters: { feed_id_eq: parseInt(feedId), read_eq: 0 },
       });
 
-      const new_articles: ArticleInterface[] = JSON.parse(message);
+      const new_entries: EntryInterface[] = JSON.parse(message);
 
-      setArticles((prevArticles) => [...prevArticles, ...new_articles]);
+      setEntries((prevEntries) => [...prevEntries, ...new_entries]);
 
-      if (new_articles.length === 0) {
+      if (new_entries.length === 0) {
         setHasMore(false);
       }
 
       setPage((prevPage) => prevPage + 1);
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      console.error("Error fetching entries:", error);
     }
   };
 
-  const handleUpdateAllArticlesAsRead = async () => {
-    await updateArticlesAsReadByFeedId(parseInt(feed!.id!.toString()));
-    resetArticleList();
+  const handleUpdateAllEntriesAsRead = async () => {
+    await updateEntriesAsReadByFeedId(parseInt(feed!.id!.toString()));
+    resetEntryList();
 
     addNotification("Updated", 'All entries were updated as read!', 'primary');
   };
 
-  const handleRefreshArticles = async () => {
+  const handleRefreshEntries = async () => {
     setRefreshLoading(true);
-    await refreshArticles(parseInt(feed!.id!.toString()));
-    resetArticleList();
+    await refreshEntries(parseInt(feed!.id!.toString()));
+    resetEntryList();
     setRefreshLoading(false);
 
     addNotification("Reloaded", 'Entries are reloaded!', 'primary');
   };
 
-  const resetArticleList = () => {
-    setArticles([]);
+  const resetEntryList = () => {
+    setEntries([]);
     setPage(1);
   };
 
@@ -97,12 +97,12 @@ export default function Feed() {
               <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
             </div>
             <div className="flex flex-row items-center gap-2">
-              <Tooltip content="Update All Articles of The Feed As Read">
+              <Tooltip content="Update All Entries of The Feed As Read">
                 <Button
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onClick={handleUpdateAllArticlesAsRead}
+                  onClick={handleUpdateAllEntriesAsRead}
                 >
                   <RiCheckDoubleLine></RiCheckDoubleLine>
                 </Button>
@@ -112,7 +112,7 @@ export default function Feed() {
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onClick={handleRefreshArticles}
+                  onClick={handleRefreshEntries}
                 >
                   {refreshLoading ? (
                     <Spinner color="primary" size="sm" />
@@ -150,9 +150,9 @@ export default function Feed() {
           </div>
         </div>
         <EntriesList
-          articles={articles}
+          entries={entries}
           key={feed?.id}
-          fetchArticles={fetchArticles}
+          fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={false}
         />

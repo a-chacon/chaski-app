@@ -6,81 +6,81 @@ import {
   RiBookmarkFill,
   RiCloseLine
 } from "@remixicon/react";
-import { ArticleInterface } from "../interfaces";
+import { EntryInterface } from "../interfaces";
 import { Tooltip, Button } from "@heroui/react";
 import {
-  updateArticleAsRead,
-  updateArticleAsUnRead,
-  updateArticleReadLater,
-  updateArticleNotReadLater,
-  updateArticleAsReadAndHide
-} from "../helpers/articlesData";
+  updateEntryAsRead,
+  updateEntryAsUnRead,
+  updateEntryReadLater,
+  updateEntryNotReadLater,
+  updateEntryAsReadAndHide
+} from "../helpers/entriesData";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-interface ArticleActionsProps {
+interface EntryActionsProps {
   compact?: Boolean;
-  article: ArticleInterface;
-  setArticle: (article: ArticleInterface) => void;
+  entry: EntryInterface;
+  setEntry: (entry: EntryInterface) => void;
   className?: String;
   children?: React.ReactNode;
   backAfterAction?: boolean;
 }
 
-const ArticleActions: React.FC<ArticleActionsProps> = ({
+const EntryActions: React.FC<EntryActionsProps> = ({
   compact = true,
-  article,
-  setArticle,
+  entry,
+  setEntry,
   className,
   children,
   backAfterAction = false,
 }) => {
   const { history } = useRouter();
 
-  const [readLater, setReadLater] = useState(article.read_later);
-  const [read, setRead] = useState(article.read);
+  const [readLater, setReadLater] = useState(entry.read_later);
+  const [read, setRead] = useState(entry.read);
 
   useEffect(() => {
-    setReadLater(article.read_later);
-    setRead(article.read);
-  }, [article]);
+    setReadLater(entry.read_later);
+    setRead(entry.read);
+  }, [entry]);
 
-  const handleHideArticle = async (article: ArticleInterface) => {
+  const handleHideEntry = async (entry: EntryInterface) => {
     try {
-      const updatedArticle = await updateArticleAsReadAndHide(article);
+      const updatedEntry = await updateEntryAsReadAndHide(entry);
 
-      if (updatedArticle) {
-        setArticle({
-          ...article,
-          ...updatedArticle,
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
         });
       }
     } catch (error) {
-      console.error("Failed to update article:", error);
+      console.error("Failed to update entry:", error);
     }
   };
 
-  const handleMarkAsRead = async (article: ArticleInterface) => {
+  const handleMarkAsRead = async (entry: EntryInterface) => {
     try {
-      const updatedArticle = await updateArticleAsRead(article);
-      if (updatedArticle) {
-        setArticle({
-          ...article,
-          ...updatedArticle,
+      const updatedEntry = await updateEntryAsRead(entry);
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
         });
       }
     } catch (error) {
-      console.error("Failed to update article:", error);
+      console.error("Failed to update entry:", error);
     }
   };
 
-  const handleMarkAsUnread = async (article: ArticleInterface) => {
+  const handleMarkAsUnread = async (entry: EntryInterface) => {
     try {
-      const updatedArticle = await updateArticleAsUnRead(article);
-      if (updatedArticle) {
-        setArticle({
-          ...article,
-          ...updatedArticle,
+      const updatedEntry = await updateEntryAsUnRead(entry);
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
         });
       }
 
@@ -88,17 +88,17 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
         history.go(-1);
       }
     } catch (error) {
-      console.error("Failed to update article:", error);
+      console.error("Failed to update entry:", error);
     }
   };
 
-  const handleMarkReadLater = async (article: ArticleInterface) => {
+  const handleMarkReadLater = async (entry: EntryInterface) => {
     try {
-      const updatedArticle = await updateArticleReadLater(article);
-      if (updatedArticle) {
-        setArticle({
-          ...article,
-          ...updatedArticle,
+      const updatedEntry = await updateEntryReadLater(entry);
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
         });
       }
 
@@ -106,21 +106,21 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
         history.go(-1);
       }
     } catch (error) {
-      console.error("Failed to update article:", error);
+      console.error("Failed to update entry:", error);
     }
   };
 
-  const handleUnMarkReadLater = async (article: ArticleInterface) => {
+  const handleUnMarkReadLater = async (entry: EntryInterface) => {
     try {
-      const updatedArticle = await updateArticleNotReadLater(article);
-      if (updatedArticle) {
-        setArticle({
-          ...article,
-          ...updatedArticle,
+      const updatedEntry = await updateEntryNotReadLater(entry);
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
         });
       }
     } catch (error) {
-      console.error("Failed to update article:", error);
+      console.error("Failed to update entry:", error);
     }
   };
 
@@ -133,7 +133,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             variant="light"
             isIconOnly
             size="sm"
-            onPress={() => handleHideArticle(article)}
+            onPress={() => handleHideEntry(entry)}
           >
             <RiCloseLine className="w-6" />
           </Button>
@@ -141,9 +141,9 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
       )
     } else {
       return (
-        <Tooltip content={"Visit Website: " + article.link} className="w-80">
+        <Tooltip content={"Visit Website: " + entry.link} className="w-80">
           <a
-            href={article.link}
+            href={entry.link}
             target="_blank"
           >
             <RiExternalLinkLine className="w-6" />
@@ -164,7 +164,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             variant="light"
             isIconOnly
             size="sm"
-            onPress={() => handleMarkReadLater(article)}
+            onPress={() => handleMarkReadLater(entry)}
           >
             <RiBookmarkLine className="w-6" />
           </Button>
@@ -176,7 +176,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             variant="light"
             isIconOnly
             size="sm"
-            onPress={() => handleUnMarkReadLater(article)}
+            onPress={() => handleUnMarkReadLater(entry)}
           >
             <RiBookmarkFill className="w-6" />
           </Button>
@@ -190,7 +190,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             variant="light"
             isIconOnly
             size="sm"
-            onPress={() => handleMarkAsUnread(article)}
+            onPress={() => handleMarkAsUnread(entry)}
           >
             <RiCheckDoubleLine className="w-6" />
           </Button>
@@ -202,7 +202,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             variant="light"
             isIconOnly
             size="sm"
-            onPress={() => handleMarkAsRead(article)}
+            onPress={() => handleMarkAsRead(entry)}
           >
             <RiCheckLine className="w-6" />
           </Button>
@@ -215,4 +215,4 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
   );
 };
 
-export default ArticleActions;
+export default EntryActions;

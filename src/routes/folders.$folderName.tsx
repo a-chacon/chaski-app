@@ -1,14 +1,14 @@
-import { ArticleInterface } from '../interfaces'
+import { EntryInterface } from '../interfaces'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import EntriesList from '../components/EntriesList'
-import { useArticles } from '../IndexArticlesContext'
+import { useEntries } from '../IndexEntriesContext'
 import { Button, Tooltip } from '@heroui/react'
 import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useNotification } from '../NotificationContext'
-import { updateArticlesAsReadByFolder } from '../helpers/feedsData'
+import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
 
 export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
@@ -19,53 +19,53 @@ export default function Folder() {
   const { folderName: folderParam } = Route.useParams()
   const [accountIdStr, folderName] = folderParam.split('-')
   const accountId = Number(accountIdStr)
-  const { articles, setArticles, page, setPage, hasMore, setHasMore } =
-    useArticles(folderName)
+  const { entries, setEntries, page, setPage, hasMore, setHasMore } =
+    useEntries(folderName)
 
   useEffect(() => {
-    if (page === 1 && articles.length == 0) {
-      fetchArticles()
+    if (page === 1 && entries.length == 0) {
+      fetchEntries()
     }
   }, [page])
 
-  const fetchArticles = async () => {
+  const fetchEntries = async () => {
     try {
-      const message = await invoke<string>('list_articles', {
+      const message = await invoke<string>('list_entries', {
         page,
         items: 20,
         filters: { folder_eq: folderName, read_eq: 0, account_id_eq: accountId },
       })
 
-      const new_articles: ArticleInterface[] = JSON.parse(message)
+      const new_entries: EntryInterface[] = JSON.parse(message)
 
-      setArticles((prevArticles) => [...prevArticles, ...new_articles])
+      setEntries((prevEntries) => [...prevEntries, ...new_entries])
 
-      if (new_articles.length === 0) {
+      if (new_entries.length === 0) {
         setHasMore(false)
       }
 
       setPage((prevPage) => prevPage + 1)
     } catch (error) {
-      console.error('Error fetching articles:', error)
+      console.error('Error fetching entries:', error)
     }
   }
 
   const handleReloadButton = () => {
     setPage(1)
-    setArticles([])
+    setEntries([])
 
     addNotification('Reloaded', 'Entries are reloaded!', 'primary')
   }
 
-  const handleUpdateArticlesAsRead = async () => {
-    await updateArticlesAsReadByFolder(folderName, accountId)
-    resetArticleList()
+  const handleUpdateEntriesAsRead = async () => {
+    await updateEntriesAsReadByFolder(folderName, accountId)
+    resetEntryList()
 
     addNotification('Updated', 'All entries were updated as read!', 'primary')
   }
 
-  const resetArticleList = () => {
-    setArticles([])
+  const resetEntryList = () => {
+    setEntries([])
     setPage(1)
   }
 
@@ -79,17 +79,17 @@ export default function Folder() {
             </div>
 
             <div className="flex flex-row items-center gap-2">
-              <Tooltip content="Update All Articles of The Folder As Read">
+              <Tooltip content="Update All Entries of The Folder As Read">
                 <Button
                   isIconOnly
                   variant="light"
                   size="sm"
-                  onPress={handleUpdateArticlesAsRead}
+                  onPress={handleUpdateEntriesAsRead}
                 >
                   <RiCheckDoubleLine></RiCheckDoubleLine>
                 </Button>
               </Tooltip>
-              <Tooltip content="Reload The Page's Articles">
+              <Tooltip content="Reload The Page's Entries">
                 <Button
                   color="primary"
                   isIconOnly
@@ -105,8 +105,8 @@ export default function Folder() {
         </div>
         <EntriesList
           key={folderParam}
-          articles={articles}
-          fetchArticles={fetchArticles}
+          entries={entries}
+          fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
         />

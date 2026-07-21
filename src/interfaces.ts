@@ -25,7 +25,7 @@ export interface FeedInterface {
   default_entry_type: string;
 }
 
-export interface ArticleInterface {
+export interface EntryInterface {
   id?: number;
   title: string;
   link: string;
@@ -42,6 +42,8 @@ export interface ArticleInterface {
   media_content_url?: string;
   media_content_type?: string;
 }
+
+
 
 export interface FilterInterface {
   id?: number;
@@ -77,8 +79,8 @@ export interface AccountInterface {
 export interface AppContextInterface {
   sideBarOpen: boolean;
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  articlesLayout: string;
-  setArticlesLayout: React.Dispatch<React.SetStateAction<string>>;
+  entriesLayout: string;
+  setEntriesLayout: React.Dispatch<React.SetStateAction<string>>;
   currentTheme: string;
   handleSetCurrentTheme: (theme: string) => void;
   currentFont: string;
@@ -90,8 +92,8 @@ export interface AppContextInterface {
   isMobile: boolean;
   handleSetMarkAsReadOnHover: (mark_as_read_on_hover: boolean) => void;
   currentMarkAsReadOnHover: boolean;
-  currentArticleScrapeMode: string;
-  handleSetCurrentArticleScrapeMode: (mode: string) => void;
+  currentEntryScrapeMode: string;
+  handleSetCurrentEntryScrapeMode: (mode: string) => void;
   setConfigurations: React.Dispatch<
     React.SetStateAction<ConfigurationInterface[]>
   >;
@@ -104,5 +106,5 @@ export interface AppContextInterface {
 
 export interface SearchResultsInterface {
   feeds: FeedInterface[];
-  articles: ArticleInterface[];
+  entries?: EntryInterface[];
 }

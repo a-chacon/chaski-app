@@ -14,15 +14,15 @@ diesel::table! {
 }
 
 diesel::table! {
-    article_tags (tag_id, article_id) {
+    entry_tags (tag_id, entry_id) {
         id -> Integer,
         tag_id -> Integer,
-        article_id -> Integer,
+        entry_id -> Integer,
     }
 }
 
 diesel::table! {
-    articles (id) {
+    entries (id) {
         id -> Integer,
         title -> Nullable<Text>,
         link -> Text,
@@ -107,20 +107,20 @@ diesel::table! {
     tags (id) {
         id -> Nullable<Integer>,
         value -> Text,
-        article_id -> Integer,
+        entry_id -> Integer,
     }
 }
 
-diesel::joinable!(article_tags -> articles (article_id));
-diesel::joinable!(article_tags -> tags (tag_id));
-diesel::joinable!(articles -> feeds (feed_id));
+diesel::joinable!(entry_tags -> entries (entry_id));
+diesel::joinable!(entry_tags -> tags (tag_id));
+diesel::joinable!(entries -> feeds (feed_id));
 diesel::joinable!(feeds -> accounts (account_id));
 diesel::joinable!(filters -> feeds (feed_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     accounts,
-    article_tags,
-    articles,
+    entry_tags,
+    entries,
     changes,
     configurations,
     feeds,

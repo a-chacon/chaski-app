@@ -1,30 +1,30 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useMemo, useRef } from "react";
-import { ArticleInterface } from "./interfaces";
+import { EntryInterface } from "./interfaces";
 
-interface ArticlesContextType {
+interface EntriesContextType {
   path: string;
-  articles: ArticleInterface[];
+  entries: EntryInterface[];
   page: number;
   hasMore: boolean;
-  setArticles: React.Dispatch<React.SetStateAction<ArticleInterface[]>>;
+  setEntries: React.Dispatch<React.SetStateAction<EntryInterface[]>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
   setPath: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const ArticlesContext = createContext<ArticlesContextType | undefined>(undefined);
+const EntriesContext = createContext<EntriesContextType | undefined>(undefined);
 
-export const useArticles = (path?: string): ArticlesContextType => {
-  const context = useContext(ArticlesContext);
+export const useEntries = (path?: string): EntriesContextType => {
+  const context = useContext(EntriesContext);
   if (!context) {
-    throw new Error("useArticles must be used within an ArticlesProvider");
+    throw new Error("useEntries must be used within an EntriesProvider");
   }
 
   const prevPathRef = useRef<string | undefined>();
 
   useEffect(() => {
     if (path && context.path !== path) {
-      context.setArticles([]);
+      context.setEntries([]);
       context.setPage(1);
       context.setHasMore(true);
       context.setPath(path);
@@ -35,31 +35,31 @@ export const useArticles = (path?: string): ArticlesContextType => {
   return context;
 };
 
-interface ArticlesProviderProps {
+interface EntriesProviderProps {
   children: ReactNode;
 }
 
-export const ArticlesProvider: React.FC<ArticlesProviderProps> = ({ children }) => {
-  const [articles, setArticles] = useState<ArticleInterface[]>([]);
+export const EntriesProvider: React.FC<EntriesProviderProps> = ({ children }) => {
+  const [entries, setEntries] = useState<EntryInterface[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [path, setPath] = useState<string>("");
 
   const contextValue = useMemo(() => ({
     path,
-    articles,
+    entries,
     page,
     hasMore,
-    setArticles,
+    setEntries,
     setPage,
     setHasMore,
     setPath,
-  }), [path, articles, page, hasMore]);
+  }), [path, entries, page, hasMore]);
 
   return (
-    <ArticlesContext.Provider value={contextValue}>
+    <EntriesContext.Provider value={contextValue}>
       {children}
-    </ArticlesContext.Provider>
+    </EntriesContext.Provider>
   );
 };
 

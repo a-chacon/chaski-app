@@ -1,5 +1,5 @@
 pub mod accounts;
-pub mod articles;
+pub mod entries;
 pub mod configurations;
 pub mod feeds;
 pub mod filters;

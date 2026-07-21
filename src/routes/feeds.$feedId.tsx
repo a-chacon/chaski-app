@@ -45,8 +45,8 @@ export default function Feed() {
     try {
       const message = await invoke<string>("list_entries", {
         page,
-        items: 20,
-        filters: { feed_id_eq: parseInt(feedId), read_eq: 0 },
+        items: 50,
+        filters: { feed_id_eq: parseInt(feedId) },
       });
 
       const new_entries: EntryInterface[] = JSON.parse(message);

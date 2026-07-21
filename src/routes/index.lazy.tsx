@@ -43,7 +43,7 @@ export default function App() {
 
       const message = await invoke<string>('list_entries', {
         page: page,
-        items: 20,
+        items: 50,
         filters: {
           account_id_eq: currentAccount.id,
         }

@@ -52,7 +52,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
   return (
     <div
       id="mainDiv"
-      className="rounded-3xl h-full w-full overflow-auto border border-primary-100 shadow-xl"
+      className="rounded-3xl h-full w-full overflow-auto"
     >
       {children}
       {showButton && (

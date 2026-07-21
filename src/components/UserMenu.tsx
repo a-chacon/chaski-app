@@ -5,7 +5,7 @@ import {
   DropdownItem,
   Button,
 } from "@heroui/react";
-import { RiUserLine } from "@remixicon/react";
+import { RiMenuLine } from "@remixicon/react";
 import { save } from "@tauri-apps/plugin-dialog";
 import { exportOPML } from "../helpers/feedsData";
 import { useNavigate } from "@tanstack/react-router";
@@ -43,19 +43,20 @@ export default function UserMenu() {
 
   return (
     <>
-      <Dropdown placement="right-end">
+      <Dropdown placement="bottom-end">
         <DropdownTrigger>
           <Button
             isIconOnly
-            variant="flat"
-            className="rounded-full shadow-lg items-center h-10 w-10 flex justify-center"
+            size="sm"
+            variant="light"
+            aria-label="Application menu"
           >
-            <RiUserLine className="p-0.5" />
+            <RiMenuLine className="p-0.5" />
           </Button>
         </DropdownTrigger>
         <DropdownMenu
           onAction={(key) => handleDropDownMenuKey(key.toString())}
-          aria-label="Profile Actions"
+          aria-label="Application menu actions"
         >
           <DropdownItem key="configurations">
             Configurations

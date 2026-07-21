@@ -169,12 +169,26 @@ pub fn update_all_as_read_by_folder(
     }
 }
 
-pub async fn full_text_search(text: &String, app_handle: tauri::AppHandle) -> Vec<Entry> {
+pub async fn full_text_search(
+    text: &String,
+    account_id_filter: Option<i32>,
+    app_handle: tauri::AppHandle,
+) -> Vec<Entry> {
     let conn = &mut establish_connection(&app_handle);
-    let query = format!(
-        "SELECT entries.* FROM entries INNER JOIN entries_fts ON entries_fts.entry_id = entries.id WHERE entries_fts MATCH '\"{}\"' LIMIT 15",
+
+    let mut query = format!(
+        "SELECT entries.* FROM entries INNER JOIN entries_fts ON entries_fts.entry_id = entries.id WHERE entries_fts MATCH '\"{}\"'",
         text
     );
+
+    if let Some(account_id_eq) = account_id_filter {
+        query.push_str(&format!(
+            " AND entries.feed_id IN (SELECT id FROM feeds WHERE account_id = {})",
+            account_id_eq
+        ));
+    }
+
+    query.push_str(" LIMIT 15");
 
     sql_query(query)
         .load::<Entry>(conn)

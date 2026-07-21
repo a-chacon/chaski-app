@@ -8,6 +8,7 @@ import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
+import { useAppContext } from '../AppContext'
 
 export const Route = createLazyFileRoute('/read_later')({
   component: ReadLater,
@@ -15,20 +16,33 @@ export const Route = createLazyFileRoute('/read_later')({
 
 export default function ReadLater() {
   const { entries, setEntries, page, setPage, hasMore, setHasMore } = useEntries("/read_later");
+  const { currentAccount } = useAppContext();
 
   useEffect(() => {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page])
+  }, [page, currentAccount?.id])
+
+  useEffect(() => {
+    setEntries([])
+    setPage(1)
+    setHasMore(true)
+  }, [currentAccount?.id])
 
   const fetchEntries = async () => {
     try {
+      if (!currentAccount?.id) {
+        setHasMore(false)
+        return
+      }
+
       const message = await invoke<string>('list_entries', {
         page: page,
         items: 20,
         filters: {
-          read_later_eq: 1
+          read_later_eq: 1,
+          account_id_eq: currentAccount.id,
         }
       })
 
@@ -49,6 +63,7 @@ export default function ReadLater() {
   const handleReloadButton = () => {
     setPage(1);
     setEntries([]);
+    setHasMore(true);
   }
 
   return (

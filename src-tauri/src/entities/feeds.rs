@@ -97,12 +97,23 @@ pub fn update(feed_id: i32, mut feed: Feed, app_handle: tauri::AppHandle) -> Fee
         .expect("Update feed")
 }
 
-pub async fn full_text_search(text: &String, app_handle: tauri::AppHandle) -> Vec<Feed> {
+pub async fn full_text_search(
+    text: &String,
+    account_id_filter: Option<i32>,
+    app_handle: tauri::AppHandle,
+) -> Vec<Feed> {
     let conn = &mut establish_connection(&app_handle);
-    let query = format!(
-        "SELECT feeds.* FROM feeds INNER JOIN feeds_fts ON feeds_fts.feed_id = feeds.id WHERE feeds_fts MATCH '\"{}\"' LIMIT 15",
+
+    let mut query = format!(
+        "SELECT feeds.* FROM feeds INNER JOIN feeds_fts ON feeds_fts.feed_id = feeds.id WHERE feeds_fts MATCH '\"{}\"'",
         text
     );
+
+    if let Some(account_id_eq) = account_id_filter {
+        query.push_str(&format!(" AND feeds.account_id = {}", account_id_eq));
+    }
+
+    query.push_str(" LIMIT 15");
 
     sql_query(query)
         .load::<Feed>(conn)

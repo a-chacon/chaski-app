@@ -14,9 +14,11 @@ import { useEffect, useState } from "react";
 import { fullTextSearch } from "../helpers/searchData";
 import { SearchResultsInterface } from "../interfaces";
 import { Link } from "@tanstack/react-router";
+import { useAppContext } from "../AppContext";
 
 
 export default function SearchModal() {
+  const { currentAccount } = useAppContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [value, setValue] = useState("");
   const [results, setResults] = useState<SearchResultsInterface>({
@@ -32,7 +34,12 @@ export default function SearchModal() {
   const handleInputChange = async (input: string) => {
     setValue(input);
     if (input.length >= 3) {
-      let result = await fullTextSearch(input);
+      if (!currentAccount?.id) {
+        setResults({ feeds: [], entries: [] });
+        return;
+      }
+
+      let result = await fullTextSearch(input, currentAccount.id);
       if (result) {
         setResults(result);
       }

@@ -103,13 +103,7 @@ async fn add_rss_feed(
 
     if new_feed.icon.is_none() {
         let client = create_async_client()?;
-        let response = client.get(link).send().await?;
-
-        if response.status().is_success() {
-            let body = response.bytes().await?;
-            let body_str = String::from_utf8_lossy(&body);
-            new_feed.icon = Some(parse_html_for_favicon(&body_str, link));
-        }
+        new_feed.icon = discover_favicon(&client, link).await;
     }
 
     new_feeds.push(new_feed);
@@ -127,12 +121,7 @@ async fn add_atom_feed(
 
     if new_feed.icon.is_none() {
         let client = create_async_client()?;
-        let response = client.get(link).send().await?;
-        if response.status().is_success() {
-            let body = response.bytes().await?;
-            let body_str = String::from_utf8_lossy(&body);
-            new_feed.icon = Some(parse_html_for_favicon(&body_str, link));
-        }
+        new_feed.icon = discover_favicon(&client, link).await;
     }
 
     new_feeds.push(new_feed);
@@ -147,7 +136,8 @@ async fn extract_feeds_from_html(
     let hrefs = parse_html_for_feeds(&body);
 
     for href in hrefs {
-        let href_url = Url::parse(&href).or_else(|_| Url::parse(&format!("{}/{}", link, href)))?;
+        let href_url =
+            Url::parse(&href).or_else(|_| Url::parse(link).and_then(|base| base.join(&href)))?;
 
         let client = create_async_client()?;
         let feed_response = client.get(href_url.clone()).send().await?;
@@ -173,11 +163,17 @@ fn parse_html_for_feeds(body: &str) -> Vec<String> {
     let mut hrefs = Vec::new();
 
     for element in document.select(&selector) {
-        if let Some(link_type) = element.value().attr("type") {
-            if link_type == "application/rss+xml" || link_type == "application/atom+xml" {
-                if let Some(href) = element.value().attr("href") {
-                    hrefs.push(href.to_string());
-                }
+        let link_type = element
+            .value()
+            .attr("type")
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        let is_feed_type =
+            link_type.contains("application/rss+xml") || link_type.contains("application/atom+xml");
+
+        if is_feed_type {
+            if let Some(href) = element.value().attr("href") {
+                hrefs.push(href.to_string());
             }
         }
     }
@@ -185,30 +181,79 @@ fn parse_html_for_feeds(body: &str) -> Vec<String> {
     hrefs
 }
 
-fn parse_html_for_favicon(body: &str, base_url: &str) -> String {
+fn parse_html_for_favicon(body: &str, base_url: &str) -> Option<String> {
     let document = Html::parse_document(body);
     let selector = Selector::parse("link").unwrap();
 
+    let favicon_rels = ["icon", "shortcut icon", "apple-touch-icon", "mask-icon"];
+
     for element in document.select(&selector) {
-        if let Some(rel) = element.value().attr("rel") {
-            if rel == "icon" || rel == "shortcut icon" {
-                if let Some(href) = element.value().attr("href") {
-                    // Resolve the URL
-                    if let Ok(base) = Url::parse(base_url) {
-                        if let Ok(full_url) = base.join(href) {
-                            return full_url.to_string(); // Return the found favicon URL
-                        }
+        let rel_value = element
+            .value()
+            .attr("rel")
+            .unwrap_or("")
+            .to_ascii_lowercase();
+
+        let rel_tokens: Vec<&str> = rel_value.split_whitespace().collect();
+        let is_icon_rel = favicon_rels.iter().any(|r| {
+            if *r == "shortcut icon" {
+                rel_tokens.contains(&"shortcut") && rel_tokens.contains(&"icon")
+            } else {
+                rel_tokens.contains(r)
+            }
+        });
+
+        if is_icon_rel {
+            if let Some(href) = element.value().attr("href") {
+                if let Ok(base) = Url::parse(base_url) {
+                    if let Ok(full_url) = base.join(href) {
+                        return Some(full_url.to_string());
                     }
                 }
             }
         }
     }
 
-    if let Ok(base) = Url::parse(base_url) {
-        return base.join("/favicon.ico").unwrap().to_string();
+    None
+}
+
+async fn discover_favicon(client: &Client, link: &str) -> Option<String> {
+    let parsed = Url::parse(link).ok()?;
+
+    let mut page_candidates = vec![link.to_string()];
+    if let Ok(root) = parsed.join("/") {
+        let root_str = root.to_string();
+        if root_str != link {
+            page_candidates.push(root_str);
+        }
     }
 
-    String::from("/favicon.ico")
+    for page_url in page_candidates {
+        let response = match client.get(&page_url).send().await {
+            Ok(response) if response.status().is_success() => response,
+            _ => continue,
+        };
+
+        let body = match response.text().await {
+            Ok(body) => body,
+            Err(_) => continue,
+        };
+
+        if let Some(icon_url) = parse_html_for_favicon(&body, &page_url) {
+            return Some(icon_url);
+        }
+    }
+
+    if let Ok(fallback) = parsed.join("/favicon.ico") {
+        let fallback_str = fallback.to_string();
+        if let Ok(response) = client.get(&fallback_str).send().await {
+            if response.status().is_success() {
+                return Some(fallback_str);
+            }
+        }
+    }
+
+    None
 }
 
 async fn autodiscover_feeds(

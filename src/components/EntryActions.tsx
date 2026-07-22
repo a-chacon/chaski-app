@@ -19,9 +19,9 @@ import {
 } from "../helpers/entriesData";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 interface EntryActionsProps {
-  compact?: Boolean;
   entry: EntryInterface;
   setEntry: (entry: EntryInterface) => void;
   className?: String;
@@ -30,7 +30,6 @@ interface EntryActionsProps {
 }
 
 const EntryActions: React.FC<EntryActionsProps> = ({
-  compact = true,
   entry,
   setEntry,
   className,
@@ -77,6 +76,26 @@ const EntryActions: React.FC<EntryActionsProps> = ({
       }
     } catch (error) {
       console.error("Failed to update entry:", error);
+    }
+  };
+
+  const handleOpenInBrowser = async (entry: EntryInterface) => {
+    try {
+      const updatedEntry = await updateEntryAsRead(entry);
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to mark entry as read before opening browser:", error);
+    }
+
+    try {
+      await openUrl(entry.link);
+    } catch (error) {
+      console.error("Failed to open link in browser:", error);
     }
   };
 
@@ -145,48 +164,35 @@ const EntryActions: React.FC<EntryActionsProps> = ({
   };
 
   const showOptionalOptions = () => {
-    if (compact) {
-      if (entry.hide) {
-        return (
-          <Tooltip content="Unhide">
-            <Button
-              color="primary"
-              variant="light"
-              isIconOnly
-              size="sm"
-              onPress={() => handleUnhideEntry(entry)}
-            >
-              <RiEyeLine className="w-6" />
-            </Button>
-          </Tooltip>
-        )
-      }
-
+    if (entry.hide) {
       return (
-        <Tooltip content="Hide">
+        <Tooltip content="Unhide">
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"
-            onPress={() => handleHideEntry(entry)}
+            onPress={() => handleUnhideEntry(entry)}
           >
-            <RiCloseLine className="w-6" />
+            <RiEyeLine className="w-6" />
           </Button>
         </Tooltip>
       )
-    } else {
-      return (
-        <Tooltip content={"Visit Website: " + entry.link} className="w-80">
-          <a
-            href={entry.link}
-            target="_blank"
-          >
-            <RiExternalLinkLine className="w-6" />
-          </a>
-        </Tooltip>
-      )
     }
+
+    return (
+      <Tooltip content="Hide">
+        <Button
+          color="default"
+          variant="light"
+          isIconOnly
+          size="sm"
+          onPress={() => handleHideEntry(entry)}
+        >
+          <RiCloseLine className="w-6" />
+        </Button>
+      </Tooltip>
+    )
   }
 
   return (
@@ -196,7 +202,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
       {!readLater ? (
         <Tooltip content="Mark for Read Later">
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"
@@ -208,7 +214,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
       ) : (
         <Tooltip content="Unmark Read Later">
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"
@@ -222,7 +228,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
       {read ? (
         <Tooltip content="Mark as unRead">
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"
@@ -234,7 +240,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
       ) : (
         <Tooltip content="Mark as Read">
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"
@@ -247,6 +253,18 @@ const EntryActions: React.FC<EntryActionsProps> = ({
 
       {showOptionalOptions()}
 
+      <Tooltip content={"Visit Website: " + entry.link} className="w-80">
+        <Button
+          color="default"
+          variant="light"
+          isIconOnly
+          size="sm"
+          onPress={() => handleOpenInBrowser(entry)}
+          aria-label="Open entry in browser"
+        >
+          <RiExternalLinkLine className="w-6" />
+        </Button>
+      </Tooltip>
     </div>
   );
 };

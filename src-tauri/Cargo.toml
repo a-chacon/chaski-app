@@ -35,6 +35,7 @@ rss = "2.0.9"
 scraper = "0.24.0"
 tokio = { version = "1.41.1", features = ["full"] }
 tauri-plugin-notification = "2"
+tauri-plugin-opener = "2"
 env_logger = "0.11.5"
 tauri-plugin-dialog = "2"
 tauri-plugin-clipboard-manager = "2.0.1"

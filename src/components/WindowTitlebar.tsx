@@ -65,7 +65,7 @@ const WindowTitlebar: React.FC = () => {
       <div className="flex items-center gap-1 text-primary-500">
         <Tooltip content={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"} delay={300}>
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"
@@ -89,7 +89,7 @@ const WindowTitlebar: React.FC = () => {
 
         <Tooltip content="Add new feed" delay={300}>
           <Button
-            color="primary"
+            color="default"
             variant="light"
             isIconOnly
             size="sm"

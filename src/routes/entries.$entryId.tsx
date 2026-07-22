@@ -64,7 +64,6 @@ function Entry() {
           <div className="mx-2 flex justify-between bg-primary-100 border border-primary-500 sticky top-3 p-1.5 rounded-xl shadow-xl">
             <div className="flex flex-row">
               <EntryActions
-                compact={false}
                 entry={entry}
                 setEntry={setEntry}
                 backAfterAction={true}

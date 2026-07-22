@@ -6,8 +6,8 @@ mod core;
 mod db;
 mod entities {
     pub(crate) mod accounts;
-    pub(crate) mod entries;
     pub(crate) mod configurations;
+    pub(crate) mod entries;
     pub(crate) mod feeds;
     pub(crate) mod filters;
     pub(crate) mod folders;
@@ -57,6 +57,7 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_opener::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .filter(|metadata| metadata.target().contains("chaski"))

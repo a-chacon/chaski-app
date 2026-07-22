@@ -8,6 +8,7 @@ import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
+import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import { useAppContext } from '../AppContext'
 
 export const Route = createLazyFileRoute('/read_later')({
@@ -16,19 +17,19 @@ export const Route = createLazyFileRoute('/read_later')({
 
 export default function ReadLater() {
   const { entries, setEntries, page, setPage, hasMore, setHasMore } = useEntries("/read_later");
-  const { currentAccount } = useAppContext();
+  const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext();
 
   useEffect(() => {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page, currentAccount?.id])
+  }, [page, entries.length, currentAccount?.id, showReadEntries, showHiddenEntries])
 
   useEffect(() => {
     setEntries([])
     setPage(1)
     setHasMore(true)
-  }, [currentAccount?.id])
+  }, [currentAccount?.id, showReadEntries, showHiddenEntries])
 
   const fetchEntries = async () => {
     try {
@@ -43,6 +44,8 @@ export default function ReadLater() {
         filters: {
           read_later_eq: 1,
           account_id_eq: currentAccount.id,
+          ...(showReadEntries ? {} : { read_eq: 0 }),
+          ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         }
       })
 
@@ -76,6 +79,7 @@ export default function ReadLater() {
           </div>
           <div className="flex flex-row items-center gap-2">
             <EntryLayoutSwitch />
+            <EntriesFiltersSwitch />
             <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
               <RiRefreshLine></RiRefreshLine>
             </Button>

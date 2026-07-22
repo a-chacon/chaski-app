@@ -32,6 +32,8 @@ const UpdaterBootstrap: React.FC = () => {
 const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [sideBarOpen, setSideBarOpen] = useState(true);
   const [entriesLayout, setEntriesLayout] = useState<string>("list");
+  const [showReadEntries, setShowReadEntries] = useState<boolean>(true);
+  const [showHiddenEntries, setShowHiddenEntries] = useState<boolean>(false);
   const [currentTheme, setCurrentTheme] = useState<string>("AUTO");
   const [isMobile, setIsMobile] = useState(false);
   const [configurations, setConfigurations] = useState<
@@ -284,6 +286,10 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         setSideBarOpen,
         entriesLayout,
         setEntriesLayout,
+        showReadEntries,
+        setShowReadEntries,
+        showHiddenEntries,
+        setShowHiddenEntries,
         currentTheme,
         handleSetCurrentTheme,
         isMobile,

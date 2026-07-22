@@ -81,6 +81,10 @@ export interface AppContextInterface {
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   entriesLayout: string;
   setEntriesLayout: React.Dispatch<React.SetStateAction<string>>;
+  showReadEntries: boolean;
+  setShowReadEntries: React.Dispatch<React.SetStateAction<boolean>>;
+  showHiddenEntries: boolean;
+  setShowHiddenEntries: React.Dispatch<React.SetStateAction<boolean>>;
   currentTheme: string;
   handleSetCurrentTheme: (theme: string) => void;
   currentFont: string;

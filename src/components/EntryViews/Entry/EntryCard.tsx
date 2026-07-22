@@ -16,7 +16,11 @@ const EntryCard: React.FC<EntryCardProps> = ({
 }) => {
   const [entry, setEntry] = useState(inputEntry);
   const [isHovering, setIsHovering] = useState(false);
-  const { currentMarkAsReadOnHover, entriesLayout: display } = useAppContext();
+  const {
+    currentMarkAsReadOnHover,
+    entriesLayout: display,
+    showHiddenEntries,
+  } = useAppContext();
 
   const isCompact = display === "compact";
   const isGrid = display === "grid";
@@ -37,7 +41,7 @@ const EntryCard: React.FC<EntryCardProps> = ({
     return (
       <div
         key={entry.id}
-        className={`px-2 py-2 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${entry.hide ? "hidden" : ""}`}
+        className={`px-2 py-2 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
@@ -80,7 +84,7 @@ const EntryCard: React.FC<EntryCardProps> = ({
   return (
     <div
       key={entry.id}
-      className={`rounded-xl ${entry.read ? "opacity-75" : ""} ${entry.hide ? "hidden" : ""}`}
+      className={`rounded-xl ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
     >

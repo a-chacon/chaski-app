@@ -16,6 +16,7 @@ pub struct EntriesFilters {
     feed_id_eq: Option<i32>,
     read_later_eq: Option<i32>,
     read_eq: Option<i32>,
+    hidden_eq: Option<i32>,
     pub_date_eq: Option<String>,
     folder_eq: Option<String>,
     account_id_eq: Option<i32>,
@@ -32,7 +33,6 @@ pub fn get_entries_with_feed(
     let mut query = entries
         .inner_join(feeds)
         .select((ShortEntry::as_select(), Feed::as_select()))
-        .filter(hide.eq(0))
         .limit(items)
         .offset(offset)
         .order(pub_date.desc())
@@ -49,6 +49,10 @@ pub fn get_entries_with_feed(
 
         if let Some(read_eq) = filter.read_eq {
             query = query.filter(entries::read.eq(read_eq));
+        }
+
+        if let Some(hidden_eq) = filter.hidden_eq {
+            query = query.filter(entries::hide.eq(hidden_eq));
         }
 
         if let Some(pub_date_eq) = filter.pub_date_eq {

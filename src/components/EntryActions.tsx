@@ -4,7 +4,8 @@ import {
   RiCheckDoubleLine,
   RiExternalLinkLine,
   RiBookmarkFill,
-  RiCloseLine
+  RiCloseLine,
+  RiEyeLine,
 } from "@remixicon/react";
 import { EntryInterface } from "../interfaces";
 import { Tooltip, Button } from "@heroui/react";
@@ -13,7 +14,8 @@ import {
   updateEntryAsUnRead,
   updateEntryReadLater,
   updateEntryNotReadLater,
-  updateEntryAsReadAndHide
+  updateEntryAsReadAndHide,
+  updateEntry,
 } from "../helpers/entriesData";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -48,6 +50,24 @@ const EntryActions: React.FC<EntryActionsProps> = ({
   const handleHideEntry = async (entry: EntryInterface) => {
     try {
       const updatedEntry = await updateEntryAsReadAndHide(entry);
+
+      if (updatedEntry) {
+        setEntry({
+          ...entry,
+          ...updatedEntry,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update entry:", error);
+    }
+  };
+
+  const handleUnhideEntry = async (entry: EntryInterface) => {
+    try {
+      const updatedEntry = await updateEntry({
+        ...entry,
+        hide: 0,
+      });
 
       if (updatedEntry) {
         setEntry({
@@ -126,6 +146,22 @@ const EntryActions: React.FC<EntryActionsProps> = ({
 
   const showOptionalOptions = () => {
     if (compact) {
+      if (entry.hide) {
+        return (
+          <Tooltip content="Unhide">
+            <Button
+              color="primary"
+              variant="light"
+              isIconOnly
+              size="sm"
+              onPress={() => handleUnhideEntry(entry)}
+            >
+              <RiEyeLine className="w-6" />
+            </Button>
+          </Tooltip>
+        )
+      }
+
       return (
         <Tooltip content="Hide">
           <Button

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FeedInterface, EntryInterface } from "../interfaces";
 import moment from "moment";
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
+import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
@@ -13,6 +14,7 @@ import { updateEntriesAsReadByFeedId, refreshEntries } from "../helpers/feedsDat
 import { getFeed } from "../helpers/feedsData";
 import { useEntries } from "../IndexEntriesContext";
 import { useNotification } from "../NotificationContext";
+import { useAppContext } from "../AppContext";
 
 export const Route = createFileRoute("/feeds/$feedId")({
   component: Feed,
@@ -20,6 +22,7 @@ export const Route = createFileRoute("/feeds/$feedId")({
 
 export default function Feed() {
   const { addNotification } = useNotification();
+  const { showReadEntries, showHiddenEntries } = useAppContext();
   const { feedId } = Route.useParams();
   const { entries, setEntries, page, setPage, hasMore, setHasMore } =
     useEntries(feedId);
@@ -39,14 +42,24 @@ export default function Feed() {
     if (page === 1 && entries.length == 0) {
       fetchEntries();
     }
-  }, [page]);
+  }, [page, entries.length, showReadEntries, showHiddenEntries]);
+
+  useEffect(() => {
+    setEntries([]);
+    setPage(1);
+    setHasMore(true);
+  }, [feedId, showReadEntries, showHiddenEntries]);
 
   const fetchEntries = async () => {
     try {
       const message = await invoke<string>("list_entries", {
         page,
         items: 50,
-        filters: { feed_id_eq: parseInt(feedId) },
+        filters: {
+          feed_id_eq: parseInt(feedId),
+          ...(showReadEntries ? {} : { read_eq: 0 }),
+          ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
+        },
       });
 
       const new_entries: EntryInterface[] = JSON.parse(message);
@@ -99,6 +112,7 @@ export default function Feed() {
             </div>
             <div className="flex flex-row items-center gap-2">
               <EntryLayoutSwitch />
+              <EntriesFiltersSwitch />
               <Tooltip content="Update All Entries of The Feed As Read">
                 <Button
                   isIconOnly

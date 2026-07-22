@@ -2,6 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import { Button, Tooltip } from "@heroui/react"
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
+import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useEffect } from 'react'
 import { EntryInterface } from '../interfaces'
@@ -18,7 +19,7 @@ export const Route = createLazyFileRoute('/')({
 
 export default function App() {
   const { addNotification } = useNotification()
-  const { currentAccount } = useAppContext()
+  const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext()
   const { entries, setEntries, page, setPage, hasMore, setHasMore } =
     useEntries('/')
 
@@ -26,13 +27,13 @@ export default function App() {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page, currentAccount?.id])
+  }, [page, entries.length, currentAccount?.id, showReadEntries, showHiddenEntries])
 
   useEffect(() => {
     setEntries([])
     setPage(1)
     setHasMore(true)
-  }, [currentAccount?.id])
+  }, [currentAccount?.id, showReadEntries, showHiddenEntries])
 
   const fetchEntries = async () => {
     try {
@@ -46,6 +47,8 @@ export default function App() {
         items: 50,
         filters: {
           account_id_eq: currentAccount.id,
+          ...(showReadEntries ? {} : { read_eq: 0 }),
+          ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         }
       })
 
@@ -96,6 +99,7 @@ export default function App() {
           </div>
           <div className="flex flex-row items-center gap-2">
             <EntryLayoutSwitch />
+            <EntriesFiltersSwitch />
             <Tooltip content="Update All Entries As Read">
               <Button
                 isIconOnly

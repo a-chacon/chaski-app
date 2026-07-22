@@ -4,11 +4,13 @@ import { useEffect } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
+import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import { Button, Tooltip } from '@heroui/react'
 import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useNotification } from '../NotificationContext'
+import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
 
 export const Route = createFileRoute('/folders/$folderName')({
@@ -17,6 +19,7 @@ export const Route = createFileRoute('/folders/$folderName')({
 
 export default function Folder() {
   const { addNotification } = useNotification()
+  const { showReadEntries, showHiddenEntries } = useAppContext()
   const { folderName: folderParam } = Route.useParams()
   const [accountIdStr, folderName] = folderParam.split('-')
   const accountId = Number(accountIdStr)
@@ -27,14 +30,25 @@ export default function Folder() {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page])
+  }, [page, entries.length, showReadEntries, showHiddenEntries])
+
+  useEffect(() => {
+    setEntries([])
+    setPage(1)
+    setHasMore(true)
+  }, [folderParam, showReadEntries, showHiddenEntries])
 
   const fetchEntries = async () => {
     try {
       const message = await invoke<string>('list_entries', {
         page,
         items: 50,
-        filters: { folder_eq: folderName, account_id_eq: accountId },
+        filters: {
+          folder_eq: folderName,
+          account_id_eq: accountId,
+          ...(showReadEntries ? {} : { read_eq: 0 }),
+          ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
+        },
       })
 
       const new_entries: EntryInterface[] = JSON.parse(message)
@@ -81,6 +95,7 @@ export default function Folder() {
 
             <div className="flex flex-row items-center gap-2">
               <EntryLayoutSwitch />
+              <EntriesFiltersSwitch />
               <Tooltip content="Update All Entries of The Folder As Read">
                 <Button
                   isIconOnly

@@ -245,12 +245,7 @@ async fn discover_favicon(client: &Client, link: &str) -> Option<String> {
     }
 
     if let Ok(fallback) = parsed.join("/favicon.ico") {
-        let fallback_str = fallback.to_string();
-        if let Ok(response) = client.get(&fallback_str).send().await {
-            if response.status().is_success() {
-                return Some(fallback_str);
-            }
-        }
+        return Some(fallback.to_string());
     }
 
     None

@@ -29,7 +29,7 @@ function RouteComponent() {
         <div className="flex flex-col content-center text-center text-lg w-1/2">
           <img className="w-40 mx-auto" src="chaski.png" alt="" />
           <h1 className="text-2xl font-bold">Chaski Version {appVersion} </h1>
-          <h3 className="py-2">Read Without Compromise</h3>
+          <h3 className="py-2">A calmer way to read the web</h3>
 
           <p className="py-2">
             Chaski is developed by{' '}

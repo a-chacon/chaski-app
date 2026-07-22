@@ -1,14 +1,18 @@
 <h1 align="center">
   <br>
-  <a href="https://chaski.a-chacon.com"><img src="https://raw.githubusercontent.com/a-chacon/chaski-app/main/docs/images/chaski.png" alt="Chaski App Logo" width="200"></a>
+  <a href="https://chaski.a-chacon.com"><img src="https://raw.githubusercontent.com/a-chacon/chaski-app/main/src-tauri/icons/icon.png" alt="Chaski App Logo" width="200"></a>
   <br>
   Chaski App
   <br>
 </h1>
 
 <h4 align="center">
-  Chaski is a content aggregator that helps you focus on what matters.<br/> Build on the top of <a href="https://tauri.app/" target="_blank">Tauri</a>.
+  A calmer way to read the web.
 </h4>
+
+<p align="center">
+  Build on the top of <a href="https://tauri.app/" target="_blank">Tauri</a>
+</p>
 
 <p align="center">
   <a href="https://chaski.a-chacon.com"><img src="http://chaski.a-chacon.com/chaski.gif" alt="Chaski App Demo"></a>
@@ -43,56 +47,6 @@
 - **Offline Mode**: Access your content even when you're offline.
 - **Built with Tauri**: A cross-platform app that works on Linux, Windows, and macOS. Android support coming soon.
 - **User Feedback**: I read and value your feedback to improve the app further!
-
-### On the Roadmap
-
-- [ ] **Multiple Content Views**
-
-  - [ ] Video Content
-  - [ ] Podcast Content
-  - [ ] Image Content
-  - [x] Article Content
-  - [x] Microblog Content
-
-- [ ] **Multiple Accounts Support** (In Progress)
-
-  - [x] Local account management
-    - [x] Create/Delete local RSS/ATOM accounts.
-    - [x] Export/Import OPML
-  - [ ] **Google Reader API**. (FreshRSS, Miniflux, TinyTiny Rss, etc.)
-    - [x] Login
-    - [x] Sync Subscriptions/Feeds
-    - [x] Create/Update/Delete Subscription/feed
-    - [x] Sync Folder/Category
-    - [x] Create/Update/Delete Folder/Category
-    - [ ] Sync Entries/Articles Read/Unread
-  - [ ] **Bluesky**.
-    - [ ] Login
-    - [ ] Sync Feed
-    - [ ] Create Post
-      - [ ] Create Post from RSS/ATOM entry. (Easy share)
-  - [ ] **Mastodon**.
-    - [ ] Login
-    - [ ] Sync Feed
-    - [ ] Create Post
-      - [ ] Create Post from RSS/ATOM entry. (Easy share)
-
-- [ ] **Offline Mode Enhancements**
-
-  - [ ] Improve offline article caching (Images).
-  - [x] Pull complete article. (If the page use JavaScript then it will fail)
-
-- [ ] **Multilingual Support**
-
-  - [ ] Add Spanish language support
-  - [ ] Add support for additional languages
-
-- [ ] **Mobile Version**
-
-  - [ ] Compile for Android
-  - [ ] Release Android version
-  - [ ] Compile for IOS
-  - [ ] Release IOS version
 
 ## Download
 

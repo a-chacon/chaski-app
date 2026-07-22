@@ -31,6 +31,7 @@ const UpdaterBootstrap: React.FC = () => {
 
 const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [sideBarOpen, setSideBarOpen] = useState(true);
+  const [isSidebarHoverVisible, setIsSidebarHoverVisible] = useState(false);
   const [entriesLayout, setEntriesLayout] = useState<string>("list");
   const [showReadEntries, setShowReadEntries] = useState<boolean>(true);
   const [showHiddenEntries, setShowHiddenEntries] = useState<boolean>(false);
@@ -158,6 +159,12 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentConfigMarkAsReadOnHover();
     getCurrentConfigEntryScrapeMode();
   }, [configurations]);
+
+  useEffect(() => {
+    if (sideBarOpen) {
+      setIsSidebarHoverVisible(false);
+    }
+  }, [sideBarOpen]);
 
   const getCurrentAccounts = async () => {
     try {
@@ -319,8 +326,29 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
             {isTauriApp && <WindowTitlebar />}
 
             <div className="relative min-h-0 flex-1 flex gap-2">
+              {!sideBarOpen && !isMobile && (
+                <>
+                  <div
+                    className="absolute left-0 top-0 bottom-0 z-40 w-3"
+                    aria-hidden="true"
+                    onMouseEnter={() => setIsSidebarHoverVisible(true)}
+                  />
+
+                  <div
+                    className={`absolute left-0 top-0 bottom-0 z-50 h-full w-72 max-w-[85vw] shadow-xl transition-all duration-200 ease-out ${isSidebarHoverVisible
+                      ? "translate-x-0 opacity-100 pointer-events-auto"
+                      : "-translate-x-full opacity-0 pointer-events-none"
+                      }`}
+                    onMouseEnter={() => setIsSidebarHoverVisible(true)}
+                    onMouseLeave={() => setIsSidebarHoverVisible(false)}
+                  >
+                    <SideBar />
+                  </div>
+                </>
+              )}
+
               {sideBarOpen && (
-                <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5">
+                <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5 transition-all duration-200 ease-out">
                   <SideBar />
                 </div>
               )}

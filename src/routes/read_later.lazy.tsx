@@ -80,7 +80,7 @@ export default function ReadLater() {
           <div className="flex flex-row items-center gap-2">
             <EntryLayoutSwitch />
             <EntriesFiltersSwitch />
-            <Button color="primary" isIconOnly variant="light" size="sm" onClick={handleReloadButton}>
+            <Button color="default" isIconOnly variant="light" size="sm" onPress={handleReloadButton}>
               <RiRefreshLine></RiRefreshLine>
             </Button>
           </div>

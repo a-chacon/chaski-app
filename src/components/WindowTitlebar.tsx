@@ -176,7 +176,7 @@ const WindowTitlebar: React.FC = () => {
 
 
         <Button
-          color="primary"
+          color="default"
           variant="light"
           isIconOnly
           size="sm"
@@ -185,7 +185,7 @@ const WindowTitlebar: React.FC = () => {
           <RiSubtractLine />
         </Button>
         <Button
-          color="primary"
+          color="default"
           variant="light"
           isIconOnly
           size="sm"
@@ -198,7 +198,6 @@ const WindowTitlebar: React.FC = () => {
           variant="light"
           isIconOnly
           size="sm"
-          className={`hover:bg-danger/20 hover:text-danger`}
           onPress={() => appWindow.close()}
         >
           <RiCloseLine />

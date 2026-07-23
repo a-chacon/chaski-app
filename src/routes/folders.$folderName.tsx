@@ -108,7 +108,7 @@ export default function Folder() {
               </Tooltip>
               <Tooltip content="Reload The Page's Entries">
                 <Button
-                  color="primary"
+                  color="default"
                   isIconOnly
                   variant="light"
                   size="sm"

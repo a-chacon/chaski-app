@@ -1,5 +1,7 @@
-use super::schema::{accounts, entry_tags, entries, configurations, feeds, filters, tags};
-use crate::core::common::{calculate_default_fetch_interval, parse_rfc822_to_naive_datetime};
+use super::schema::{accounts, configurations, entries, entry_tags, feeds, filters, tags};
+use crate::core::common::{
+    calculate_default_fetch_interval, parse_date_to_utc, parse_rfc822_to_naive_datetime,
+};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel::sql_types::{BigInt, Integer, Text};
@@ -242,13 +244,7 @@ impl From<rss::Channel> for NewFeed {
         let entries_pub_dates: Vec<DateTime<Utc>> = channel
             .items
             .iter()
-            .filter_map(|entry| {
-                entry.pub_date.as_ref().and_then(|pub_date_str| {
-                    DateTime::parse_from_rfc2822(pub_date_str)
-                        .ok()
-                        .map(|dt| dt.with_timezone(&Utc))
-                })
-            })
+            .filter_map(|entry| entry.pub_date.as_deref().and_then(parse_date_to_utc))
             .collect();
 
         let update_interval = calculate_default_fetch_interval(&entries_pub_dates, 30, 1440);
@@ -374,12 +370,17 @@ impl NewEntry {
     }
 
     pub fn from_feed_and_entry(feed: &Feed, entry: atom_syndication::Entry) -> Self {
+        let pub_date = entry
+            .published
+            .map(|dt| dt.naive_utc())
+            .or(Some(entry.updated.naive_utc()));
+
         NewEntry {
             feed_id: feed.id,
             title: Some(entry.title.value),
             link: entry.links.into_iter().nth(0).unwrap().href,
             thumbnail: None,
-            pub_date: entry.published.map(|dt| dt.naive_utc()),
+            pub_date,
             description: crate::core::common::remove_html_tags(
                 Some(entry.summary.unwrap_or_default().value).clone(),
             ),

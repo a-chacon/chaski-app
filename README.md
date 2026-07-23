@@ -1,35 +1,10 @@
-<h1 align="center">
-  <br>
-  <a href="https://chaski.a-chacon.com"><img src="https://raw.githubusercontent.com/a-chacon/chaski-app/main/src-tauri/icons/icon.png" alt="Chaski App Logo" width="200"></a>
-  <br>
-  Chaski App
-  <br>
-</h1>
+<img src="https://raw.githubusercontent.com/a-chacon/chaski-app/main/src-tauri/icons/icon.png" alt="Chaski App Logo" width="200">
 
-<h4 align="center">
-  A calmer way to read the web.
-</h4>
+## Chaski App
 
-<p align="center">
-  Build on the top of <a href="https://tauri.app/" target="_blank">Tauri</a>
-</p>
+**A calmer way to read the web.**
 
-<p align="center">
-  <a href="https://chaski.a-chacon.com"><img src="http://chaski.a-chacon.com/chaski.gif" alt="Chaski App Demo"></a>
-</p>
-
-<p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="#download">Download</a> •
-  <a href="#contributing">Contribute</a> •
-  <a href="#license">License</a>
-</p>
-
-## Support
-
-<a href="https://www.buymeacoffee.com/achacon" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-
-# Key Features
+## Key Features
 
 - **Privacy First**: No ads, telemetry, or any data leaving your device.
 - **Auto-discovery of RSS/Atom**: The app will automatically find the URL when possible.
@@ -48,7 +23,11 @@
 - **Built with Tauri**: A cross-platform app that works on Linux, Windows, and macOS. Android support coming soon.
 - **User Feedback**: I read and value your feedback to improve the app further!
 
-## Download
+## Support
+
+<a href="https://www.buymeacoffee.com/achacon" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+## Install
 
 You can [download](https://github.com/a-chacon/chaski-app/releases) the latest installable version of Chaski for Windows, macOS and Linux.
 
@@ -62,7 +41,7 @@ Please note that the codebase is still in an early stage. It was initially creat
 
 The project is open to large refactors and improvements. If you're interested in contributing, feel free to dive into the code, suggest improvements, or help clean it up.
 
-### Prerequisites
+### Prerequisites for development only
 
 - Install Node.js. I recommend you to use [NVM](https://github.com/nvm-sh/nvm).
 - Install yarn. [Here](https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable) is the manual.

@@ -1,6 +1,25 @@
 use crate::entities::feeds::FeedsFilters;
 use crate::models::{Feed, NewFeed};
-use tauri::command;
+use tauri::{command, Emitter};
+
+const SIDEBAR_UPDATED_EVENT: &str = "sidebar://updated";
+
+fn emit_sidebar_updated(
+    app_handle: &tauri::AppHandle,
+    account_id: Option<i32>,
+    entity: &str,
+    action: &str,
+) {
+    let payload = serde_json::json!({
+        "accountId": account_id,
+        "entity": entity,
+        "action": action,
+    });
+
+    if let Err(err) = app_handle.emit(SIDEBAR_UPDATED_EVENT, payload) {
+        log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
+    }
+}
 
 #[command]
 pub async fn fetch_site_feeds(site_url: String, account_id: i32) -> Result<String, ()> {
@@ -57,7 +76,9 @@ pub async fn create_feed(
         }
     }
 
-    let created_feed = crate::entities::feeds::create_feed(new_feed, true, app_handle);
+    let created_feed = crate::entities::feeds::create_feed(new_feed, true, app_handle.clone());
+
+    emit_sidebar_updated(&app_handle, created_feed.account_id, "feed", "create");
 
     let response = json!({
         "success": true,
@@ -76,7 +97,9 @@ pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) -> Result<
     use crate::integrations::greader::GReaderClient;
     use serde_json::json;
 
-    if let Some(feed) = crate::entities::feeds::show(feed_id, app_handle.clone()) {
+    let feed_account_id = if let Some(feed) =
+        crate::entities::feeds::show(feed_id, app_handle.clone())
+    {
         if let Some(account_id) = feed.account_id {
             if let Some(account) = accounts::show(account_id, app_handle.clone()) {
                 if account.kind == "greaderapi" {
@@ -95,10 +118,17 @@ pub async fn destroy_feed(feed_id: i32, app_handle: tauri::AppHandle) -> Result<
                     }
                 }
             }
-        }
-    }
 
-    crate::entities::feeds::destroy(feed_id, app_handle);
+            Some(account_id)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    crate::entities::feeds::destroy(feed_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, feed_account_id, "feed", "delete");
 
     let response = json!({
         "success": true,
@@ -156,7 +186,9 @@ pub async fn update_feed(
         }
     }
 
-    let result = crate::entities::feeds::update(feed_id, feed, app_handle);
+    let result = crate::entities::feeds::update(feed_id, feed, app_handle.clone());
+
+    emit_sidebar_updated(&app_handle, result.account_id, "feed", "update");
 
     let response = json!({
         "success": true,

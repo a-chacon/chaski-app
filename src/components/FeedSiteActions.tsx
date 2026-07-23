@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+
 import {
   Popover,
   PopoverTrigger,
@@ -62,9 +62,6 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
     try {
 
       const response = await destroyFeed(feed);
-      await invoke<string>("destroy_feed", {
-        feedId: feed.id,
-      });
 
       if (response.success) {
         feed.id = undefined;

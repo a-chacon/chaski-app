@@ -1,4 +1,23 @@
-use tauri::command;
+use tauri::{command, Emitter};
+
+const SIDEBAR_UPDATED_EVENT: &str = "sidebar://updated";
+
+fn emit_sidebar_updated(
+    app_handle: &tauri::AppHandle,
+    account_id: i32,
+    entity: &str,
+    action: &str,
+) {
+    let payload = serde_json::json!({
+        "accountId": account_id,
+        "entity": entity,
+        "action": action,
+    });
+
+    if let Err(err) = app_handle.emit(SIDEBAR_UPDATED_EVENT, payload) {
+        log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
+    }
+}
 
 #[command]
 pub async fn list_folders(account_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
@@ -53,7 +72,8 @@ pub async fn rename_folder(
     }
 
     // Update the folder locally
-    crate::entities::folders::rename(account_id, current_name, new_name, app_handle);
+    crate::entities::folders::rename(account_id, current_name, new_name, app_handle.clone());
+    emit_sidebar_updated(&app_handle, account_id, "folder", "rename");
 
     let response = json!({
         "success": true,
@@ -92,7 +112,11 @@ pub async fn delete_folder(
         }
     }
 
-    let result = crate::entities::folders::delete(account_id, folder, app_handle);
+    let result = crate::entities::folders::delete(account_id, folder, app_handle.clone());
+
+    if result {
+        emit_sidebar_updated(&app_handle, account_id, "folder", "delete");
+    }
 
     let response = json!({
         "success": result,

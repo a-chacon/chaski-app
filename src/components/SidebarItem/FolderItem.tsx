@@ -20,10 +20,9 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) =
   };
 
   return (
-    <div className="folder-item pl-2"
-    >
-      <div className="folder-header flex items-center gap-0.5 pr-4" >
-        <Button isIconOnly size='sm' variant='light' onPress={toggleFolder} className='rounded-md' >
+    <div className="folder-item px-1">
+      <div className="folder-header flex items-center gap-1 pr-2">
+        <Button isIconOnly size='sm' variant='light' onPress={toggleFolder} className='rounded-md min-w-7 w-7 h-7' >
           {isOpen ? (
             <
               RiArrowDownSLine
@@ -39,24 +38,25 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) =
 
         <Link
           to="/folders/$folderName"
-          params={{ folderName: account.id + "-" + folderName }}
-          className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md p-1 px-2"
+          params={{ folderName: account.id + "-" + folder }}
+          className="w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md py-1 px-2 text-sm"
           activeProps={{
             className: "bg-default/40"
           }}
         >
-          {folderName}
+          {folder}
         </Link>
 
         <FolderActions folder={folder} account={account} setFolder={setFolder} />
       </div>
 
-      <div className={`flex flex-col gap-2 pr-4 py-2 ${isOpen ? 'block' : 'hidden'}`}>
+      <div className={`flex flex-col gap-1 ml-8 pr-2 py-1 ${isOpen ? 'block' : 'hidden'}`}>
         {feeds.map((feed) => (
           <Link
+            key={feed.id}
             to="/feeds/$feedId"
             params={{ feedId: feed.id!.toString() }}
-            className="w-full h-full flex flex-row items-center opacity-80 hover:bg-default/40 rounded-md p-1 px-2 justify-between"
+            className="w-full h-full flex flex-row items-center opacity-80 hover:bg-default/40 rounded-md py-1 px-2 justify-between"
             activeProps={{
               className: "bg-default/40"
             }}
@@ -67,7 +67,7 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) =
                 src={feed.icon}
                 className="h-5 w-5 object-cover"
               />
-              <p >{feed.title}</p>
+              <p className="text-sm leading-5">{feed.title}</p>
             </div>
             {
               feed.unread_count > 0 && (

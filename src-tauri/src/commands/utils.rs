@@ -48,20 +48,21 @@ pub async fn import_opml(
 ) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command import_opml. file_path: {file_path:?}");
 
-    let result = crate::utils::opml_utils::opml_file_to_new_feeds(file_path.as_str()).await;
+    let result =
+        crate::utils::opml_utils::opml_file_to_new_feeds(file_path.as_str(), &app_handle).await;
 
     match result {
-        Ok(new_feeds) => {
+        Ok(report) => {
             send_notification(
                 &app_handle,
                 "Importing OPML",
                 &format!(
-                    "{} new feeds were found in the file. They will appear in the app ASAP.",
-                    new_feeds.len()
+                    "Import complete. {} feeds detected, {} added, {} with error.",
+                    report.detected, report.added, report.errors
                 ),
             );
 
-            let mut feeds_with_account = new_feeds;
+            let mut feeds_with_account = report.new_feeds;
             for feed in &mut feeds_with_account {
                 feed.account_id = Some(account_id);
             }

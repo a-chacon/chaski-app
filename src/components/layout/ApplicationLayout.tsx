@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
 import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
 import { AccountInterface, ConfigurationInterface } from "../../interfaces";
@@ -17,6 +18,18 @@ import updater from "../../helpers/updater";
 
 interface ApplicationProps {
   children: React.ReactNode;
+}
+
+const OPML_IMPORT_PROGRESS_EVENT = "opml://import-progress";
+
+interface OpmlImportProgressPayload {
+  status?: "started" | "progress" | "finished" | "error";
+  message?: string;
+  detected?: number;
+  processed?: number;
+  added?: number;
+  errors?: number;
+  currentUrl?: string | null;
 }
 
 const UpdaterBootstrap: React.FC = () => {
@@ -50,6 +63,21 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
   const [currentEntryScrapeMode, setCurrentEntryScrapeMode] = useState<string>("ON_DEMAND");
   const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
+  const [showOpmlImportAlert, setShowOpmlImportAlert] = useState<boolean>(false);
+  const [isOpmlImportRunning, setIsOpmlImportRunning] = useState<boolean>(false);
+  const [opmlImportProgress, setOpmlImportProgress] = useState<{
+    message: string;
+    detected: number;
+    processed: number;
+    added: number;
+    errors: number;
+  }>({
+    message: "",
+    detected: 0,
+    processed: 0,
+    added: 0,
+    errors: 0,
+  });
   const feedbackModalState = useDisclosure();
   const isTauriApp = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
@@ -165,6 +193,48 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       setIsSidebarHoverVisible(false);
     }
   }, [sideBarOpen]);
+
+  useEffect(() => {
+    if (!isTauriApp) {
+      return;
+    }
+
+    let unlisten: (() => void) | undefined;
+
+    const setupListener = async () => {
+      unlisten = await listen<OpmlImportProgressPayload>(OPML_IMPORT_PROGRESS_EVENT, (event) => {
+        const payload = event.payload ?? {};
+        const status = payload.status;
+
+        setOpmlImportProgress((prev) => ({
+          message: payload.message ?? prev.message,
+          detected: payload.detected ?? prev.detected,
+          processed: payload.processed ?? prev.processed,
+          added: payload.added ?? prev.added,
+          errors: payload.errors ?? prev.errors,
+        }));
+
+        if (status === "started" || status === "progress") {
+          setIsOpmlImportRunning(true);
+          setShowOpmlImportAlert(true);
+          return;
+        }
+
+        if (status === "finished" || status === "error") {
+          setIsOpmlImportRunning(false);
+          setShowOpmlImportAlert(true);
+        }
+      });
+    };
+
+    setupListener();
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
+  }, [isTauriApp]);
 
   const getCurrentAccounts = async () => {
     try {
@@ -354,6 +424,31 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
               )}
 
               {children}
+              {showOpmlImportAlert && (
+                <div className="fixed bottom-4 left-4 z-50 max-w-lg">
+                  <Alert
+                    color={isOpmlImportRunning ? "primary" : (opmlImportProgress.errors > 0 ? "warning" : "success")}
+                    description={`${isOpmlImportRunning
+                      ? "This could take a while, every link is checked, don't close the app."
+                      : "OPML import finished."}
+Detected: ${opmlImportProgress.detected} · Checked: ${opmlImportProgress.processed} · Added: ${opmlImportProgress.added} · Errors: ${opmlImportProgress.errors}`}
+                    endContent={
+                      !isOpmlImportRunning ? (
+                        <Button
+                          color="default"
+                          size="sm"
+                          variant="flat"
+                          onPress={() => setShowOpmlImportAlert(false)}
+                        >
+                          Close
+                        </Button>
+                      ) : null
+                    }
+                    title={isOpmlImportRunning ? "Importing OPML" : "OPML import completed"}
+                    variant="faded"
+                  />
+                </div>
+              )}
               {showFeedbackAlert && (
                 <div className="fixed bottom-4 right-4 z-50">
                   <Alert

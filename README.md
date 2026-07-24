@@ -4,7 +4,7 @@
 
 **A calmer way to read the web.**
 
-## Key Features
+#### Key Features
 
 - **Privacy First**: No ads, telemetry, or any data leaving your device.
 - **Auto-discovery of RSS/Atom**: The app will automatically find the URL when possible.
@@ -16,12 +16,16 @@
 - **New Entry Notifications**: Get notified when new content is available.
 - **Configurable Fonts**: Choose and customize your preferred fonts for reading.
 - **Multiple Account Support**: Manage both local accounts and Google Reader API-compliant accounts like FreshRSS, Miniflux, and TinyTiny RSS.
-- **API Sync with Google Reader API**: Sync your feeds with popular services like **FreshRSS**, **Miniflux**, and **TinyTiny RSS** for a seamless experience. Notice this is work in progress.
 - **Full-Text Search**: Search through your articles with ease.
 - **Read Full Articles**: View the complete text of articles directly in the app.
-- **Offline Mode**: Access your content even when you're offline.
-- **Built with Tauri**: A cross-platform app that works on Linux, Windows, and macOS. Android support coming soon.
+- **Offline Mode**: Access your content even when you're offline. Just save it for read later and content will be downloaded (if possible).
 - **User Feedback**: I read and value your feedback to improve the app further!
+
+## Screenshots
+
+![Screenshot of the main view of the app](https://raw.githubusercontent.com/a-chacon/chaski-app/main/screenshots/index.png)
+
+![Screenshot of the main view of the app with list view](https://raw.githubusercontent.com/a-chacon/chaski-app/main/screenshots/index-list.png)
 
 ## Support
 

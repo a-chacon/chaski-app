@@ -14,10 +14,23 @@ diesel::table! {
 }
 
 diesel::table! {
-    entry_tags (tag_id, entry_id) {
+    changes (id) {
+        id -> Nullable<Integer>,
+        table_name -> Text,
+        record_id -> Integer,
+        change_type -> Text,
+        timestamp -> Timestamp,
+    }
+}
+
+diesel::table! {
+    configurations (id) {
         id -> Integer,
-        tag_id -> Integer,
-        entry_id -> Integer,
+        name -> Text,
+        value -> Text,
+        kind -> Text,
+        updated_at -> Timestamp,
+        created_at -> Timestamp,
     }
 }
 
@@ -45,23 +58,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    changes (id) {
-        id -> Nullable<Integer>,
-        table_name -> Text,
-        record_id -> Integer,
-        change_type -> Text,
-        timestamp -> Timestamp,
-    }
-}
-
-diesel::table! {
-    configurations (id) {
+    entry_tags (tag_id, entry_id) {
         id -> Integer,
-        name -> Text,
-        value -> Text,
-        kind -> Text,
-        updated_at -> Timestamp,
-        created_at -> Timestamp,
+        tag_id -> Integer,
+        entry_id -> Integer,
     }
 }
 
@@ -111,18 +111,18 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(entries -> feeds (feed_id));
 diesel::joinable!(entry_tags -> entries (entry_id));
 diesel::joinable!(entry_tags -> tags (tag_id));
-diesel::joinable!(entries -> feeds (feed_id));
 diesel::joinable!(feeds -> accounts (account_id));
 diesel::joinable!(filters -> feeds (feed_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     accounts,
-    entry_tags,
-    entries,
     changes,
     configurations,
+    entries,
+    entry_tags,
     feeds,
     filters,
     tags,

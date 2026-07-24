@@ -38,6 +38,7 @@
         "width": 1200,
         "height": 720,
         "decorations": false,
+        "resizable": true,
         "transparent": true,
         "shadow": false,
         "backgroundColor": "#00000000"

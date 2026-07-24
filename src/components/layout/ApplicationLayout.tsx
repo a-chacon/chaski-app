@@ -6,6 +6,7 @@ import { AccountInterface, ConfigurationInterface } from "../../interfaces";
 import { load } from '@tauri-apps/plugin-store';
 import FeedbackModal from "../FeedbackModal";
 import WindowTitlebar from "../WindowTitlebar";
+import WindowResizeHandles from "../WindowResizeHandles";
 import { indexAccounts } from "../../helpers/accountsData";
 import { useDisclosure } from "@heroui/react";
 import {
@@ -393,6 +394,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
 
         <div className="h-screen ">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
+            {isTauriApp && <WindowResizeHandles />}
             {isTauriApp && <WindowTitlebar />}
 
             <div className="relative min-h-0 flex-1 flex gap-2">

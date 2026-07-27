@@ -122,3 +122,18 @@ pub async fn export_opml(
 pub async fn get_env(name: &str) -> Result<String, ()> {
     Ok(std::env::var(String::from(name)).unwrap_or(String::from("")))
 }
+
+#[command]
+pub async fn is_flatpak() -> Result<bool, ()> {
+    #[cfg(target_os = "linux")]
+    {
+        let env_detected = std::env::var("FLATPAK_ID").is_ok();
+        let file_detected = std::path::Path::new("/.flatpak-info").exists();
+        return Ok(env_detected || file_detected);
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(false)
+    }
+}

@@ -7,7 +7,12 @@ import { platform } from '@tauri-apps/plugin-os';
 const updater = async (addNotification: (title: string, message: string, type: "default" | "primary" | "secondary" | "success" | "warning" | "danger", duration?: number) => void) => {
 
   async function get_env(name: string) {
-    return await invoke("get_env", { name });
+    return await invoke<string>("get_env", { name });
+  }
+
+  const flatpak = await invoke<boolean>("is_flatpak");
+  if (flatpak) {
+    return;
   }
 
   const currentPlatform = platform();

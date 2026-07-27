@@ -3,6 +3,7 @@ import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
 import { useAppContext } from "../AppContext";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
+import { invoke } from "@tauri-apps/api/core";
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
 });
@@ -25,11 +26,21 @@ export default function Configurations() {
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
+  const [isFlatpak, setIsFlatpak] = useState(false);
 
   useEffect(() => {
-    isEnabled().then((state) => {
-      setAutostartState(state)
-    })
+    const loadAutostartState = async () => {
+      const flatpak = await invoke<boolean>("is_flatpak");
+      setIsFlatpak(flatpak);
+
+      if (!flatpak) {
+        isEnabled().then((state) => {
+          setAutostartState(state)
+        })
+      }
+    };
+
+    loadAutostartState();
   }, []);
 
   const fonts = [
@@ -41,6 +52,10 @@ export default function Configurations() {
   ]
 
   async function handleAutostartChange() {
+    if (isFlatpak) {
+      return;
+    }
+
     if (autostartState) {
       disable();
       setAutostartState(false);
@@ -151,8 +166,12 @@ export default function Configurations() {
                   >
                     Download entries always (otherwise scrape on demand)
                   </Switch>
-                  <Switch isSelected={autostartState} onValueChange={handleAutostartChange} >
-                    Autostart Application
+                  <Switch
+                    isSelected={autostartState}
+                    onValueChange={handleAutostartChange}
+                    isDisabled={isFlatpak}
+                  >
+                    {isFlatpak ? "Autostart Application (not available in Flatpak)" : "Autostart Application"}
                   </Switch>
                 </div>
               </CardBody>

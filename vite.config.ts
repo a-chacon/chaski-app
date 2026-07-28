@@ -18,8 +18,14 @@ export default defineConfig(async () => ({
     port: 1420,
     strictPort: true,
     watch: {
-      // 3. tell vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
+      // 3. tell vite to ignore folders that can contain generated/sandbox mounts
+      ignored: [
+        "**/src-tauri/**",
+        "**/.flatpak-builder/**",
+        "**/builddir/**",
+        "**/repo/**",
+        "**/flatpak-build/**",
+      ],
     },
     host: "0.0.0.0"
   },

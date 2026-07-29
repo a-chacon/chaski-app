@@ -1,0 +1,19 @@
+{
+  "collapseSidebar": "Colapsar barra lateral",
+  "expandSidebar": "Expandir barra lateral",
+  "applicationMenu": "Menú de la aplicación",
+  "searchFeedsAndEntries": "Buscar fuentes y entradas",
+  "addNewFeed": "Agregar nueva fuente",
+  "configurations": "Configuraciones",
+  "aboutChaski": "Acerca de Chaski",
+  "feedback": "Comentarios",
+  "addAccount": "Agregar cuenta",
+  "noAccount": "Sin cuenta",
+  "noAccountsYet": "Aún no hay cuentas.",
+  "currentAccount": "Cuenta actual: {{name}}",
+  "noAccountSelected": "Ninguna cuenta seleccionada",
+  "deleteAccount": "Eliminar cuenta",
+  "deleteAccountConfirm": "¿Estás seguro de que quieres eliminar {{name}}?",
+  "thisActionCannotBeUndone": "Esta acción no se puede deshacer.",
+  "exportOpml": "Exportar OPML"
+}

@@ -1,0 +1,20 @@
+{
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "close": "Cerrar",
+  "delete": "Eliminar",
+  "add": "Agregar",
+  "edit": "Editar",
+  "back": "Atrás",
+  "next": "Siguiente",
+  "finish": "Finalizar",
+  "skip": "Omitir por ahora",
+  "rename": "Renombrar",
+  "update": "Actualizar",
+  "share": "Compartir",
+  "create": "Crear",
+  "login": "Iniciar sesión",
+  "loggingIn": "Iniciando sesión...",
+  "adding": "Agregando...",
+  "loading": "Cargando..."
+}

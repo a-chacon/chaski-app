@@ -1,0 +1,14 @@
+{
+  "opml": {
+    "importingTitle": "Importando OPML",
+    "completedTitle": "Importación OPML completada",
+    "running": "Esto puede tardar un momento, cada enlace es verificado. No cierres la aplicación.",
+    "finished": "Importación OPML finalizada.",
+    "stats": "Detectados: {{detected}} · Verificados: {{processed}} · Agregados: {{added}} · Errores: {{errors}}"
+  },
+  "feedback": {
+    "title": "¿Cómo va tu experiencia?",
+    "body": "Has estado usando la aplicación por un tiempo. ¿Te gustaría dejarnos tu opinión?",
+    "give": "Dar opinión"
+  }
+}

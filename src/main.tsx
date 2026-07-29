@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
 import "./main.css";
+import "./i18n";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";

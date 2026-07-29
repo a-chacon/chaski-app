@@ -15,12 +15,14 @@ import { getFeed } from "../helpers/feedsData";
 import { useEntries } from "../IndexEntriesContext";
 import { useNotification } from "../NotificationContext";
 import { useAppContext } from "../AppContext";
+import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute("/feeds/$feedId")({
   component: Feed,
 });
 
 export default function Feed() {
+  const { t } = useTranslation('entries');
   const { addNotification } = useNotification();
   const { showReadEntries, showHiddenEntries } = useAppContext();
   const { feedId } = Route.useParams();
@@ -80,7 +82,7 @@ export default function Feed() {
     await updateEntriesAsReadByFeedId(parseInt(feed!.id!.toString()));
     resetEntryList();
 
-    addNotification("Updated", 'All entries were updated as read!', 'primary');
+    addNotification(t('updatedTitle'), t('updatedBody'), 'primary');
   };
 
   const handleRefreshEntries = async () => {
@@ -89,7 +91,7 @@ export default function Feed() {
     resetEntryList();
     setRefreshLoading(false);
 
-    addNotification("Reloaded", 'Entries are reloaded!', 'primary');
+    addNotification(t('reloadedTitle'), t('reloadingBody'), 'primary');
   };
 
   const resetEntryList = () => {
@@ -113,7 +115,7 @@ export default function Feed() {
             <div className="flex flex-row items-center gap-2">
               <EntryLayoutSwitch />
               <EntriesFiltersSwitch />
-              <Tooltip content="Update All Entries of The Feed As Read">
+              <Tooltip content={t('updateFeedAsRead')}>
                 <Button
                   isIconOnly
                   variant="light"
@@ -123,7 +125,7 @@ export default function Feed() {
                   <RiCheckDoubleLine></RiCheckDoubleLine>
                 </Button>
               </Tooltip>
-              <Tooltip content="Fetch New Entries">
+              <Tooltip content={t('fetchNewEntries')}>
                 <Button
                   isIconOnly
                   variant="light"
@@ -155,11 +157,11 @@ export default function Feed() {
             </Snippet>
             <div className="flex flex-col">
               <span className="text-sm">
-                <span className="font-semibold">Last fetch: </span>
+                <span className="font-semibold">{t('lastFetch')}: </span>
                 {moment.utc(feed?.last_fetch).fromNow()}
               </span>
               <span className="text-sm">
-                <span className="font-semibold">Latest entry: </span>
+                <span className="font-semibold">{t('latestEntry')}: </span>
                 {moment.utc(feed?.latest_entry).fromNow()}
               </span>
             </div>

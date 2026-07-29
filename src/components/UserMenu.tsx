@@ -12,10 +12,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { useDisclosure } from "@heroui/react";
 import FeedbackModal from "./FeedbackModal";
 import { RiFeedbackLine } from "@remixicon/react";
+import { useTranslation } from "react-i18next";
 
 export default function UserMenu() {
   const navigate = useNavigate();
   const feedbackModalState = useDisclosure();
+  const { t } = useTranslation("titlebar");
 
   const handleDropDownMenuKey = async (key: string) => {
     switch (key) {
@@ -49,31 +51,31 @@ export default function UserMenu() {
             isIconOnly
             size="sm"
             variant="light"
-            aria-label="Application menu"
+            aria-label={t("applicationMenu")}
           >
             <RiMenuLine className="p-0.5" />
           </Button>
         </DropdownTrigger>
         <DropdownMenu
           onAction={(key) => handleDropDownMenuKey(key.toString())}
-          aria-label="Application menu actions"
+          aria-label={t("applicationMenu")}
         >
           <DropdownItem key="configurations">
-            Configurations
+            {t("configurations")}
           </DropdownItem>
           <DropdownItem key="about">
-            About Chaski
+            {t("aboutChaski")}
           </DropdownItem>
-          <DropdownItem key="feedback" >
+          <DropdownItem key="feedback">
             <div className="flex gap-2 items-center">
               <span>
-                Feedback
+                {t("feedback")}
               </span>
               <RiFeedbackLine></RiFeedbackLine>
             </div>
           </DropdownItem>
         </DropdownMenu>
-      </Dropdown >
+      </Dropdown>
 
       <FeedbackModal
         isOpen={feedbackModalState.isOpen}

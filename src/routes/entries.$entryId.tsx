@@ -10,12 +10,14 @@ import { RiArrowLeftLine } from "@remixicon/react";
 import { Button, Spinner } from "@heroui/react";
 import { getEntry, updateEntryAsRead } from "../helpers/entriesData";
 import { useAppContext } from "../AppContext";
+import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute("/entries/$entryId")({
   component: Entry,
 });
 
 function Entry() {
+  const { t } = useTranslation('entries');
   const { entryId } = Route.useParams();
   const [entry, setEntry] = useState<EntryInterface>();
   const [isLoadingEntry, setIsLoadingEntry] = useState(true);
@@ -51,7 +53,7 @@ function Entry() {
       <MainSectionLayout>
         <div className="h-full w-full flex items-center justify-center gap-2 text-sm opacity-80">
           <Spinner size="sm" color="default" />
-          Loading entry...
+          {t('loadingEntry')}
         </div>
       </MainSectionLayout>
     );

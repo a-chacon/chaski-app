@@ -98,6 +98,8 @@ export interface AppContextInterface {
   currentMarkAsReadOnHover: boolean;
   currentEntryScrapeMode: string;
   handleSetCurrentEntryScrapeMode: (mode: string) => void;
+  currentLanguage: string;
+  handleSetCurrentLanguage: (lang: string) => void;
   setConfigurations: React.Dispatch<
     React.SetStateAction<ConfigurationInterface[]>
   >;

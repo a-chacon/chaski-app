@@ -12,12 +12,14 @@ import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useNotification } from '../NotificationContext'
 import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
 })
 
 export default function Folder() {
+  const { t } = useTranslation('entries')
   const { addNotification } = useNotification()
   const { showReadEntries, showHiddenEntries } = useAppContext()
   const { folderName: folderParam } = Route.useParams()
@@ -69,14 +71,14 @@ export default function Folder() {
     setPage(1)
     setEntries([])
 
-    addNotification('Reloaded', 'Entries are reloaded!', 'primary')
+    addNotification(t('reloadedTitle'), t('reloadingBody'), 'primary')
   }
 
   const handleUpdateEntriesAsRead = async () => {
     await updateEntriesAsReadByFolder(folderName, accountId)
     resetEntryList()
 
-    addNotification('Updated', 'All entries were updated as read!', 'primary')
+    addNotification(t('updatedTitle'), t('updatedBody'), 'primary')
   }
 
   const resetEntryList = () => {
@@ -96,7 +98,7 @@ export default function Folder() {
             <div className="flex flex-row items-center gap-2">
               <EntryLayoutSwitch />
               <EntriesFiltersSwitch />
-              <Tooltip content="Update All Entries of The Folder As Read">
+              <Tooltip content={t('updateFolderAsRead')}>
                 <Button
                   isIconOnly
                   variant="light"
@@ -106,7 +108,7 @@ export default function Folder() {
                   <RiCheckDoubleLine></RiCheckDoubleLine>
                 </Button>
               </Tooltip>
-              <Tooltip content="Reload The Page's Entries">
+              <Tooltip content={t('reloadEntries')}>
                 <Button
                   color="default"
                   isIconOnly

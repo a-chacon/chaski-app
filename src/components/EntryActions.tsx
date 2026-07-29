@@ -20,6 +20,7 @@ import {
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { useTranslation } from "react-i18next";
 
 interface EntryActionsProps {
   entry: EntryInterface;
@@ -37,6 +38,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
   backAfterAction = false,
 }) => {
   const { history } = useRouter();
+  const { t } = useTranslation("entries");
 
   const [readLater, setReadLater] = useState(entry.read_later);
   const [read, setRead] = useState(entry.read);
@@ -166,7 +168,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
   const showOptionalOptions = () => {
     if (entry.hide) {
       return (
-        <Tooltip content="Unhide">
+        <Tooltip content={t("unhide")}>
           <Button
             color="default"
             variant="light"
@@ -177,11 +179,11 @@ const EntryActions: React.FC<EntryActionsProps> = ({
             <RiEyeLine className="w-6" />
           </Button>
         </Tooltip>
-      )
+      );
     }
 
     return (
-      <Tooltip content="Hide">
+      <Tooltip content={t("hide")}>
         <Button
           color="default"
           variant="light"
@@ -192,15 +194,15 @@ const EntryActions: React.FC<EntryActionsProps> = ({
           <RiCloseLine className="w-6" />
         </Button>
       </Tooltip>
-    )
-  }
+    );
+  };
 
   return (
     <div className={"flex items-center gap-1 " + className}>
       {children}
 
       {!readLater ? (
-        <Tooltip content="Mark for Read Later">
+        <Tooltip content={t("markForReadLater")}>
           <Button
             color="default"
             variant="light"
@@ -212,7 +214,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
           </Button>
         </Tooltip>
       ) : (
-        <Tooltip content="Unmark Read Later">
+        <Tooltip content={t("unmarkReadLater")}>
           <Button
             color="default"
             variant="light"
@@ -226,7 +228,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
       )}
 
       {read ? (
-        <Tooltip content="Mark as unRead">
+        <Tooltip content={t("markAsUnread")}>
           <Button
             color="default"
             variant="light"
@@ -238,7 +240,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
           </Button>
         </Tooltip>
       ) : (
-        <Tooltip content="Mark as Read">
+        <Tooltip content={t("markAsRead")}>
           <Button
             color="default"
             variant="light"
@@ -253,7 +255,7 @@ const EntryActions: React.FC<EntryActionsProps> = ({
 
       {showOptionalOptions()}
 
-      <Tooltip content={"Visit Website: " + entry.link} className="w-80">
+      <Tooltip content={t("visitWebsite", { link: entry.link })} className="w-80">
         <Button
           color="default"
           variant="light"

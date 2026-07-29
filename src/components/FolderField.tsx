@@ -1,6 +1,7 @@
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { getFolders } from "../helpers/feedsData";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FeedInterface } from "../interfaces";
 
 interface FolderItem {
@@ -12,6 +13,7 @@ interface FolderFieldInterface {
 }
 
 export default function FolderField({ feed }: FolderFieldInterface) {
+  const { t } = useTranslation('feeds');
   const [availableFolders, setAvailableFolders] = useState<FolderItem[]>([]);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function FolderField({ feed }: FolderFieldInterface) {
       autoFocus={!feed.id}
       menuTrigger="input"
       allowsCustomValue
-      label="Folder"
+      label={t('folder')}
       defaultItems={availableFolders}
       defaultSelectedKey={feed.folder}
       onInputChange={onInputChange}

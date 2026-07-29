@@ -4,12 +4,14 @@ import { createAccount, fullSync } from "../../helpers/accountsData";
 import { Form, Input, Button } from "@heroui/react";
 import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import { useAppContext } from "../../AppContext";
+import { useTranslation } from 'react-i18next';
 
 interface SyncLoginFormProps {
   onClose: () => void;
 }
 
 const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
+  const { t } = useTranslation(['accounts', 'common']);
   const {
     setAccounts,
   } = useAppContext();
@@ -69,38 +71,38 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
     >
       <Input
         isRequired
-        errorMessage="Please enter a valid url"
-        label="Server Url"
+        errorMessage={t('accounts:serverUrlError')}
+        label={t('accounts:serverUrl')}
         labelPlacement="outside"
         name="server"
-        placeholder="Enter your server url"
+        placeholder={t('accounts:serverUrlPlaceholder')}
         type="url"
       />
 
       <Input
         isRequired
-        errorMessage="Please enter a valid username"
-        label="Username"
+        errorMessage={t('accounts:usernameError')}
+        label={t('accounts:username')}
         labelPlacement="outside"
         name="username"
-        placeholder="Enter your username"
+        placeholder={t('accounts:usernamePlaceholder')}
         type="text"
       />
 
       <Input
         isRequired
-        errorMessage="Please enter a valid password"
-        label="Password"
+        errorMessage={t('accounts:passwordError')}
+        label={t('accounts:password')}
         labelPlacement="outside"
         name="password"
-        placeholder="Enter your password"
+        placeholder={t('accounts:passwordPlaceholder')}
         type={isPasswordVisible ? "text" : "password"}
         endContent={
           <button
             className="focus:outline-none"
             type="button"
             onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+            aria-label={isPasswordVisible ? t('accounts:hidePassword') : t('accounts:showPassword')}
           >
             {isPasswordVisible ? (
               <RiEyeLine></RiEyeLine>
@@ -124,7 +126,7 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Logging in...' : 'Login'}
+          {isSubmitting ? t('accounts:loggingIn') : t('common:login')}
         </Button>
       </div>
     </Form>

@@ -1,16 +1,16 @@
 import React from "react";
 import { useAppContext } from "../AppContext";
 import { Button, Tooltip } from "@heroui/react";
-
-import { RiLayoutGridLine, RiListUnordered, RiLayoutHorizontalLine } from '@remixicon/react'
-
+import { RiLayoutGridLine, RiListUnordered, RiLayoutHorizontalLine } from "@remixicon/react";
+import { useTranslation } from "react-i18next";
 
 const EntryLayoutSwitch: React.FC = () => {
   const { entriesLayout, setEntriesLayout } = useAppContext();
+  const { t } = useTranslation("entries");
 
   return (
     <div className="flex items-center gap-2 justify-end">
-      <Tooltip content="List view">
+      <Tooltip content={t("listView")}>
         <Button
           onPress={() => setEntriesLayout("list")}
           color={entriesLayout === "list" ? "primary" : "default"}
@@ -22,7 +22,7 @@ const EntryLayoutSwitch: React.FC = () => {
           <RiListUnordered></RiListUnordered>
         </Button>
       </Tooltip>
-      <Tooltip content="Compact view">
+      <Tooltip content={t("compactView")}>
         <Button
           onPress={() => setEntriesLayout("compact")}
           color={entriesLayout === "compact" ? "primary" : "default"}
@@ -34,7 +34,7 @@ const EntryLayoutSwitch: React.FC = () => {
           <RiLayoutHorizontalLine></RiLayoutHorizontalLine>
         </Button>
       </Tooltip>
-      <Tooltip content="Grid view">
+      <Tooltip content={t("gridView")}>
         <Button
           onPress={() => setEntriesLayout("grid")}
           color={entriesLayout === "grid" ? "primary" : "default"}

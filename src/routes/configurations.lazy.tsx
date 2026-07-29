@@ -4,25 +4,23 @@ import { Tabs, Tab, Card, CardBody, Button, Select, SelectItem, Slider, Switch }
 import { useAppContext } from "../AppContext";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import { invoke } from "@tauri-apps/api/core";
+import { useTranslation } from 'react-i18next';
+
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
 });
+
 import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 
-
 export default function Configurations() {
+  const { t } = useTranslation('configurations');
+
   const {
-    handleSetCurrentFont,
-    currentFont,
-    currentFontSize,
-    handleSetCurrentFontSize,
-    currentFontSpace,
-    handleSetCurrentFontSpace,
-    currentMarkAsReadOnHover,
-    handleSetMarkAsReadOnHover,
-    currentEntryScrapeMode,
-    handleSetCurrentEntryScrapeMode,
+    handleSetCurrentFont, currentFont, currentFontSize, handleSetCurrentFontSize,
+    currentFontSpace, handleSetCurrentFontSpace, currentMarkAsReadOnHover,
+    handleSetMarkAsReadOnHover, currentEntryScrapeMode, handleSetCurrentEntryScrapeMode,
+    currentLanguage, handleSetCurrentLanguage,
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
@@ -49,7 +47,7 @@ export default function Configurations() {
     { key: "font-tisa", label: "Tisa" },
     { key: "font-roboto", label: "Roboto" },
     { key: "font-opensans", label: "Open Sans" },
-  ]
+  ];
 
   async function handleAutostartChange() {
     if (isFlatpak) {
@@ -69,91 +67,43 @@ export default function Configurations() {
   return (
     <MainSectionLayout>
       <div className="m-20 max-w-prose">
-        <Tabs
-          aria-label="Options"
-          isVertical={true}
-          color="primary"
-        >
-          <Tab key="look" title="Look and Feel" >
+        <Tabs aria-label="Options" isVertical={true} color="primary">
+          <Tab key="look" title={t('tabs.lookAndFeel')}>
             <Card>
               <CardBody>
-                <h1 className="text-xl font-semibold pb-2 text-center">
-                  Look And Feel
-                </h1>
+                <h1 className="text-xl font-semibold pb-2 text-center">{t('look.title')}</h1>
                 <div className="pb-4">
-                  <h3 className="pb-4 font-semibold text-lg">Theme</h3>
-                  <ThemeSwitcher></ThemeSwitcher>
+                  <h3 className="pb-4 font-semibold text-lg">{t('look.theme')}</h3>
+                  <ThemeSwitcher />
                 </div>
                 <div>
-                  <h3 className="py-2 font-semibold text-lg">Text</h3>
+                  <h3 className="py-2 font-semibold text-lg">{t('look.text')}</h3>
                   <div className="flex w-full max-w-xs flex-col gap-2">
-                    <Select
-                      variant="underlined"
-                      color="primary"
-                      className="max-w-xs py-3"
-                      onChange={(e) => handleSetCurrentFont(e.target.value)}
-                      defaultSelectedKeys={[currentFont]}
-                    >
-                      {fonts.map((font) => (
-                        <SelectItem key={font.key}>
-                          {font.label}
-                        </SelectItem>
-                      ))}
+                    <Select variant="underlined" color="primary" className="max-w-xs py-3"
+                      onChange={(e) => handleSetCurrentFont(e.target.value)} defaultSelectedKeys={[currentFont]}>
+                      {fonts.map((font) => (<SelectItem key={font.key}>{font.label}</SelectItem>))}
                     </Select>
                     <div className="flex flex-wrap gap-4 items-center justify-start">
-                      <Button
-                        color="primary"
-                        variant={currentFontSize === 14 ? "flat" : "light"}
-                        onClick={() => handleSetCurrentFontSize(14)}
-                      >
-                        small
-                      </Button>
-                      <Button
-                        color="primary"
-                        variant={currentFontSize === 16 ? "flat" : "light"}
-                        onClick={() => handleSetCurrentFontSize(16)}
-                      >
-                        medium
-                      </Button>
-                      <Button
-                        color="primary"
-                        variant={currentFontSize === 18 ? "flat" : "light"}
-                        onClick={() => handleSetCurrentFontSize(18)}
-                      >
-                        big
-                      </Button>
+                      <Button color="primary" variant={currentFontSize === 14 ? "flat" : "light"} onClick={() => handleSetCurrentFontSize(14)}>{t('look.fontSizeSmall')}</Button>
+                      <Button color="primary" variant={currentFontSize === 16 ? "flat" : "light"} onClick={() => handleSetCurrentFontSize(16)}>{t('look.fontSizeMedium')}</Button>
+                      <Button color="primary" variant={currentFontSize === 18 ? "flat" : "light"} onClick={() => handleSetCurrentFontSize(18)}>{t('look.fontSizeBig')}</Button>
                     </div>
-                    <Slider
-                      label="Font Space"
-                      size="sm"
-                      color="primary"
-                      step={0.01}
-                      maxValue={0.1}
-                      minValue={-0.1}
-                      fillOffset={0}
-                      defaultValue={0}
-                      className="max-w-xs py-3"
-                      formatOptions={{ signDisplay: 'always' }}
-                      value={currentFontSpace}
-                      onChangeEnd={(value: number | number[]) => handleSetCurrentFontSpace(Array.isArray(value) ? value[0] : value)}
-                    />
+                    <Slider label={t('look.fontSpace')} size="sm" color="primary" step={0.01} maxValue={0.1} minValue={-0.1}
+                      fillOffset={0} defaultValue={0} className="max-w-xs py-3" formatOptions={{ signDisplay: 'always' }}
+                      value={currentFontSpace} onChangeEnd={(value: number | number[]) => handleSetCurrentFontSpace(Array.isArray(value) ? value[0] : value)} />
                   </div>
                   <div className="m-2 p-2 border rounded-xl">
-                    <h5 className="font-semibold text-xl">Example</h5>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Integer ut dui at turpis pretium sagittis. </strong>Fusce quis vehicula eros, id dapibus magna. Praesent efficitur a tellus at mattis.
-                    </p>
+                    <h5 className="font-semibold text-xl">{t('look.example')}</h5>
+                    <p>{t('look.exampleText')}</p>
                   </div>
                 </div>
               </CardBody>
             </Card>
           </Tab>
-          <Tab key="Behavior" title="Behavior">
+          <Tab key="Behavior" title={t('tabs.behavior')}>
             <Card>
               <CardBody>
-                <h1 className="text-xl font-semibold pb-4 text-center">
-                  Behavior
-                </h1>
+                <h1 className="text-xl font-semibold pb-4 text-center">{t('behavior.title')}</h1>
                 <div className="flex flex-col gap-4">
                   <Switch isSelected={currentMarkAsReadOnHover} onValueChange={handleSetMarkAsReadOnHover} >
                     Mark as Read on hover.
@@ -173,12 +123,31 @@ export default function Configurations() {
                   >
                     {isFlatpak ? "Autostart Application (not available in Flatpak)" : "Autostart Application"}
                   </Switch>
+                  <Switch isSelected={autostartState} onValueChange={handleAutostartChange}>{t('behavior.autostart')}</Switch>
                 </div>
+              </CardBody>
+            </Card>
+          </Tab>
+          <Tab key="language" title={t('tabs.language')}>
+            <Card>
+              <CardBody>
+                <h1 className="text-xl font-semibold pb-4 text-center">{t('language.title')}</h1>
+                <Select
+                  label={t('language.select')}
+                  variant="underlined"
+                  color="primary"
+                  className="max-w-xs"
+                  onChange={(e) => handleSetCurrentLanguage(e.target.value)}
+                  defaultSelectedKeys={[currentLanguage]}
+                >
+                  <SelectItem key="en">English</SelectItem>
+                  <SelectItem key="es">Español</SelectItem>
+                </Select>
               </CardBody>
             </Card>
           </Tab>
         </Tabs>
       </div>
-    </MainSectionLayout >
+    </MainSectionLayout>
   );
 }

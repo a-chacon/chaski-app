@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Select, SelectItem, Input, Button } from "@heroui/react"; // Adjust based on your UI library
 import { FilterInterface } from "../interfaces";
 import { RiCloseLine } from "@remixicon/react";
@@ -18,6 +19,7 @@ const FilterItem: React.FC<FilterItemProps> = ({
   onRemove,
   isLast,
 }) => {
+  const { t } = useTranslation('feeds');
   const handleFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFilterChange(index, { ...filter, field: e.target.value });
   };
@@ -40,7 +42,7 @@ const FilterItem: React.FC<FilterItemProps> = ({
     <div className="flex flex-col gap-1 justify-between mb-2">
       <div className="flex flex-row gap-2 items-center">
         <Select
-          label="Field"
+          label={t('field')}
           value={filter.field}
           onChange={handleFieldChange}
           defaultSelectedKeys={[filter.field]}
@@ -48,13 +50,13 @@ const FilterItem: React.FC<FilterItemProps> = ({
           size="sm"
           variant="underlined"
         >
-          <SelectItem key="LINK">Link</SelectItem>
-          <SelectItem key="TITLE">Title</SelectItem>
-          <SelectItem key="DESCRIPTION">Description</SelectItem>
+          <SelectItem key="LINK">{t('linkField')}</SelectItem>
+          <SelectItem key="TITLE">{t('titleField')}</SelectItem>
+          <SelectItem key="DESCRIPTION">{t('descriptionField')}</SelectItem>
         </Select>
 
         <Select
-          label="Operator"
+          label={t('operator')}
           value={filter.operator}
           onChange={handleOperatorChange}
           className="max-w-xs"
@@ -62,15 +64,15 @@ const FilterItem: React.FC<FilterItemProps> = ({
           defaultSelectedKeys={[filter.operator]}
           variant="underlined"
         >
-          <SelectItem key="CONTAINS">Contains</SelectItem>
-          <SelectItem key="NO_CONTAINS">No Contains</SelectItem>
-          <SelectItem key="STARTS_WITH">Start with</SelectItem>
-          <SelectItem key="ENDS_WITH">End With</SelectItem>
+          <SelectItem key="CONTAINS">{t('contains')}</SelectItem>
+          <SelectItem key="NO_CONTAINS">{t('noContains')}</SelectItem>
+          <SelectItem key="STARTS_WITH">{t('startsWith')}</SelectItem>
+          <SelectItem key="ENDS_WITH">{t('endsWith')}</SelectItem>
         </Select>
 
         <Input
           type="text"
-          label="Value"
+          label={t('value')}
           value={filter.value}
           onChange={handleValueChange}
           className="max-w-xs"
@@ -92,15 +94,15 @@ const FilterItem: React.FC<FilterItemProps> = ({
       {!isLast && (
         <div className="mx-auto">
           <Select
-            label="Connector"
+            label={t('connector')}
             defaultSelectedKeys={[filter.logical_operator]}
             onChange={handleLogicalOperatorChange}
             className="w-24"
             size="sm"
             variant="underlined"
           >
-            <SelectItem key="AND">And</SelectItem>
-            <SelectItem key="OR">Or</SelectItem>
+            <SelectItem key="AND">{t('and')}</SelectItem>
+            <SelectItem key="OR">{t('or')}</SelectItem>
           </Select>
         </div>
       )}

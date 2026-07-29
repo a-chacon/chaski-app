@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardHeader,
@@ -18,6 +19,7 @@ interface FeedSiteProps {
 }
 
 const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
+  const { t } = useTranslation('feeds');
   const [currentFeed, setCurrentFeed] = useState(feed);
   const [copied, setCopied] = useState(false);
 

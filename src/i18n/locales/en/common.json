@@ -1,0 +1,20 @@
+{
+  "save": "Save",
+  "cancel": "Cancel",
+  "close": "Close",
+  "delete": "Delete",
+  "add": "Add",
+  "edit": "Edit",
+  "back": "Back",
+  "next": "Next",
+  "finish": "Finish",
+  "skip": "Skip for now",
+  "rename": "Rename",
+  "update": "Update",
+  "share": "Share",
+  "create": "Create",
+  "login": "Login",
+  "loggingIn": "Logging in...",
+  "adding": "Adding...",
+  "loading": "Loading..."
+}

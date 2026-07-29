@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Popover,
@@ -27,6 +28,7 @@ interface FeedSiteActionsProps {
 }
 
 const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
+  const { t } = useTranslation(['feeds', 'common']);
   const navigate = useNavigate();
   const { addNotification } = useNotification();
   const [isSaved, setIsSaved] = useState<boolean>(!!feed.id);
@@ -45,14 +47,14 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
         feed.id = response.data.id;
         setFeed(response.data);
         setIsSaved(true);
-        addNotification("Feed Created", response.message, 'success');
+        addNotification(t('feeds:feedCreated'), response.message, 'success');
       } else {
-        addNotification("Failed to create feed", response.message, 'danger');
+        addNotification(t('feeds:failedToCreate'), response.message, 'danger');
       }
     } catch (error) {
       console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create feed';
-      addNotification("Error", errorMessage, 'danger');
+      const errorMessage = error instanceof Error ? error.message : t('feeds:failedToCreate');
+      addNotification(t('feeds:error'), errorMessage, 'danger');
     } finally {
       setIsLoading(false);
     }
@@ -66,15 +68,15 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
       if (response.success) {
         feed.id = undefined;
         setIsSaved(false);
-        addNotification("Feed Deleted", response.message, 'success');
+        addNotification(t('feeds:feedDeleted'), response.message, 'success');
         navigate({ to: "/" });
       } else {
-        addNotification("Failed to delete feed", response.message, 'danger');
+        addNotification(t('feeds:failedToDelete'), response.message, 'danger');
       }
     } catch (error) {
       console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete feed';
-      addNotification("Error", errorMessage, 'danger');
+      const errorMessage = error instanceof Error ? error.message : t('feeds:failedToDelete');
+      addNotification(t('feeds:error'), errorMessage, 'danger');
     }
   };
 
@@ -98,13 +100,13 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
           </DropdownTrigger>
           <DropdownMenu variant="light" aria-label="Static Actions">
             <DropdownItem key="edit" onClick={editModal.onOpen}>
-              Edit
+              {t('feeds:edit')}
             </DropdownItem>
             <DropdownItem key="filters" onClick={filtersModal.onOpen}>
-              Filters
+              {t('feeds:filters')}
             </DropdownItem>
             <DropdownItem key="filters" onClick={handleExportFeed}>
-              Export as opml
+              {t('feeds:exportAsOpml')}
             </DropdownItem>
             <DropdownItem
               key="delete"
@@ -112,7 +114,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
               color="danger"
               onClick={handleDeleteFeed}
             >
-              Delete
+              {t('common:delete')}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -137,7 +139,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
       <Popover placement="bottom" showArrow offset={10}>
         <PopoverTrigger>
           <Button className="animate-bounce" variant="bordered" color="warning" size="sm">
-            follow
+            {t('feeds:follow')}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[240px}">
@@ -175,7 +177,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
                   </svg>
                 }
               >
-                {isLoading ? 'Adding...' : 'Add'}
+                {isLoading ? t('common:adding') : t('common:add')}
               </Button>
             </div>
           </form>

@@ -9,6 +9,7 @@ import LocalForm from "./NewAccountForms/LocalForm";
 import { useState } from "react";
 import GReaderForm from "./NewAccountForms/GReaderForm";
 import { RiArrowGoBackLine } from "@remixicon/react";
+import { useTranslation } from 'react-i18next';
 
 
 interface NewAccountModalInterface {
@@ -21,6 +22,7 @@ interface NewAccountModalInterface {
 type AccountType = 'local' | 'google-reader';
 
 const NewAccountModal: React.FC<NewAccountModalInterface> = ({ isOpen, onOpenChange }) => {
+  const { t } = useTranslation('accounts');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAccountType, setSelectedAccountType] = useState<AccountType | null>(null);
 
@@ -51,7 +53,7 @@ const NewAccountModal: React.FC<NewAccountModalInterface> = ({ isOpen, onOpenCha
                   </Button>
                 }
                 <h1 className="pl-2">
-                  {currentStep === 1 ? 'Select Account Type' : 'Login'}
+                  {currentStep === 1 ? t('selectAccountType') : t('login')}
                 </h1>
               </ModalHeader>
               <ModalBody>
@@ -62,14 +64,14 @@ const NewAccountModal: React.FC<NewAccountModalInterface> = ({ isOpen, onOpenCha
                       color="primary"
                       onPress={() => handleAccountTypeSelect('local')}
                     >
-                      Local RSS Account
+                      {t('localRss')}
                     </Button>
                     <Button
                       variant="faded"
                       color="primary"
                       onPress={() => handleAccountTypeSelect('google-reader')}
                     >
-                      Google Reader API Account
+                      {t('googleReader')}
                     </Button>
                   </div>
                 ) : (

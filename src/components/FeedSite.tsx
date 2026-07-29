@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardHeader,
@@ -16,6 +17,7 @@ interface FeedSiteProps {
 }
 
 const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
+  const { t } = useTranslation('feeds');
   const [currentFeed, setCurrentFeed] = useState(feed);
 
   return (
@@ -47,7 +49,7 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
           <p className="font-semibold text-small">
             {currentFeed.items_count}
           </p>
-          <p className="text-small">Entries</p>
+          <p className="text-small">{t('entries')}</p>
         </div>
         <div className="flex gap-1">
           {currentFeed.kind === "rss" ? (

@@ -1,0 +1,8 @@
+{
+  "mastodonSharing": "Mastodon sharing",
+  "mastodonServerUrl": "What is your Mastodon server URL?",
+  "mastodonExample": "Example: https://mastodon.social/",
+  "copyToClipboard": "Copy to clipboard",
+  "copiedTitle": "Copied",
+  "copiedBody": "The link was copied to the clipboard!"
+}

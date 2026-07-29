@@ -15,9 +15,11 @@ import { fullTextSearch } from "../helpers/searchData";
 import { SearchResultsInterface } from "../interfaces";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
+import { useTranslation } from 'react-i18next';
 
 
 export default function SearchModal() {
+  const { t } = useTranslation('search');
   const { currentAccount } = useAppContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [value, setValue] = useState("");
@@ -95,10 +97,10 @@ export default function SearchModal() {
               </ModalHeader>
               <ModalBody>
                 {results.feeds.length === 0 && entries.length === 0 ? (
-                  <p className="p-10 text-center">No results found.</p>
+                  <p className="p-10 text-center">{t('noResults')}</p>
                 ) : (
                   <>
-                    <h2 className="font-semibold">Feeds</h2>
+                    <h2 className="font-semibold">{t('feeds')}</h2>
                     <ul>
                       {results.feeds.map((feed) => (
                         <li key={feed.id} className="py-2">
@@ -124,7 +126,7 @@ export default function SearchModal() {
                       ))}
                     </ul>
 
-                    <h2 className="font-semibold">Entries</h2>
+                    <h2 className="font-semibold">{t('entries')}</h2>
                     <ul>
                       {entries.map((entry) => (
                         <li key={entry.id} className="py-2">

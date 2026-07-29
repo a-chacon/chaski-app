@@ -1,0 +1,24 @@
+{
+  "back": "Atrás",
+  "next": "Siguiente",
+  "finish": "Finalizar",
+  "step1": {
+    "title": "¡Bienvenido a Chaski! 👋",
+    "body": "Tu lector de fuentes personal para mantenerte en control de tu contenido."
+  },
+  "step2": {
+    "title": "Hazlo tuyo 🎨",
+    "body": "Personaliza tu experiencia con tu apariencia favorita",
+    "chooseTheme": "Elige tu tema:"
+  },
+  "step3": {
+    "title": "Conecta tus fuentes 📚",
+    "body": "Agrega tus cuentas RSS ahora o configúralas más tarde, ¡tú decides!",
+    "addAccount": "Agregar cuenta",
+    "skip": "Omitir por ahora"
+  },
+  "step4": {
+    "title": "¡Todo listo! 🎉",
+    "body": "¿Sabías que? El nombre \"Chaski\" proviene de los Chasquis Incas, los veloces mensajeros que llevaban importantes mensajes a través del imperio. 🏃‍♂️"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "collapseSidebar": "Collapse sidebar",
+  "expandSidebar": "Expand sidebar",
+  "applicationMenu": "Application menu",
+  "searchFeedsAndEntries": "Search feeds and entries",
+  "addNewFeed": "Add new feed",
+  "configurations": "Configurations",
+  "aboutChaski": "About Chaski",
+  "feedback": "Feedback",
+  "addAccount": "Add account",
+  "noAccount": "No account",
+  "noAccountsYet": "No accounts yet.",
+  "currentAccount": "Current account: {{name}}",
+  "noAccountSelected": "No account selected",
+  "deleteAccount": "Delete account",
+  "deleteAccountConfirm": "Are you sure you want to delete {{name}}?",
+  "thisActionCannotBeUndone": "This action cannot be undone.",
+  "exportOpml": "Export OPML"
+}

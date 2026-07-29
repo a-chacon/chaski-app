@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import i18n from "../../i18n";
 import { listen } from "@tauri-apps/api/event";
 import SideBar from "../SideBar";
 import { AppContext } from "../../AppContext";
@@ -44,6 +46,7 @@ const UpdaterBootstrap: React.FC = () => {
 };
 
 const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
+  const { t } = useTranslation(['alerts', 'common']);
   const [sideBarOpen, setSideBarOpen] = useState(true);
   const [isSidebarHoverVisible, setIsSidebarHoverVisible] = useState(false);
   const [entriesLayout, setEntriesLayout] = useState<string>("list");
@@ -63,6 +66,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
   const [currentEntryScrapeMode, setCurrentEntryScrapeMode] = useState<string>("ON_DEMAND");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("en");
   const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
   const [showOpmlImportAlert, setShowOpmlImportAlert] = useState<boolean>(false);
   const [isOpmlImportRunning, setIsOpmlImportRunning] = useState<boolean>(false);
@@ -155,6 +159,21 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setIsMobile(mobileViewport);
   };
 
+  const handleSetCurrentLanguage = async (lang: string) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('app-language', { value: lang });
+    i18n.changeLanguage(lang);
+    setCurrentLanguage(lang);
+  };
+
+  const getCurrentConfigLanguage = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const persisted = await store.get<{ value: string }>('app-language');
+    const lang = persisted?.value ?? navigator.language.split('-')[0];
+    const supported = ['en', 'es'];
+    return supported.includes(lang) ? lang : 'en';
+  };
+
   const setCurrentConfigurations = async () => {
     let results = await indexConfigurations();
     setConfigurations(results);
@@ -164,6 +183,10 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentConfigurations();
     getCurrentAccounts();
     getPersistedCurrentAccountId();
+    getCurrentConfigLanguage().then((lang) => {
+      i18n.changeLanguage(lang);
+      setCurrentLanguage(lang);
+    });
 
     const mobileViewport = window.innerWidth < 768;
     setIsMobile(mobileViewport);
@@ -383,6 +406,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         handleSetMarkAsReadOnHover,
         currentEntryScrapeMode,
         handleSetCurrentEntryScrapeMode,
+        currentLanguage,
+        handleSetCurrentLanguage,
         setAccounts,
         accounts,
         currentAccount,
@@ -430,10 +455,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
                 <div className="fixed bottom-4 left-4 z-50 max-w-lg">
                   <Alert
                     color={isOpmlImportRunning ? "primary" : (opmlImportProgress.errors > 0 ? "warning" : "success")}
-                    description={`${isOpmlImportRunning
-                      ? "This could take a while, every link is checked, don't close the app."
-                      : "OPML import finished."}
-Detected: ${opmlImportProgress.detected} · Checked: ${opmlImportProgress.processed} · Added: ${opmlImportProgress.added} · Errors: ${opmlImportProgress.errors}`}
+                    description={`${isOpmlImportRunning ? t('alerts:opml.running') : t('alerts:opml.finished')}\n${t('alerts:opml.stats', { detected: opmlImportProgress.detected, processed: opmlImportProgress.processed, added: opmlImportProgress.added, errors: opmlImportProgress.errors })}`}
                     endContent={
                       !isOpmlImportRunning ? (
                         <Button
@@ -442,11 +464,11 @@ Detected: ${opmlImportProgress.detected} · Checked: ${opmlImportProgress.proces
                           variant="flat"
                           onPress={() => setShowOpmlImportAlert(false)}
                         >
-                          Close
+                          {t('common:close')}
                         </Button>
                       ) : null
                     }
-                    title={isOpmlImportRunning ? "Importing OPML" : "OPML import completed"}
+                    title={isOpmlImportRunning ? t('alerts:opml.importingTitle') : t('alerts:opml.completedTitle')}
                     variant="faded"
                   />
                 </div>
@@ -455,7 +477,7 @@ Detected: ${opmlImportProgress.detected} · Checked: ${opmlImportProgress.proces
                 <div className="fixed bottom-4 right-4 z-50">
                   <Alert
                     color="warning"
-                    description="You've been using the application for a while. Would you like to give us your feedback?"
+                    description={t('alerts:feedback.body')}
                     endContent={
                       <div className="flex gap-2">
                         <Button
@@ -467,7 +489,7 @@ Detected: ${opmlImportProgress.detected} · Checked: ${opmlImportProgress.proces
                             setShowFeedbackAlert(false);
                           }}
                         >
-                          Give feedback
+                          {t('alerts:feedback.give')}
                         </Button>
                         <Button
                           color="default"
@@ -475,11 +497,11 @@ Detected: ${opmlImportProgress.detected} · Checked: ${opmlImportProgress.proces
                           variant="flat"
                           onPress={() => setShowFeedbackAlert(false)}
                         >
-                          Cerrar
+                          {t('common:close')}
                         </Button>
                       </div>
                     }
-                    title="How is your experience going?"
+                    title={t('alerts:feedback.title')}
                     variant="faded"
                   />
                 </div>

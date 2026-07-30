@@ -1,5 +1,6 @@
 use crate::models::{Feed, NewEntry, NewFeed};
 use chrono::NaiveDateTime;
+use readabilityrs::Readability;
 use reqwest::{
     header::{HeaderMap, HeaderValue, ACCEPT, CACHE_CONTROL, CONNECTION, REFERER, USER_AGENT},
     redirect::Policy,
@@ -361,43 +362,23 @@ pub async fn scrape_entry_content(url: &str) -> Result<EntryContentData, Box<dyn
     }
 
     let body = response.text().await?;
-    let document = Html::parse_document(&body);
+    let readability = Readability::new(&body, None, None)?;
 
-    let title = Selector::parse("title")
-        .ok()
-        .and_then(|selector| document.select(&selector).next())
-        .map(|node| node.text().collect::<String>().trim().to_string())
-        .filter(|value| !value.is_empty());
+    if let Some(article) = readability.parse() {
+        let title = article.title;
+        let description = article.excerpt;
+        let content = article.content;
 
-    let description = Selector::parse("meta[name='description']")
-        .ok()
-        .and_then(|selector| document.select(&selector).next())
-        .and_then(|node| node.value().attr("content"))
-        .map(|value| value.trim().to_string())
-        .filter(|value| !value.is_empty());
-
-    let content = ["entry", "main", "body"].iter().find_map(|tag| {
-        Selector::parse(tag).ok().and_then(|selector| {
-            document.select(&selector).next().and_then(|node| {
-                let text = node
-                    .text()
-                    .map(|chunk| chunk.trim())
-                    .filter(|chunk| !chunk.is_empty())
-                    .collect::<Vec<_>>()
-                    .join("\n\n");
-
-                if text.is_empty() {
-                    None
-                } else {
-                    Some(text)
-                }
-            })
-        })
-    });
+        return Ok(EntryContentData {
+            title,
+            description,
+            content,
+        });
+    }
 
     Ok(EntryContentData {
-        title,
-        description,
-        content,
+        title: None,
+        description: None,
+        content: None,
     })
 }

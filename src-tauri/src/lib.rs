@@ -39,7 +39,9 @@ use tauri_plugin_store::StoreExt;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let ctx = tauri::generate_context!();
-    tauri::Builder::default()
+    let is_flatpak = is_flatpak_sandbox();
+
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
@@ -48,12 +50,7 @@ pub fn run() {
                 .expect("no main window")
                 .set_focus();
         }))
-        .plugin(tauri_plugin_autostart::init(
-            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            None,
-        ))
         .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
@@ -67,30 +64,50 @@ pub fn run() {
                     tauri_plugin_log::TargetKind::LogDir { file_name: None },
                 ))
                 .build(),
-        )
-        .setup(|app| {
-            let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let open_i = MenuItem::with_id(app, "open", "Open", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&quit_i, &open_i])?;
-            let _tray = TrayIconBuilder::new()
-                .menu(&menu)
-                .show_menu_on_left_click(true)
-                .on_menu_event(|app, event| match event.id.as_ref() {
-                    "quit" => {
-                        app.exit(0);
-                    }
-                    "open" => {
-                        if let Some(window) = app.get_webview_window("main") {
-                            window.show().unwrap();
-                            window.set_focus().unwrap();
+        );
+
+    if !is_flatpak {
+        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+        builder = builder.plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ));
+    }
+
+    builder
+        .setup(move |app| {
+            if !is_flatpak {
+                let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+                let open_i = MenuItem::with_id(app, "open", "Open", true, None::<&str>)?;
+                let menu = Menu::with_items(app, &[&quit_i, &open_i])?;
+                let mut tray_builder = TrayIconBuilder::new()
+                    .menu(&menu)
+                    .show_menu_on_left_click(true)
+                    .on_menu_event(|app, event| match event.id.as_ref() {
+                        "quit" => {
+                            app.exit(0);
                         }
+                        "open" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                window.show().unwrap();
+                                window.set_focus().unwrap();
+                            }
+                        }
+                        _ => {
+                            println!("menu item {:?} not handled", event.id);
+                        }
+                    })
+                    .icon(app.default_window_icon().unwrap().clone());
+
+                #[cfg(target_os = "linux")]
+                {
+                    if let Ok(cache_dir) = app.path().app_cache_dir() {
+                        tray_builder = tray_builder.temp_dir_path(cache_dir);
                     }
-                    _ => {
-                        println!("menu item {:?} not handled", event.id);
-                    }
-                })
-                .icon(app.default_window_icon().unwrap().clone())
-                .build(app)?;
+                }
+
+                let _tray = tray_builder.build(app)?;
+            }
 
             db::init(app.handle());
             configure_default_app_settings(app);
@@ -123,6 +140,7 @@ pub fn run() {
             commands::feeds::collect_feed_content,
             commands::utils::full_text_search,
             commands::utils::get_env,
+            commands::utils::is_flatpak,
             commands::filters::create_filter,
             commands::filters::update_filter,
             commands::filters::destroy_filter,
@@ -142,6 +160,19 @@ pub fn run() {
         ])
         .run(ctx)
         .expect("error while building tauri application");
+}
+
+fn is_flatpak_sandbox() -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        return std::env::var("FLATPAK_ID").is_ok()
+            || std::path::Path::new("/.flatpak-info").exists();
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        false
+    }
 }
 
 fn configure_default_app_settings(app: &mut tauri::App) {

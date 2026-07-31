@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Chaski
-Comment=A calmer way to read the web
-Exec=chaski
-Icon=com.chaski.app
-Terminal=false
-Categories=Network;News;
-StartupWMClass=Chaski

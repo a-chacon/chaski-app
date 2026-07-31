@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "2.6.3", features = [] }
 
 [dependencies]
-tauri = { version = "2.11.5", features = ["tray-icon", "devtools"] }
+tauri = { version = "2.11.5", features = ["tray-icon"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dirs = "6"
@@ -21,7 +21,7 @@ diesel = { version = "2.3.11", features = [
   "chrono",
 ] }
 diesel_migrations = { version = "2.3.2", features = ["sqlite"] }
-libsqlite3-sys = { version = "0.35", features = ["bundled"] }
+libsqlite3-sys = { version = "0.35", features = [] }
 dotenvy = "0.15"
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"

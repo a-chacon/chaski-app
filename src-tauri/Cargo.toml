@@ -21,7 +21,7 @@ diesel = { version = "2.3.11", features = [
   "chrono",
 ] }
 diesel_migrations = { version = "2.3.2", features = ["sqlite"] }
-libsqlite3-sys = { version = "0.35", features = [] }
+libsqlite3-sys = { version = "0.35", features = ["bundled"] }
 dotenvy = "0.15"
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"

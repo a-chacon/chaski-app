@@ -46,6 +46,35 @@ fn db_file_exists(db_path: &String) -> bool {
     Path::new(&db_path).exists()
 }
 
+/// Retries a fallible database operation up to `MAX_RETRIES` times when SQLite
+/// reports "database is locked", waiting `RETRY_DELAY_MS` milliseconds between
+/// attempts. Any other error is returned immediately.
+pub fn with_retry<T, F>(mut op: F) -> Result<T, String>
+where
+    F: FnMut() -> Result<T, diesel::result::Error>,
+{
+    const MAX_RETRIES: u32 = 3;
+    const RETRY_DELAY_MS: u64 = 200;
+
+    let mut attempts = 0;
+    loop {
+        attempts += 1;
+        match op() {
+            Ok(value) => return Ok(value),
+            Err(e) if attempts < MAX_RETRIES && e.to_string().contains("database is locked") => {
+                log::warn!(
+                    target: "chaski:db",
+                    "Database locked, retrying ({}/{})",
+                    attempts,
+                    MAX_RETRIES
+                );
+                std::thread::sleep(std::time::Duration::from_millis(RETRY_DELAY_MS));
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+}
+
 fn get_db_path(app_handle: &tauri::AppHandle) -> String {
     match app_handle.path().app_data_dir() {
         Ok(base_dir) => base_dir.to_str().unwrap().to_string() + "/database.sqlite",

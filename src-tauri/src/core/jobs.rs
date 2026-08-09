@@ -50,8 +50,7 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
         if let Some(first_entry) = limited_entries.first() {
             updated_feed.latest_entry = first_entry.pub_date;
 
-            let created_entries =
-                entries::create_list(limited_entries, app_handle.clone()).await;
+            let created_entries = entries::create_list(limited_entries, app_handle.clone()).await;
             entries::trim_feed_history(feed.clone(), app_handle.clone());
             notify_new_entries(app_handle.clone(), feed, created_entries);
         } else {
@@ -63,5 +62,7 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
     }
 
     updated_feed.last_fetch = Some(Utc::now().naive_utc());
-    crate::entities::feeds::update(feed.id, updated_feed, app_handle.clone());
+    if let Err(e) = crate::entities::feeds::update(feed.id, updated_feed, app_handle.clone()) {
+        log::error!(target: "chaski:jobs", "Failed to update feed {} after content collection: {}", feed.id, e);
+    }
 }

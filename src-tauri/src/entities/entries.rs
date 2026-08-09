@@ -110,12 +110,19 @@ pub fn show(entry_id: i32, app_handle: tauri::AppHandle) -> Option<EntryWithFeed
     }
 }
 
-pub fn update(entry_id: i32, entry: Entry, app_handle: tauri::AppHandle) -> Entry {
-    diesel::update(entries.find(entry_id))
-        .set(entry)
-        .returning(Entry::as_returning())
-        .get_result(&mut establish_connection(&app_handle))
-        .expect("Update entry")
+pub fn update(entry_id: i32, entry: Entry, app_handle: tauri::AppHandle) -> Result<Entry, String> {
+    let conn = &mut establish_connection(&app_handle);
+
+    crate::db::with_retry(|| {
+        diesel::update(entries.find(entry_id))
+            .set(entry.clone())
+            .returning(Entry::as_returning())
+            .get_result(conn)
+    })
+    .map_err(|e| {
+        log::error!(target: "chaski:entities", "Failed to update entry {}: {}", entry_id, e);
+        e
+    })
 }
 
 pub fn update_all_as_read(app_handle: tauri::AppHandle) {

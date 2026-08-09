@@ -46,11 +46,13 @@ pub async fn show_entry(entry_id: i32, app_handle: tauri::AppHandle) -> Result<S
             entry_with_feed.entry.description = completed_entry.description;
             entry_with_feed.entry.content = completed_entry.content;
 
-            entry_with_feed.entry = crate::entities::entries::update(
+            if let Ok(updated) = crate::entities::entries::update(
                 entry_id,
                 entry_with_feed.entry.clone(),
                 app_handle.clone(),
-            );
+            ) {
+                entry_with_feed.entry = updated;
+            }
         }
     }
 
@@ -81,7 +83,10 @@ pub async fn update_entry(
         entry.content = completed_entry.content;
     }
 
-    let result = crate::entities::entries::update(entry_id, entry, app_handle);
+    let result = match crate::entities::entries::update(entry_id, entry, app_handle) {
+        Ok(r) => r,
+        Err(_) => return Err(()),
+    };
 
     match serde_json::to_string(&result) {
         Ok(json_string) => Ok(json_string),

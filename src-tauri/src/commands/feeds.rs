@@ -76,7 +76,18 @@ pub async fn create_feed(
         }
     }
 
-    let created_feed = crate::entities::feeds::create_feed(new_feed, true, app_handle.clone());
+    let created_feed = match crate::entities::feeds::create_feed(new_feed, true, app_handle.clone())
+    {
+        Ok(f) => f,
+        Err(e) => {
+            return Ok(json!({
+                "success": false,
+                "message": format!("Failed to create feed: {}", e),
+                "data": null
+            })
+            .to_string());
+        }
+    };
 
     emit_sidebar_updated(&app_handle, created_feed.account_id, "feed", "create");
 
@@ -186,7 +197,17 @@ pub async fn update_feed(
         }
     }
 
-    let result = crate::entities::feeds::update(feed_id, feed, app_handle.clone());
+    let result = match crate::entities::feeds::update(feed_id, feed, app_handle.clone()) {
+        Ok(r) => r,
+        Err(e) => {
+            return Ok(json!({
+                "success": false,
+                "message": format!("Failed to update feed: {}", e),
+                "data": null
+            })
+            .to_string());
+        }
+    };
 
     emit_sidebar_updated(&app_handle, result.account_id, "feed", "update");
 

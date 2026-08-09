@@ -51,7 +51,7 @@ pub fn create_feed(
     mut new_feed: NewFeed,
     should_collect_data: bool,
     app_handle: tauri::AppHandle,
-) -> Feed {
+) -> Result<Feed, String> {
     use crate::schema::feeds;
 
     let conn = &mut establish_connection(&app_handle);
@@ -66,14 +66,18 @@ pub fn create_feed(
 
     new_feed.default_entry_type = String::from("entry");
 
-    let created_feed = diesel::insert_into(feeds::table)
-        .values(&new_feed)
-        .returning(Feed::as_returning())
-        .get_result(conn)
-        .expect("Error saving new post");
+    let created_feed = crate::db::with_retry(|| {
+        diesel::insert_into(feeds::table)
+            .values(&new_feed)
+            .returning(Feed::as_returning())
+            .get_result(conn)
+    })
+    .map_err(|e| {
+        log::error!(target: "chaski:entities", "Failed to create feed: {}", e);
+        e
+    })?;
 
     let created_feed_clone = created_feed.clone();
-
     let cloned_app_handle = app_handle.clone();
 
     if should_collect_data {
@@ -82,19 +86,24 @@ pub fn create_feed(
         });
     }
 
-    created_feed
+    Ok(created_feed)
 }
 
-pub fn update(feed_id: i32, mut feed: Feed, app_handle: tauri::AppHandle) -> Feed {
+pub fn update(feed_id: i32, mut feed: Feed, app_handle: tauri::AppHandle) -> Result<Feed, String> {
     let conn = &mut establish_connection(&app_handle);
 
     feed.updated_at = Utc::now().naive_utc();
 
-    diesel::update(feeds.find(feed_id))
-        .set(feed)
-        .returning(Feed::as_returning())
-        .get_result(conn)
-        .expect("Update feed")
+    crate::db::with_retry(|| {
+        diesel::update(feeds.find(feed_id))
+            .set(feed.clone())
+            .returning(Feed::as_returning())
+            .get_result(conn)
+    })
+    .map_err(|e| {
+        log::error!(target: "chaski:entities", "Failed to update feed {}: {}", feed_id, e);
+        e
+    })
 }
 
 pub async fn full_text_search(
@@ -168,9 +177,15 @@ pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec
 pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec<Feed> {
     new_feeds
         .into_iter()
-        .map(|nf| {
+        .filter_map(|nf| {
             let cloned_app_handle = app_handle.clone();
-            create_feed(nf, false, cloned_app_handle)
+            match create_feed(nf, false, cloned_app_handle) {
+                Ok(feed) => Some(feed),
+                Err(e) => {
+                    log::error!(target: "chaski:entities", "Skipping feed in create_list: {}", e);
+                    None
+                }
+            }
         })
         .collect()
 }

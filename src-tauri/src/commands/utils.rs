@@ -58,11 +58,11 @@ pub async fn import_opml(
                 "Importing OPML",
                 &format!(
                     "Import complete. {} feeds detected, {} added, {} with error.",
-                    report.detected, report.added, report.errors
+                    report.detected, report.good, report.bad
                 ),
             );
 
-            let mut feeds_with_account = report.new_feeds;
+            let mut feeds_with_account = report.new_feeds.unwrap();
             for feed in &mut feeds_with_account {
                 feed.account_id = Some(account_id);
             }

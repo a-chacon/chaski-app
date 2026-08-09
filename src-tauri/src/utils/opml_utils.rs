@@ -4,34 +4,33 @@ use diesel::ExpressionMethods;
 use opml::{Outline, OPML};
 use std::collections::HashMap;
 use std::fs;
+use std::sync::Arc;
 use tauri::Emitter;
 
 pub const OPML_IMPORT_PROGRESS_EVENT: &str = "opml://import-progress";
 
-pub struct OpmlImportResult {
-    pub new_feeds: Vec<NewFeed>,
+pub struct OmplImportStats {
+    pub new_feeds: Option<Vec<NewFeed>>,
     pub detected: usize,
-    pub added: usize,
-    pub errors: usize,
+    pub processed: usize,
+    pub good: usize,
+    pub bad: usize,
 }
 
 fn emit_opml_import_progress(
     app_handle: &tauri::AppHandle,
     status: &str,
     message: &str,
-    detected: usize,
-    processed: usize,
-    added: usize,
-    errors: usize,
+    opml_import_stats: OmplImportStats,
     current_url: Option<&str>,
 ) {
     let payload = serde_json::json!({
         "status": status,
         "message": message,
-        "detected": detected,
-        "processed": processed,
-        "added": added,
-        "errors": errors,
+        "detected": opml_import_stats.detected,
+        "processed": opml_import_stats.processed,
+        "added": opml_import_stats.good,
+        "errors": opml_import_stats.bad,
         "currentUrl": current_url,
     });
 
@@ -43,12 +42,24 @@ fn emit_opml_import_progress(
 pub async fn opml_file_to_new_feeds(
     file_path: &str,
     app_handle: &tauri::AppHandle,
-) -> Result<OpmlImportResult, Box<dyn std::error::Error>> {
+) -> Result<OmplImportStats, Box<dyn std::error::Error>> {
     let contents = match fs::read_to_string(file_path) {
         Ok(contents) => contents,
         Err(e) => {
             let message = format!("Error reading OPML file: {e}");
-            emit_opml_import_progress(app_handle, "error", &message, 0, 0, 0, 1, None);
+            emit_opml_import_progress(
+                app_handle,
+                "error",
+                &message,
+                OmplImportStats {
+                    new_feeds: None,
+                    detected: 0,
+                    processed: 0,
+                    good: 0,
+                    bad: 1,
+                },
+                None,
+            );
             return Err(message.into());
         }
     };
@@ -58,7 +69,19 @@ pub async fn opml_file_to_new_feeds(
         Err(e) => {
             let message = format!("Invalid OPML file format: {e}");
             log::error!(target: "chaski:opml", "Failed to parse OPML file: {:?}", e);
-            emit_opml_import_progress(app_handle, "error", &message, 0, 0, 0, 1, None);
+            emit_opml_import_progress(
+                app_handle,
+                "error",
+                &message,
+                OmplImportStats {
+                    new_feeds: None,
+                    detected: 0,
+                    processed: 0,
+                    good: 0,
+                    bad: 1,
+                },
+                None,
+            );
             return Err(message.into());
         }
     };
@@ -84,63 +107,103 @@ pub async fn opml_file_to_new_feeds(
         app_handle,
         "started",
         "This could take a while, every link is checked, don't close the app.",
-        detected,
-        0,
-        0,
-        0,
+        OmplImportStats {
+            new_feeds: None,
+            detected,
+            processed: 0,
+            good: 0,
+            bad: 0,
+        },
         None,
     );
 
-    let mut new_feeds: Vec<NewFeed> = Vec::new();
-    let mut added = 0usize;
-    let mut errors = 0usize;
+    const MAX_CONCURRENT: usize = 10;
+    let semaphore = Arc::new(tokio::sync::Semaphore::new(MAX_CONCURRENT));
 
-    for (index, (url, folder)) in sources.into_iter().enumerate() {
-        match crate::utils::scrape::scrape_site_feeds(url.clone()).await {
-            Ok(mut found_feeds) => {
+    let mut join_set: tokio::task::JoinSet<(String, Option<String>, Result<Vec<NewFeed>, String>)> =
+        tokio::task::JoinSet::new();
+
+    for (url, folder) in sources.into_iter() {
+        let sem = semaphore.clone();
+        join_set.spawn(async move {
+            let _permit = sem.acquire().await.unwrap();
+            let result = crate::utils::scrape::scrape_site_feeds(url.clone())
+                .await
+                .map_err(|e| e.to_string());
+            (url, folder, result)
+        });
+    }
+
+    let mut new_feeds: Vec<NewFeed> = Vec::new();
+    let mut good = 0usize;
+    let mut bad = 0usize;
+    let mut processed = 0usize;
+
+    while let Some(task_result) = join_set.join_next().await {
+        processed += 1;
+
+        let (url, current_url_opt) = match task_result {
+            Ok((url, folder, Ok(mut found_feeds))) => {
                 if let Some(mut first_feed) = found_feeds.pop() {
                     first_feed.folder = folder;
                     new_feeds.push(first_feed);
-                    added += 1;
+                    good += 1;
                 } else {
-                    errors += 1;
+                    bad += 1;
                     log::warn!(target: "chaski:opml", "No feeds detected from OPML url: {}", url);
                 }
+                let u = url.clone();
+                (url, Some(u))
             }
-            Err(e) => {
-                errors += 1;
+            Ok((url, _folder, Err(e))) => {
+                bad += 1;
                 log::error!(target: "chaski:opml", "opml_file_to_new_feeds. Url: {:?} Error: {:?}", url, e);
+                let u = url.clone();
+                (url, Some(u))
             }
-        }
+            Err(join_error) => {
+                bad += 1;
+                log::error!(target: "chaski:opml", "opml_file_to_new_feeds task panicked: {:?}", join_error);
+                (String::new(), None)
+            }
+        };
 
         emit_opml_import_progress(
             app_handle,
             "progress",
             "Importing OPML feeds...",
-            detected,
-            index + 1,
-            added,
-            errors,
-            Some(url.as_str()),
+            OmplImportStats {
+                new_feeds: None,
+                detected,
+                processed,
+                good,
+                bad,
+            },
+            current_url_opt.as_deref(),
         );
+        let _ = url;
     }
 
     emit_opml_import_progress(
         app_handle,
         "finished",
         "OPML import finished.",
-        detected,
-        detected,
-        added,
-        errors,
+        OmplImportStats {
+            new_feeds: None,
+            detected,
+            processed,
+            good,
+            bad,
+        },
         None,
     );
 
-    Ok(OpmlImportResult {
-        new_feeds,
+    Ok(OmplImportStats {
+        new_feeds: Some(new_feeds),
         detected,
-        added,
-        errors,
+        processed,
+        good,
+        bad,
     })
 }
 

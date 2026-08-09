@@ -32,7 +32,7 @@
   </provides>
 
   <releases>
-    <release version="0.6.3" date="2026-07-29"/>
+    <release version="0.6.4" date="2026-08-09"/>
   </releases>
 
   <content_rating type="oars-1.1"/>

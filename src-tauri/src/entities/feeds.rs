@@ -216,7 +216,7 @@ pub fn spawn_feeds_update_loop(app_handle: tauri::AppHandle) {
 
 async fn feeds_update_loop(app_handle: tauri::AppHandle) {
     loop {
-        sleep(Duration::from_secs(1)).await;
+        sleep(Duration::from_millis(500)).await;
         let conn = &mut establish_connection(&app_handle);
 
         let feeds_to_update: Vec<Feed> = feeds

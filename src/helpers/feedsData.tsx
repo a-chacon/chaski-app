@@ -105,8 +105,24 @@ export const exportOPML = async (file_path: string, feed_ids: number[]) => {
 
 export const createFeed = async (feed: FeedInterface): Promise<ApiResponse<FeedInterface>> => {
   try {
+    const newFeed = {
+      title: feed.title,
+      description: feed.description,
+      link: feed.link,
+      icon: feed.icon || null,
+      last_fetch: null,
+      latest_entry: null,
+      kind: feed.kind,
+      items_count: null,
+      folder: feed.folder || null,
+      update_interval_minutes: feed.update_interval_minutes ?? 0,
+      notifications_enabled: feed.notifications_enabled ?? 0,
+      account_id: feed.account_id,
+      external_id: null,
+      default_entry_type: feed.default_entry_type || "entry",
+    };
     const message = await invoke<string>("create_feed", {
-      newFeed: feed,
+      newFeed,
     });
     const response: ApiResponse<FeedInterface> = JSON.parse(message);
     return response;

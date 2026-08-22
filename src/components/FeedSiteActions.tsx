@@ -136,7 +136,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
     return (
       <Popover placement="bottom" showArrow offset={10}>
         <PopoverTrigger>
-          <Button className="animate-bounce" variant="bordered" color="warning" size="sm">
+          <Button variant="bordered" color="warning" size="sm">
             follow
           </Button>
         </PopoverTrigger>

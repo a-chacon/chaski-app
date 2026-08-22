@@ -1,4 +1,4 @@
-import { RiBookmarkFill, RiAlignJustify } from "@remixicon/react";
+import { RiBookmarkFill, RiAlignJustify, RiCompassDiscoverLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
@@ -31,6 +31,16 @@ function SideBar() {
           >
             <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
             Read Later
+          </Link>
+          <Link
+            to="/discover"
+            className="w-full h-full flex flex-row items-center gap-2 hover:bg-default/40 rounded-md py-1.5 px-2 text-sm"
+            activeProps={{
+              className: "bg-default/40"
+            }}
+          >
+            <RiCompassDiscoverLine className="h-5 opacity-90" />
+            Discover
           </Link>
         </div>
 

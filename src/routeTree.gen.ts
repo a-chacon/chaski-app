@@ -18,6 +18,7 @@ import { Route as FoldersFolderNameRouteImport } from './routes/folders.$folderN
 
 const AboutLazyRouteImport = createFileRoute('/about')()
 const ConfigurationsLazyRouteImport = createFileRoute('/configurations')()
+const DiscoverLazyRouteImport = createFileRoute('/discover')()
 const New_feedLazyRouteImport = createFileRoute('/new_feed')()
 const OnboardingLazyRouteImport = createFileRoute('/onboarding')()
 const Read_laterLazyRouteImport = createFileRoute('/read_later')()
@@ -39,6 +40,11 @@ const ConfigurationsLazyRoute = ConfigurationsLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/configurations.lazy').then((d) => d.Route),
 )
+const DiscoverLazyRoute = DiscoverLazyRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/discover.lazy').then((d) => d.Route))
 const New_feedLazyRoute = New_feedLazyRouteImport.update({
   id: '/new_feed',
   path: '/new_feed',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
+  '/discover': typeof DiscoverLazyRoute
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
+  '/discover': typeof DiscoverLazyRoute
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutLazyRoute
   '/configurations': typeof ConfigurationsLazyRoute
+  '/discover': typeof DiscoverLazyRoute
   '/new_feed': typeof New_feedLazyRoute
   '/onboarding': typeof OnboardingLazyRoute
   '/read_later': typeof Read_laterLazyRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/configurations'
+    | '/discover'
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/configurations'
+    | '/discover'
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/configurations'
+    | '/discover'
     | '/new_feed'
     | '/onboarding'
     | '/read_later'
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutLazyRoute: typeof AboutLazyRoute
   ConfigurationsLazyRoute: typeof ConfigurationsLazyRoute
+  DiscoverLazyRoute: typeof DiscoverLazyRoute
   New_feedLazyRoute: typeof New_feedLazyRoute
   OnboardingLazyRoute: typeof OnboardingLazyRoute
   Read_laterLazyRoute: typeof Read_laterLazyRoute
@@ -173,6 +186,13 @@ declare module '@tanstack/react-router' {
       path: '/configurations'
       fullPath: '/configurations'
       preLoaderRoute: typeof ConfigurationsLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new_feed': {
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutLazyRoute: AboutLazyRoute,
   ConfigurationsLazyRoute: ConfigurationsLazyRoute,
+  DiscoverLazyRoute: DiscoverLazyRoute,
   New_feedLazyRoute: New_feedLazyRoute,
   OnboardingLazyRoute: OnboardingLazyRoute,
   Read_laterLazyRoute: Read_laterLazyRoute,

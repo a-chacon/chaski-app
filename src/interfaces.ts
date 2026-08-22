@@ -23,6 +23,7 @@ export interface FeedInterface {
   unread_count: number;
   account_id: number;
   default_entry_type: string;
+  tags?: string[];
 }
 
 export interface EntryInterface {

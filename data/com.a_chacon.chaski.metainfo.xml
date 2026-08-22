@@ -32,6 +32,18 @@
   </provides>
 
   <releases>
+    <release version="0.7.0" date="2026-08-22">
+      <description>
+        <p>New features:</p>
+        <ul>
+          <li>Added a discovery page to find and follow new feeds.</li>
+        </ul>
+        <p>Bug fixes:</p>
+        <ul>
+          <li>Fixed Flathub release date and screenshots metadata.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.4" date="2026-08-09"/>
   </releases>
 

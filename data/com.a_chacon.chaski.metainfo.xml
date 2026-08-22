@@ -35,28 +35,41 @@
     <release version="0.6.4" date="2026-08-09"/>
   </releases>
 
+  <branding>
+    <color type="primary" scheme_preference="light">#d46312</color>
+    <color type="primary" scheme_preference="dark">#ee7d2b</color>
+  </branding>
+
   <content_rating type="oars-1.1"/>
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/screenshots/index.png</image>
-      <caption>All entries page of chaski app.</caption>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/entries.png</image>
+      <caption>Browse all entries in chronological order.</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/screenshots/index-list.png</image>
-      <caption>All entries page of chaski app in compact mode.</caption>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/discovery.png</image>
+      <caption>Discover and follow interesting feeds.</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/configuration.png</image>
-      <caption>Configuration page of the app.</caption>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/entry.png</image>
+      <caption>Read an article directly inside Chaski.</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/opml-import.png</image>
-      <caption>OPML import function.</caption>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/folder_view.png</image>
+      <caption>Organize feeds into folders.</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/search.png</image>
-      <caption>Full text search modal.</caption>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/feed_view.png</image>
+      <caption>View and manage a feed's entries.</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/new_feed.png</image>
+      <caption>Add a new feed by pasting its URL.</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/list_mode.png</image>
+      <caption>Compact list mode for distraction-free reading.</caption>
     </screenshot>
   </screenshots>
 </component>

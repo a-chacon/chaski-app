@@ -36,6 +36,7 @@ function discoverFeedToFeedInterface(feed: DiscoverFeed, accountId: number): Fee
     unread_count: 0,
     account_id: accountId,
     default_entry_type: "article",
+    tags: feed.tags.map((t) => t.slug),
   };
 }
 

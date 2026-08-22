@@ -5,6 +5,7 @@ import {
   CardBody,
   CardFooter,
   Tooltip,
+  Chip,
 } from "@heroui/react";
 import { FeedInterface } from "../interfaces.ts";
 import FeedSiteActions from "./FeedSiteActions.tsx";
@@ -62,6 +63,15 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
       </CardHeader>
       <CardBody className="px-3 py-0 text-small">
         <p className="line-clamp-3">{currentFeed.description}</p>
+        {currentFeed.tags && currentFeed.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {currentFeed.tags.map((tag) => (
+              <Chip key={tag} size="sm" variant="flat" color="default">
+                {tag}
+              </Chip>
+            ))}
+          </div>
+        )}
       </CardBody>
       <CardFooter className="gap-3 flex justify-between">
         <div className="flex items-center gap-1.5 min-w-0">

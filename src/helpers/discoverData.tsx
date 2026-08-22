@@ -1,4 +1,4 @@
-const DISCOVER_API_BASE = "http://192.168.1.100:3000/api";
+const DISCOVER_API_BASE = "https://api.chaski.a-chacon.com/api";
 
 export interface DiscoverFeedTag {
   id: number;
@@ -28,7 +28,6 @@ export interface DiscoverPagination {
 
 export interface DiscoverFilters {
   tags: string[];
-  countries: string[];
   languages: string[];
 }
 

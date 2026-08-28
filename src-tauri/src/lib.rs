@@ -60,9 +60,12 @@ pub fn run() {
                 .filter(|metadata| metadata.target().contains("chaski"))
                 .level(log::LevelFilter::Debug)
                 .max_file_size(10_000_000)
-                .target(tauri_plugin_log::Target::new(
-                    tauri_plugin_log::TargetKind::LogDir { file_name: None },
-                ))
+                .targets([
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir {
+                        file_name: None,
+                    }),
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
+                ])
                 .build(),
         );
 
@@ -157,7 +160,8 @@ pub fn run() {
             commands::accounts::create_account,
             commands::accounts::full_sync,
             commands::accounts::show_account,
-            commands::accounts::destroy_account
+            commands::accounts::destroy_account,
+            commands::logs::get_log_content
         ])
         .run(ctx)
         .expect("error while building tauri application");

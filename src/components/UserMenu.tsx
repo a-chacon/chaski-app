@@ -5,7 +5,7 @@ import {
   DropdownItem,
   Button,
 } from "@heroui/react";
-import { RiMenuLine } from "@remixicon/react";
+import { RiMenuLine, RiFileListLine } from "@remixicon/react";
 import { save } from "@tauri-apps/plugin-dialog";
 import { exportOPML } from "../helpers/feedsData";
 import { useNavigate } from "@tanstack/react-router";
@@ -32,6 +32,9 @@ export default function UserMenu() {
         break;
       case "about":
         navigate({ to: "/about" });
+        break;
+      case "logs":
+        navigate({ to: "/logs" });
         break;
       case "feedback":
         feedbackModalState.onOpen();
@@ -63,6 +66,12 @@ export default function UserMenu() {
           </DropdownItem>
           <DropdownItem key="about">
             About Chaski
+          </DropdownItem>
+          <DropdownItem key="logs">
+            <div className="flex gap-2 items-center">
+              <span>Logs</span>
+              <RiFileListLine />
+            </div>
           </DropdownItem>
           <DropdownItem key="feedback" >
             <div className="flex gap-2 items-center">

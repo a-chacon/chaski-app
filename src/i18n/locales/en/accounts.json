@@ -26,5 +26,7 @@
   "deleteFolderTitle": "Delete {{folder}}",
   "deleteFolderConfirm": "Are you sure you want to delete this folder?",
   "deleteFolderWarning": "This will delete all the included feeds in the folder!",
-  "newName": "New name"
+  "newName": "New name",
+  "type": "Type",
+  "created": "Created"
 }

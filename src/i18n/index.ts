@@ -13,6 +13,8 @@ import enAccounts from './locales/en/accounts.json';
 import enAbout from './locales/en/about.json';
 import enSearch from './locales/en/search.json';
 import enShare from './locales/en/share.json';
+import enDiscover from './locales/en/discover.json';
+import enLogs from './locales/en/logs.json';
 
 import esCommon from './locales/es/common.json';
 import esSidebar from './locales/es/sidebar.json';
@@ -26,6 +28,8 @@ import esAccounts from './locales/es/accounts.json';
 import esAbout from './locales/es/about.json';
 import esSearch from './locales/es/search.json';
 import esShare from './locales/es/share.json';
+import esDiscover from './locales/es/discover.json';
+import esLogs from './locales/es/logs.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -42,6 +46,8 @@ i18n.use(initReactI18next).init({
       about: enAbout,
       search: enSearch,
       share: enShare,
+      discover: enDiscover,
+      logs: enLogs,
     },
     es: {
       common: esCommon,
@@ -56,6 +62,8 @@ i18n.use(initReactI18next).init({
       about: esAbout,
       search: esSearch,
       share: esShare,
+      discover: esDiscover,
+      logs: esLogs,
     },
   },
   lng: 'en',

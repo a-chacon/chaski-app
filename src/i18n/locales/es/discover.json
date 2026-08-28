@@ -1,0 +1,18 @@
+{
+  "title": "Descubrir",
+  "subtitle": "Explora fuentes curadas de todo el mundo y sigue lo que te interesa.",
+  "searchPlaceholder": "Buscar fuentes...",
+  "languagePlaceholder": "Idioma",
+  "filterByLanguage": "Filtrar por idioma",
+  "topics": "Temas",
+  "noInternetTitle": "Sin conexión a internet",
+  "noInternetDesc": "Descubrir requiere conexión a internet para cargar fuentes. Verifica tu conexión e intenta de nuevo.",
+  "serviceUnavailableTitle": "Servicio no disponible",
+  "serviceUnavailableDesc": "El servicio de descubrimiento no está disponible temporalmente. Por favor, intenta de nuevo en un momento.",
+  "retry": "Reintentar",
+  "noFeedsTitle": "No se encontraron fuentes",
+  "noFeedsDesc": "Prueba un término de búsqueda diferente o elimina algunos filtros.",
+  "loadMore": "Cargar más",
+  "showingResults_one": "Mostrando {{count}} resultado",
+  "showingResults_other": "Mostrando todos los {{count}} resultados"
+}

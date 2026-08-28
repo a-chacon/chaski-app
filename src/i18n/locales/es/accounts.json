@@ -26,5 +26,7 @@
   "deleteFolderTitle": "Eliminar {{folder}}",
   "deleteFolderConfirm": "¿Estás seguro de que quieres eliminar esta carpeta?",
   "deleteFolderWarning": "¡Esto eliminará todas las fuentes incluidas en la carpeta!",
-  "newName": "Nuevo nombre"
+  "newName": "Nuevo nombre",
+  "type": "Tipo",
+  "created": "Creado"
 }

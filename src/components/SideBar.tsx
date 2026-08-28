@@ -42,7 +42,7 @@ function SideBar() {
             }}
           >
             <RiCompassDiscoverLine className="h-5 opacity-90" />
-            Discover
+            {t("discover")}
           </Link>
         </div>
 

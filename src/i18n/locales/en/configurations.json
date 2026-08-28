@@ -19,7 +19,8 @@
     "title": "Behavior",
     "markAsRead": "Mark as Read on hover.",
     "downloadEntries": "Download entries always (otherwise scrape on demand)",
-    "autostart": "Autostart Application"
+    "autostart": "Autostart Application",
+    "autostartFlatpak": "Autostart Application (not available in Flatpak)"
   },
   "language": {
     "title": "Language",

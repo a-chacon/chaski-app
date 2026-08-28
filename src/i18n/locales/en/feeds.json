@@ -43,5 +43,6 @@
   "and": "And",
   "or": "Or",
   "folder": "Folder",
-  "validUrl": "Please enter a valid URL."
+  "validUrl": "Please enter a valid URL.",
+  "addNewFeedsHere": "Add new feeds here!"
 }

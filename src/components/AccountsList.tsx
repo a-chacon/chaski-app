@@ -1,17 +1,19 @@
 import { Card, CardBody } from '@heroui/react';
 import { AccountInterface } from '../interfaces';
+import { useTranslation } from 'react-i18next';
 
 interface AccountCardProps {
   account: AccountInterface;
 }
 
 function AccountCard({ account }: AccountCardProps) {
+  const { t } = useTranslation('accounts');
   return (
     <Card className="w-96 mb-4">
       <CardBody>
         <h3 className="text-lg font-semibold">{account.name}</h3>
-        <p className="text-sm text-gray-500">Type: {account.kind}</p>
-        <p className="text-xs text-gray-400">Created: {new Date(account.created_at).toLocaleDateString()}</p>
+        <p className="text-sm text-gray-500">{t('type')}: {account.kind}</p>
+        <p className="text-xs text-gray-400">{t('created')}: {new Date(account.created_at).toLocaleDateString()}</p>
       </CardBody>
     </Card>
   );

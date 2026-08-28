@@ -1,0 +1,14 @@
+{
+  "title": "App Logs",
+  "autoScroll": "Auto-scroll",
+  "refresh": "Refresh",
+  "searchPlaceholder": "Search logs...",
+  "noEntries": "No log entries found.",
+  "levelAll": "All levels",
+  "levelTrace": "Trace & above",
+  "levelDebug": "Debug & above",
+  "levelInfo": "Info & above",
+  "levelWarn": "Warn & above",
+  "levelError": "Error only",
+  "lineCount": "{{filtered}} / {{total}} lines (last 500)"
+}

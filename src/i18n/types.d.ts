@@ -12,6 +12,8 @@ import type enAccounts from './locales/en/accounts.json';
 import type enAbout from './locales/en/about.json';
 import type enSearch from './locales/en/search.json';
 import type enShare from './locales/en/share.json';
+import type enDiscover from './locales/en/discover.json';
+import type enLogs from './locales/en/logs.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -29,6 +31,8 @@ declare module 'i18next' {
       about: typeof enAbout;
       search: typeof enSearch;
       share: typeof enShare;
+      discover: typeof enDiscover;
+      logs: typeof enLogs;
     };
   }
 }

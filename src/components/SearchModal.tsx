@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function SearchModal() {
   const { t } = useTranslation('search');
+  const { t: tTitlebar } = useTranslation('titlebar');
   const { currentAccount } = useAppContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [value, setValue] = useState("");
@@ -57,7 +58,7 @@ export default function SearchModal() {
         variant="light"
         size="sm"
         isIconOnly
-        aria-label="Search feeds and entries"
+        aria-label={tTitlebar('searchFeedsAndEntries')}
       >
         <RiSearchLine className="p-0.5" />
       </Button>

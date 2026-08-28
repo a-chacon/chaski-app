@@ -43,5 +43,6 @@
   "and": "Y",
   "or": "O",
   "folder": "Carpeta",
-  "validUrl": "Por favor, ingresa una URL válida."
+  "validUrl": "Por favor, ingresa una URL válida.",
+  "addNewFeedsHere": "¡Agrega nuevas fuentes aquí!"
 }

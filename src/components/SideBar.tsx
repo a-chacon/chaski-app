@@ -2,9 +2,11 @@ import { RiBookmarkFill, RiAlignJustify, RiCompassDiscoverLine } from "@remixico
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
+import { useTranslation } from "react-i18next";
 
 function SideBar() {
   const { currentAccount } = useAppContext();
+  const { t } = useTranslation("sidebar");
 
   const classes = "overflow-auto px-2 py-4 h-full w-full absolute z-30 top-0 left-0 right-0 md:static bg-primary-50";
 
@@ -20,7 +22,7 @@ function SideBar() {
             }}
           >
             <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
-            Entries
+            {t("entries")}
           </Link>
           <Link
             to="/read_later"
@@ -30,7 +32,7 @@ function SideBar() {
             }}
           >
             <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
-            Read Later
+            {t("readLater")}
           </Link>
           <Link
             to="/discover"
@@ -40,19 +42,19 @@ function SideBar() {
             }}
           >
             <RiCompassDiscoverLine className="h-5 opacity-90" />
-            Discover
+            {t("discover")}
           </Link>
         </div>
 
         <div className="px-3 pt-2 pb-1">
-          <h5 className="font-semibold text-xs uppercase tracking-wide text-foreground-500">Feeds</h5>
+          <h5 className="font-semibold text-xs uppercase tracking-wide text-foreground-500">{t("feeds")}</h5>
         </div>
 
         <div className="w-full relative flex flex-col gap-1 py-1">
           {currentAccount ? (
             <AccountItemContent account={currentAccount} />
           ) : (
-            <p className="px-3 text-sm text-foreground-500">No account selected. Add an account from the titlebar.</p>
+            <p className="px-3 text-sm text-foreground-500">{t("noAccountSelected")}</p>
           )}
         </div>
       </div>

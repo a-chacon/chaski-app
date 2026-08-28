@@ -1,0 +1,14 @@
+{
+  "opml": {
+    "importingTitle": "Importing OPML",
+    "completedTitle": "OPML import completed",
+    "running": "This could take a while, every link is checked, don't close the app.",
+    "finished": "OPML import finished.",
+    "stats": "Detected: {{detected}} · Checked: {{processed}} · Added: {{added}} · Errors: {{errors}}"
+  },
+  "feedback": {
+    "title": "How is your experience going?",
+    "body": "You've been using the application for a while. Would you like to give us your feedback?",
+    "give": "Give feedback"
+  }
+}

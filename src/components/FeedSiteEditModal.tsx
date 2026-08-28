@@ -14,6 +14,7 @@ import { FeedInterface } from "../interfaces";
 import FolderField from "./FolderField";
 import { updateFeed } from "../helpers/feedsData";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNotification } from "../NotificationContext";
 
 
@@ -30,6 +31,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
   isOpen,
   onOpenChange,
 }) => {
+  const { t } = useTranslation(['feeds', 'common']);
   const { addNotification } = useNotification();
   const [title, setTitle] = useState(feed.title);
   const [description, setDescription] = useState(feed.description);
@@ -54,9 +56,9 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
     let response = await updateFeed(feed);
     if (response.success) {
       setFeed(response.data);
-      addNotification("Feed Updated", 'The feed was updated successfully!', 'success');
+      addNotification(t('feeds:feedUpdated'), t('feeds:feedUpdatedBody'), 'success');
     } else {
-      addNotification("Error Updating", response.message, 'warning');
+      addNotification(t('feeds:errorUpdating'), response.message, 'warning');
     }
   };
 
@@ -69,17 +71,17 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
       <ModalContent>
         {(onCloseModal) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">Feed</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">{t('feeds:feedHeader')}</ModalHeader>
             <ModalBody>
               <Input
                 type="text"
-                label="Title"
+                label={t('feeds:title')}
                 value={title}
                 onValueChange={setTitle}
                 variant="underlined"
               />
               <Textarea
-                label="Description"
+                label={t('feeds:description')}
                 value={description}
                 onValueChange={setDescription}
                 variant="underlined"
@@ -87,7 +89,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
               <FolderField feed={feed}></FolderField>
               <Input
                 type="number"
-                label="Entry Limit"
+                label={t('feeds:entryLimit')}
                 value={entryLimit.toString()}
                 onValueChange={(e) => setEntryLimit(parseInt(e))}
                 variant="underlined"
@@ -95,7 +97,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
 
               <Input
                 type="number"
-                label="History Limit"
+                label={t('feeds:historyLimit')}
                 value={historyLimit.toString()}
                 onValueChange={(e) => setHistoryLimit(parseInt(e))}
                 variant="underlined"
@@ -103,7 +105,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
 
               <Input
                 type="number"
-                label="Update Minutes Interval"
+                label={t('feeds:updateMinutesInterval')}
                 value={updateIntervalMinutes.toString()}
                 onValueChange={(e) => setUpdateIntervalMinutes(parseInt(e))}
                 variant="underlined"
@@ -113,13 +115,13 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
                 isSelected={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
               >
-                Notifications Enabled
+                {t('feeds:notificationsEnabled')}
               </Switch>
 
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onCloseModal}>
-                Close
+                {t('common:close')}
               </Button>
 
               <Button
@@ -130,7 +132,7 @@ const FeedSiteEditModal: React.FC<FeedSiteEditModalProps> = ({
                   onCloseModal();
                 }}
               >
-                Update
+                {t('common:update')}
               </Button>
             </ModalFooter>
           </>

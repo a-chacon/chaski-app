@@ -1,0 +1,24 @@
+{
+  "back": "Back",
+  "next": "Next",
+  "finish": "Finish",
+  "step1": {
+    "title": "Welcome to Chaski! 👋",
+    "body": "Your personal feed reader for staying in control of your content."
+  },
+  "step2": {
+    "title": "Make it yours 🎨",
+    "body": "Personalize your experience with your favorite look and feel",
+    "chooseTheme": "Choose your theme:"
+  },
+  "step3": {
+    "title": "Connect your feeds 📚",
+    "body": "Add your RSS accounts now or set them up later - your choice!",
+    "addAccount": "Add Account",
+    "skip": "Skip for now"
+  },
+  "step4": {
+    "title": "You're all set! 🎉",
+    "body": "Did you know? The name \"Chaski\" comes from the Inca Chasquis, the swift messengers who carried important messages across the empire. 🏃‍♂️"
+  }
+}

@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import FeedSite from "../components/FeedSite";
 import { FeedInterface } from "../interfaces";
 import { useAppContext } from '../AppContext'
+import { useTranslation } from 'react-i18next';
 
 import {
   fetchDiscoverFeeds,
@@ -45,6 +46,7 @@ type ErrorKind = "offline" | "server" | null;
 
 export default function Discover() {
   const { currentAccount } = useAppContext()
+  const { t } = useTranslation('discover');
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -144,10 +146,9 @@ export default function Discover() {
       <div className="flex flex-col max-w-screen-md mx-auto px-4">
         {/* Header */}
         <div className="py-8">
-          <h1 className="text-3xl pt-2 font-bold">Discover</h1>
+          <h1 className="text-3xl pt-2 font-bold">{t('title')}</h1>
           <h2 className="pt-1 pb-4 text-foreground-500">
-            Explore curated feeds from around the world and follow what
-            interests you.
+            {t('subtitle')}
           </h2>
         </div>
 
@@ -155,7 +156,7 @@ export default function Discover() {
         <div className="flex gap-2 mb-4 items-center">
           <Input
             variant="bordered"
-            placeholder="Search feeds..."
+            placeholder={t('searchPlaceholder')}
             value={query}
             onValueChange={setQuery}
             startContent={
@@ -168,14 +169,14 @@ export default function Discover() {
           {availableFilters && availableFilters.languages.length > 0 && (
             <Select
               variant="bordered"
-              placeholder="Language"
+              placeholder={t('languagePlaceholder')}
               className="w-36 shrink-0"
               selectedKeys={selectedLanguage ? [selectedLanguage] : []}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as string ?? "";
                 setSelectedLanguage(val);
               }}
-              aria-label="Filter by language"
+              aria-label={t('filterByLanguage')}
             >
               {availableFilters.languages.map((lang) => (
                 <SelectItem key={lang}>
@@ -192,7 +193,7 @@ export default function Discover() {
             {availableFilters.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 items-center">
                 <span className="text-xs text-foreground-400 uppercase tracking-wide font-semibold mr-1">
-                  Topics
+                  {t('topics')}
                 </span>
                 {availableFilters.tags.map((tag) => (
                   <Chip
@@ -218,19 +219,17 @@ export default function Discover() {
             {error === "offline" ? (
               <>
                 <RiWifiOffLine className="w-12 h-12 text-foreground-300" />
-                <h3 className="text-lg font-semibold">No internet connection</h3>
+                <h3 className="text-lg font-semibold">{t('noInternetTitle')}</h3>
                 <p className="text-sm text-foreground-500 max-w-xs">
-                  Discover requires an internet connection to load feeds. Check
-                  your connection and try again.
+                  {t('noInternetDesc')}
                 </p>
               </>
             ) : (
               <>
                 <span className="text-4xl">🛰️</span>
-                <h3 className="text-lg font-semibold">Service unavailable</h3>
+                <h3 className="text-lg font-semibold">{t('serviceUnavailableTitle')}</h3>
                 <p className="text-sm text-foreground-500 max-w-xs">
-                  The discovery service is temporarily unreachable. Please try
-                  again in a moment.
+                  {t('serviceUnavailableDesc')}
                 </p>
               </>
             )}
@@ -241,7 +240,7 @@ export default function Discover() {
               startContent={<RiRefreshLine className="w-4 h-4" />}
               onPress={handleRetry}
             >
-              Retry
+              {t('retry')}
             </Button>
           </div>
         )}
@@ -259,9 +258,9 @@ export default function Discover() {
             {feeds.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
                 <span className="text-4xl">🔍</span>
-                <h3 className="text-lg font-semibold">No feeds found</h3>
+                <h3 className="text-lg font-semibold">{t('noFeedsTitle')}</h3>
                 <p className="text-sm text-foreground-500">
-                  Try a different search term or remove some filters.
+                  {t('noFeedsDesc')}
                 </p>
               </div>
             ) : (
@@ -279,15 +278,14 @@ export default function Discover() {
                       isLoading={isLoadingMore}
                       onPress={handleLoadMore}
                     >
-                      Load more
+                      {t('loadMore')}
                     </Button>
                   </div>
                 )}
 
                 {pagination && !hasMore && feeds.length > 0 && (
                   <p className="text-center text-xs text-foreground-400 pt-2">
-                    Showing all {pagination.count} result
-                    {pagination.count !== 1 ? "s" : ""}
+                    {t('showingResults', { count: pagination.count })}
                   </p>
                 )}
               </div>

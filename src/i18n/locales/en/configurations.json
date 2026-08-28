@@ -1,0 +1,29 @@
+{
+  "tabs": {
+    "lookAndFeel": "Look and Feel",
+    "behavior": "Behavior",
+    "language": "Language"
+  },
+  "look": {
+    "title": "Look And Feel",
+    "theme": "Theme",
+    "text": "Text",
+    "fontSpace": "Font Space",
+    "fontSizeSmall": "small",
+    "fontSizeMedium": "medium",
+    "fontSizeBig": "big",
+    "example": "Example",
+    "exampleText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut dui at turpis pretium sagittis. Fusce quis vehicula eros, id dapibus magna. Praesent efficitur a tellus at mattis."
+  },
+  "behavior": {
+    "title": "Behavior",
+    "markAsRead": "Mark as Read on hover.",
+    "downloadEntries": "Download entries always (otherwise scrape on demand)",
+    "autostart": "Autostart Application",
+    "autostartFlatpak": "Autostart Application (not available in Flatpak)"
+  },
+  "language": {
+    "title": "Language",
+    "select": "Select your preferred language"
+  }
+}

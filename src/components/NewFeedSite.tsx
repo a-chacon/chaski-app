@@ -6,10 +6,12 @@ import FeedSite from "./FeedSite";
 import { FeedInterface } from "../interfaces";
 import { readText } from '@tauri-apps/plugin-clipboard-manager';
 import { useAppContext } from "../AppContext";
+import { useTranslation } from 'react-i18next';
 import { open } from "@tauri-apps/plugin-dialog";
 import { importOPML } from "../helpers/feedsData";
 
 export default function App() {
+  const { t } = useTranslation(['feeds', 'common']);
   const { currentAccount } = useAppContext();
 
   const [step, setStep] = useState<number>(1);
@@ -110,7 +112,7 @@ export default function App() {
       setIsInvalidMessage("");
     } catch (_error) {
       setIsInvalid(true);
-      setIsInvalidMessage("Please enter a valid URL.");
+      setIsInvalidMessage(t('feeds:validUrl'));
     }
 
     setSiteUrl(url);
@@ -119,9 +121,9 @@ export default function App() {
   if (!currentAccount) {
     return (
       <div className="flex flex-col gap-2">
-        <h3 className="font-semibold">No account selected</h3>
+        <h3 className="font-semibold">{t('feeds:noAccountSelected')}</h3>
         <p className="text-sm text-foreground-500">
-          Create or select an account from the titlebar to add new feeds.
+          {t('feeds:noAccountSelectedDesc')}
         </p>
       </div>
     );
@@ -130,7 +132,7 @@ export default function App() {
   if (step === 1) {
     return (
       <div className="flex flex-col gap-4">
-        <p className="text-sm text-foreground-500">Adding feeds to: <strong>{currentAccount.name}</strong></p>
+        <p className="text-sm text-foreground-500">{t('feeds:addingFeedsTo', { name: currentAccount.name })}</p>
         <form
           className="flex w-full md:flex-nowrap gap-4 items-center"
           action="#"
@@ -139,8 +141,8 @@ export default function App() {
           <Input
             type="url"
             variant="underlined"
-            label="Feed Url"
-            description="It will try to discover the RSS feed if a direct link is not provided"
+            label={t('feeds:feedUrl')}
+            description={t('feeds:feedUrlDesc')}
             isInvalid={isInvalid}
             errorMessage={isInvalidMessage}
             value={siteUrl}
@@ -154,7 +156,7 @@ export default function App() {
             size="sm"
             radius="full"
             isIconOnly
-            aria-label="Add"
+            aria-label={t('common:add')}
             isLoading={isLoading}
             type="submit"
           >
@@ -169,7 +171,7 @@ export default function App() {
               onPress={handleImportButton}
               isLoading={isImportLoading}
             >
-              Import OPML
+              {t('feeds:importOpml')}
             </Button>
           )}
         </div>
@@ -179,11 +181,11 @@ export default function App() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="font-semibold p-3">Feeds found. Select the ones you'd like to add.</h3>
+      <h3 className="font-semibold p-3">{t('feeds:feedsFound')}</h3>
       <div className="flex flex-col gap-4 mx-auto">
         {availableFeeds.length === 0 ? (
           <p className="p-4">
-            🫣Sorry, we can't find any RSS in the given link.
+            {t('feeds:noRssFound')}
           </p>
         ) : (
           availableFeeds.map((feed: FeedInterface) => {
@@ -197,7 +199,7 @@ export default function App() {
           variant="light"
           onPress={handleGoBack}
         >
-          ← Back
+          ← {t('common:back')}
         </Button>
       </div>
     </div>

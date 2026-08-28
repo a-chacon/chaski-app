@@ -4,6 +4,7 @@ import { EntryInterface } from "../interfaces";
 import EntryCard from "./EntryViews/Entry/EntryCard";
 import { useAppContext } from "../AppContext";
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 interface EntriesListProps {
   entries: EntryInterface[];
@@ -11,6 +12,23 @@ interface EntriesListProps {
   hasMore: boolean;
   header: boolean;
 }
+
+interface EndMessageProps {
+  display: string;
+}
+
+const EndMessage = React.memo(({ display }: EndMessageProps) => {
+  const { t } = useTranslation("entries");
+
+  return (
+    <div className={`${display === "grid" ? "col-span-full" : ""} mx-auto`}>
+      <div className="p-6 text-center">
+        <h5 className="text-2xl font-semibold pb-2">{t("endTitle")}</h5>
+        <p>{t("endSubtitle")}</p>
+      </div>
+    </div>
+  );
+});
 
 function EntriesList({
   entries,
@@ -32,17 +50,6 @@ function EntriesList({
     return "flex flex-col gap-2";
   }, [display]);
 
-  const EndMessage = React.memo(() => (
-    <div className={`${display === "grid" ? "col-span-full" : ""} mx-auto`}>
-      <div className="p-6 text-center">
-        <h5 className="text-2xl font-semibold pb-2">
-          We've reached the end of the road…
-        </h5>
-        <p>But don’t fret, our Chasquis are already off to bring more!</p>
-      </div>
-    </div>
-  ));
-
   return (
     <div key="entries">
       <InfiniteScroll
@@ -55,7 +62,7 @@ function EntriesList({
           </div>
         }
         scrollableTarget="mainDiv"
-        endMessage={<EndMessage />}
+        endMessage={<EndMessage display={display} />}
         className={listClass}
       >
         {entries.map((entry) => (

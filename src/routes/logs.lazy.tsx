@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button, Select, SelectItem, Switch } from "@heroui/react";
 import { RiRefreshLine } from "@remixicon/react";
+import { useTranslation } from 'react-i18next';
 
 export const Route = createLazyFileRoute("/logs")({
   component: LogsPage,
@@ -80,6 +81,7 @@ function LogsPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation('logs');
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
@@ -119,12 +121,12 @@ function LogsPage() {
   });
 
   const levels: { key: LogLevel; label: string }[] = [
-    { key: "ALL", label: "All levels" },
-    { key: "TRACE", label: "Trace & above" },
-    { key: "DEBUG", label: "Debug & above" },
-    { key: "INFO", label: "Info & above" },
-    { key: "WARN", label: "Warn & above" },
-    { key: "ERROR", label: "Error only" },
+    { key: "ALL", label: t('levelAll') },
+    { key: "TRACE", label: t('levelTrace') },
+    { key: "DEBUG", label: t('levelDebug') },
+    { key: "INFO", label: t('levelInfo') },
+    { key: "WARN", label: t('levelWarn') },
+    { key: "ERROR", label: t('levelError') },
   ];
 
   return (
@@ -132,14 +134,14 @@ function LogsPage() {
       <div className="flex flex-col h-full p-4 gap-3">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-bold flex-1">App Logs</h1>
+          <h1 className="text-xl font-bold flex-1">{t('title')}</h1>
 
           <Switch
             size="sm"
             isSelected={autoScroll}
             onValueChange={setAutoScroll}
           >
-            Auto-scroll
+            {t('autoScroll')}
           </Switch>
 
           <Button
@@ -150,7 +152,7 @@ function LogsPage() {
             isLoading={loading}
             startContent={<RiRefreshLine className="h-4 w-4" />}
           >
-            Refresh
+            {t('refresh')}
           </Button>
 
 
@@ -172,14 +174,14 @@ function LogsPage() {
 
           <input
             type="text"
-            placeholder="Search logs..."
+            placeholder={t('searchPlaceholder')}
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
             className="flex-1 min-w-0 text-sm px-3 py-1.5 rounded-md border border-default-300 bg-default-100 focus:outline-none focus:border-primary"
           />
 
           <span className="text-xs text-foreground-500 whitespace-nowrap">
-            {filteredLines.length} / {lines.length} lines (last 500)
+            {t('lineCount', { filtered: filteredLines.length, total: lines.length })}
           </span>
         </div>
 
@@ -188,7 +190,7 @@ function LogsPage() {
           {error ? (
             <p className="p-4 text-red-500">{error}</p>
           ) : filteredLines.length === 0 && !loading ? (
-            <p className="p-4 text-foreground-400">No log entries found.</p>
+            <p className="p-4 text-foreground-400">{t('noEntries')}</p>
           ) : (
             <table className="w-full border-collapse">
               <tbody>

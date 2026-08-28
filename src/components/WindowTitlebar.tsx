@@ -21,6 +21,7 @@ import { AccountInterface } from "../interfaces";
 import { deleteAccount } from "../helpers/accountsData";
 import SearchModal from "./SearchModal";
 import UserMenu from "./UserMenu";
+import { useTranslation } from "react-i18next";
 
 const appWindow = getCurrentWindow();
 
@@ -28,6 +29,7 @@ const WindowTitlebar: React.FC = () => {
   const newAccountModal = useDisclosure();
   const deleteModal = useDisclosure();
   const [accountToDelete, setAccountToDelete] = useState<AccountInterface | null>(null);
+  const { t } = useTranslation(["titlebar", "common"]);
 
   const {
     accounts,
@@ -63,37 +65,37 @@ const WindowTitlebar: React.FC = () => {
   return (
     <div className="h-10 border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none">
       <div className="flex items-center gap-1 text-primary-500">
-        <Tooltip content={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"} delay={300}>
+        <Tooltip content={sideBarOpen ? t("titlebar:collapseSidebar") : t("titlebar:expandSidebar")} delay={300}>
           <Button
             color="default"
             variant="light"
             isIconOnly
             size="sm"
-            aria-label={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            aria-label={sideBarOpen ? t("titlebar:collapseSidebar") : t("titlebar:expandSidebar")}
             onPress={() => setSideBarOpen((prev) => !prev)}
           >
             {sideBarOpen ? <RiSidebarFoldLine /> : <RiSidebarUnfoldLine />}
           </Button>
         </Tooltip>
-        <Tooltip content="Application menu" delay={300}>
+        <Tooltip content={t("titlebar:applicationMenu")} delay={300}>
           <div>
             <UserMenu />
           </div>
         </Tooltip>
 
-        <Tooltip content="Search feeds and entries" delay={300}>
+        <Tooltip content={t("titlebar:searchFeedsAndEntries")} delay={300}>
           <div>
             <SearchModal />
           </div>
         </Tooltip>
 
-        <Tooltip content="Add new feed" delay={300}>
+        <Tooltip content={t("titlebar:addNewFeed")} delay={300}>
           <Button
             color="default"
             variant="light"
             isIconOnly
             size="sm"
-            aria-label="Add new feed"
+            aria-label={t("titlebar:addNewFeed")}
           >
             <Link
               to="/new_feed"
@@ -121,8 +123,8 @@ const WindowTitlebar: React.FC = () => {
               aria-label="Accounts"
             >
               <RiUserLine size={18} />
-              <Tooltip content={currentAccount ? `Current account: ${currentAccount.name}` : "No account selected"} delay={300}>
-                <span className="text-xs text-foreground-500 max-w-40 truncate px-1">{currentAccount?.name || "No account"}</span>
+              <Tooltip content={currentAccount ? t("titlebar:currentAccount", { name: currentAccount.name }) : t("titlebar:noAccountSelected")} delay={300}>
+                <span className="text-xs text-foreground-500 max-w-40 truncate px-1">{currentAccount?.name || t("titlebar:noAccount")}</span>
               </Tooltip>
             </Button>
           </PopoverTrigger>
@@ -131,7 +133,7 @@ const WindowTitlebar: React.FC = () => {
               <div className="px-2 pb-2 border-b border-default-200">
                 <Button size="sm" variant="flat" color="primary" className="w-full" onPress={newAccountModal.onOpen}>
                   <RiAddLine />
-                  Add account
+                  {t("titlebar:addAccount")}
                 </Button>
               </div>
 
@@ -167,7 +169,7 @@ const WindowTitlebar: React.FC = () => {
                 ))}
 
                 {accounts.length === 0 && (
-                  <p className="px-3 py-2 text-sm text-foreground-500">No accounts yet.</p>
+                  <p className="px-3 py-2 text-sm text-foreground-500">{t("titlebar:noAccountsYet")}</p>
                 )}
               </div>
             </div>
@@ -215,14 +217,14 @@ const WindowTitlebar: React.FC = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Delete account</ModalHeader>
+              <ModalHeader>{t("titlebar:deleteAccount")}</ModalHeader>
               <ModalBody>
-                <p>Are you sure you want to delete <strong>{accountToDelete?.name}</strong>?</p>
-                <p className="text-danger">This action cannot be undone.</p>
+                <p>{t("titlebar:deleteAccountConfirm", { name: accountToDelete?.name })}</p>
+                <p className="text-danger">{t("titlebar:thisActionCannotBeUndone")}</p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>Cancel</Button>
-                <Button color="danger" onPress={handleDeleteAccount}>Delete</Button>
+                <Button variant="light" onPress={onClose}>{t("common:cancel")}</Button>
+                <Button color="danger" onPress={handleDeleteAccount}>{t("common:delete")}</Button>
               </ModalFooter>
             </>
           )}

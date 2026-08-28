@@ -1,0 +1,14 @@
+{
+  "title": "Registros de la app",
+  "autoScroll": "Desplazamiento automático",
+  "refresh": "Actualizar",
+  "searchPlaceholder": "Buscar registros...",
+  "noEntries": "No se encontraron entradas de registro.",
+  "levelAll": "Todos los niveles",
+  "levelTrace": "Trace y superiores",
+  "levelDebug": "Debug y superiores",
+  "levelInfo": "Info y superiores",
+  "levelWarn": "Warn y superiores",
+  "levelError": "Solo errores",
+  "lineCount": "{{filtered}} / {{total}} líneas (últimas 500)"
+}

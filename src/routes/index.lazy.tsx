@@ -12,12 +12,14 @@ import { useEntries } from '../IndexEntriesContext'
 import { useNotification } from '../NotificationContext'
 import { updateAllEntriesAsRead } from '../helpers/feedsData'
 import { useAppContext } from '../AppContext'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createLazyFileRoute('/')({
   component: App,
 })
 
 export default function App() {
+  const { t } = useTranslation('entries')
   const { addNotification } = useNotification()
   const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext()
   const { entries, setEntries, page, setPage, hasMore, setHasMore } =
@@ -71,14 +73,14 @@ export default function App() {
     setEntries([])
     setHasMore(true)
 
-    addNotification('Reloading', 'Entries are reloaded!', 'secondary')
+    addNotification(t('reloadingTitle'), t('reloadingBody'), 'secondary')
   }
 
   const handleUpdateEntriesAsRead = async () => {
     await updateAllEntriesAsRead()
     resetEntryList()
 
-    addNotification('Updated', 'All entries were updated as read!', 'primary')
+    addNotification(t('updatedTitle'), t('updatedBody'), 'primary')
   }
 
   const resetEntryList = () => {
@@ -91,16 +93,13 @@ export default function App() {
       <div className="flex flex-col max-w-screen-md mx-auto">
         <div className="flex py-8 justify-between items-start">
           <div>
-            <h1 className="text-3xl pt-2 font-bold">All entries</h1>
-            <h2 className="pt-1 pb-4">
-              Explore the latest entries and updates from your favorite
-              sources, all in one place.
-            </h2>
+            <h1 className="text-3xl pt-2 font-bold">{t('allEntries')}</h1>
+            <h2 className="pt-1 pb-4">{t('allEntriesSubtitle')}</h2>
           </div>
           <div className="flex flex-row items-center gap-2">
             <EntryLayoutSwitch />
             <EntriesFiltersSwitch />
-            <Tooltip content="Update All Entries As Read">
+            <Tooltip content={t('updateAllAsRead')}>
               <Button
                 isIconOnly
                 variant="light"
@@ -110,7 +109,7 @@ export default function App() {
                 <RiCheckDoubleLine></RiCheckDoubleLine>
               </Button>
             </Tooltip>
-            <Tooltip content="Reload The Page's Entries">
+            <Tooltip content={t('reloadEntries')}>
               <Button
                 color="default"
                 isIconOnly

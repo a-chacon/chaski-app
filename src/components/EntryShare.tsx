@@ -20,7 +20,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import { useNotification } from "../NotificationContext";
-
+import { useTranslation } from "react-i18next";
 
 interface EntryShareProps {
   entry: EntryInterface;
@@ -31,7 +31,7 @@ const EntryShare: React.FC<EntryShareProps> = ({
   entry,
   className,
 }) => {
-
+  const { t } = useTranslation(["share", "common"]);
   const { addNotification } = useNotification();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { title, link, description } = entry;
@@ -58,7 +58,7 @@ const EntryShare: React.FC<EntryShareProps> = ({
         console.error("Failed to copy: ", err);
       });
 
-    addNotification("Copied", 'The link was copied to the clipboard!', 'primary');
+    addNotification(t("share:copiedTitle"), t("share:copiedBody"), "primary");
   };
 
   const handleMastodonShare = () => {
@@ -83,7 +83,7 @@ const EntryShare: React.FC<EntryShareProps> = ({
       <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer">
         <RiLinkedinBoxFill className="w-6" />
       </a>
-      <Tooltip content="Copy to clipboard">
+      <Tooltip content={t("share:copyToClipboard")}>
         <button onClick={copyLinkToClipboard} className="flex items-center">
           <RiLinkUnlink className="w-6" />
         </button>
@@ -94,23 +94,23 @@ const EntryShare: React.FC<EntryShareProps> = ({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Mastodon sharing
+                {t("share:mastodonSharing")}
               </ModalHeader>
               <ModalBody>
                 <Input
                   type="text"
-                  label="What is your Mastodon server URL?"
-                  description="Example: https://mastodon.social/"
+                  label={t("share:mastodonServerUrl")}
+                  description={t("share:mastodonExample")}
                   value={mastodonUrl}
                   onValueChange={setMastodonUrl}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
-                  Close
+                  {t("common:close")}
                 </Button>
                 <Button color="primary" onPress={handleMastodonShare}>
-                  Share
+                  {t("common:share")}
                 </Button>
               </ModalFooter>
             </>

@@ -1,0 +1,29 @@
+{
+  "tabs": {
+    "lookAndFeel": "Apariencia",
+    "behavior": "Comportamiento",
+    "language": "Idioma"
+  },
+  "look": {
+    "title": "Apariencia",
+    "theme": "Tema",
+    "text": "Texto",
+    "fontSpace": "Espaciado de fuente",
+    "fontSizeSmall": "pequeño",
+    "fontSizeMedium": "mediano",
+    "fontSizeBig": "grande",
+    "example": "Ejemplo",
+    "exampleText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut dui at turpis pretium sagittis. Fusce quis vehicula eros, id dapibus magna. Praesent efficitur a tellus at mattis."
+  },
+  "behavior": {
+    "title": "Comportamiento",
+    "markAsRead": "Marcar como leído al pasar el cursor.",
+    "downloadEntries": "Descargar entradas siempre (de lo contrario, obtener bajo demanda)",
+    "autostart": "Iniciar automáticamente la aplicación",
+    "autostartFlatpak": "Iniciar automáticamente (no disponible en Flatpak)"
+  },
+  "language": {
+    "title": "Idioma",
+    "select": "Selecciona tu idioma preferido"
+  }
+}

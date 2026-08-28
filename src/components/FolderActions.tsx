@@ -14,6 +14,7 @@ import {
 } from "@heroui/react";
 import { RiMore2Line } from "@remixicon/react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { renameFolder, deleteFolder } from "../helpers/foldersData";
 import { useNotification } from "../NotificationContext";
 import { AccountInterface } from "../interfaces";
@@ -26,6 +27,7 @@ interface FolderActionsProps {
 }
 
 const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolder }) => {
+  const { t } = useTranslation(['accounts', 'common']);
   const { addNotification } = useNotification();
   const renameModalDisclosure = useDisclosure()
   const deleteModalDisclosure = useDisclosure()
@@ -36,9 +38,9 @@ const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolde
     if (response.success) {
       setFolder(newName);
       renameModalDisclosure.onClose();
-      addNotification("Folder Updated", 'The folder was renamed successfully!', 'success');
+      addNotification(t('accounts:folderUpdated'), t('accounts:folderUpdatedBody'), 'success');
     } else {
-      addNotification("Error Folder Rename", response.message, 'danger');
+      addNotification(t('accounts:folderUpdateError'), response.message, 'danger');
     }
   }
 
@@ -46,7 +48,7 @@ const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolde
     try {
       const response = await deleteFolder(account.id!, folder);
       if (response.success) {
-        addNotification("Folder Deleted", response.message, 'success');
+        addNotification(t('accounts:folderDeleted'), response.message, 'success');
         deleteModalDisclosure.onClose();
       } else {
         addNotification("Error", response.message, 'danger');
@@ -68,16 +70,16 @@ const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolde
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Rename {folder}</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">{t('accounts:renameFolderTitle', { folder })}</ModalHeader>
                 <ModalBody>
-                  <Input label="New name" type="text" variant="underlined" value={newName} onValueChange={setNewName} />
+                  <Input label={t('accounts:newName')} type="text" variant="underlined" value={newName} onValueChange={setNewName} />
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="light" onPress={onClose}>
-                    Close
+                    {t('common:close')}
                   </Button>
                   <Button color="primary" variant="flat" onPress={handleRenameFolder}>
-                    Save
+                    {t('common:save')}
                   </Button>
                 </ModalFooter>
               </>
@@ -99,17 +101,17 @@ const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolde
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Delete {folder}</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">{t('accounts:deleteFolderTitle', { folder })}</ModalHeader>
                 <ModalBody>
-                  <h2 className="font-semibold text-danger-500">Are you sure you want to delete this folder?</h2>
-                  <p>This will delete all the included feeds in the folder!</p>
+                  <h2 className="font-semibold text-danger-500">{t('accounts:deleteFolderConfirm')}</h2>
+                  <p>{t('accounts:deleteFolderWarning')}</p>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="primary" variant="light" onPress={onClose}>
-                    Close
+                    {t('common:close')}
                   </Button>
                   <Button color="danger" variant="flat" onPress={handleDeleteFolder}>
-                    Delete
+                    {t('common:delete')}
                   </Button>
                 </ModalFooter>
               </>
@@ -129,10 +131,10 @@ const FolderActions: React.FC<FolderActionsProps> = ({ account, folder, setFolde
         </DropdownTrigger>
         <DropdownMenu variant="light" aria-label="Folder Options" >
           <DropdownItem key="rename" onPress={renameModalDisclosure.onOpen}>
-            Rename
+            {t('common:rename')}
           </DropdownItem>
           <DropdownItem key="delete" onPress={deleteModalDisclosure.onOpen} className="text-danger" color="danger">
-            Delete
+            {t('common:delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>

@@ -10,12 +10,14 @@ import { useEntries } from '../IndexEntriesContext'
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import { useAppContext } from '../AppContext'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createLazyFileRoute('/read_later')({
   component: ReadLater,
 })
 
 export default function ReadLater() {
+  const { t } = useTranslation('entries')
   const { entries, setEntries, page, setPage, hasMore, setHasMore } = useEntries("/read_later");
   const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext();
 
@@ -74,8 +76,8 @@ export default function ReadLater() {
       <div className="flex flex-col max-w-screen-md mx-auto">
         <div className="flex py-8 justify-between items-start">
           <div>
-            <h1 className="text-3xl pt-2 font-bold">Read Later</h1>
-            <h2 className="pt-1 pb-4">Curate your journey, one entry at a time.</h2>
+            <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>
+            <h2 className="pt-1 pb-4">{t('readLaterSubtitle')}</h2>
           </div>
           <div className="flex flex-row items-center gap-2">
             <EntryLayoutSwitch />

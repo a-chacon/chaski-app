@@ -3,12 +3,14 @@ import { AccountInterface } from "../../interfaces";
 import { createAccount } from "../../helpers/accountsData";
 import { Form, Input, Button } from "@heroui/react";
 import { useAppContext } from "../../AppContext";
+import { useTranslation } from 'react-i18next';
 
 interface SyncLoginFormProps {
   onClose: () => void;
 }
 
 const LocalForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
+  const { t } = useTranslation(['accounts', 'common']);
 
   const {
     setAccounts,
@@ -45,16 +47,16 @@ const LocalForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
     >
       <Input
         isRequired
-        label="Account Identifier"
+        label={t('accounts:accountIdentifier')}
         labelPlacement="outside"
         name="name"
-        placeholder="Enter a name for the local RSS account."
+        placeholder={t('accounts:accountIdentifierPlaceholder')}
         type="text"
       />
 
       <div className="flex w-full justify-end">
         <Button color="primary" type="submit">
-          Create
+          {t('common:create')}
         </Button>
       </div>
     </Form>

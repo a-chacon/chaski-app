@@ -8,6 +8,7 @@ import {
 } from "@heroui/react";
 import { FeedInterface, FilterInterface } from "../interfaces";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { RiAddLine } from "@remixicon/react";
 import FilterItem from "./FilterItem";
 import {
@@ -29,6 +30,7 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
   isOpen,
   onOpenChange,
 }) => {
+  const { t } = useTranslation(['feeds', 'common']);
   const [filters, setFilters] = useState<FilterInterface[]>([]);
 
   useEffect(() => {
@@ -81,12 +83,11 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
         {(onCloseModal) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Filter entries
+              {t('feeds:filterEntries')}
             </ModalHeader>
             <ModalBody>
               <span className="text-sm">
-                Entries don't match this filters will be discarded. If there is
-                not filters then all entries are added.
+                {t('feeds:filtersDescription')}
               </span>
               <div className="mt-4">
                 {filters.map((filter, index) => (
@@ -109,10 +110,10 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onCloseModal}>
-                Close
+                {t('common:close')}
               </Button>
               <Button color="success" variant="flat" onPress={onCloseModal}>
-                Save
+                {t('common:save')}
               </Button>
             </ModalFooter>
           </>

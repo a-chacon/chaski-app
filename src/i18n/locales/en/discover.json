@@ -1,0 +1,18 @@
+{
+  "title": "Discover",
+  "subtitle": "Explore curated feeds from around the world and follow what interests you.",
+  "searchPlaceholder": "Search feeds...",
+  "languagePlaceholder": "Language",
+  "filterByLanguage": "Filter by language",
+  "topics": "Topics",
+  "noInternetTitle": "No internet connection",
+  "noInternetDesc": "Discover requires an internet connection to load feeds. Check your connection and try again.",
+  "serviceUnavailableTitle": "Service unavailable",
+  "serviceUnavailableDesc": "The discovery service is temporarily unreachable. Please try again in a moment.",
+  "retry": "Retry",
+  "noFeedsTitle": "No feeds found",
+  "noFeedsDesc": "Try a different search term or remove some filters.",
+  "loadMore": "Load more",
+  "showingResults_one": "Showing all {{count}} result",
+  "showingResults_other": "Showing all {{count}} results"
+}

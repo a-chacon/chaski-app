@@ -2,7 +2,7 @@ use std::io::{Read, Seek, SeekFrom};
 use tauri::{command, Manager};
 
 const TAIL_LINES: usize = 500;
-const CHUNK_SIZE: u64 = 32_768; // 32 KB — enough to hold 500 typical log lines
+const CHUNK_SIZE: u64 = 65_536;
 
 #[command]
 pub async fn get_log_content(app_handle: tauri::AppHandle) -> Result<String, String> {

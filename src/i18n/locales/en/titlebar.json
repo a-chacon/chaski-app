@@ -15,5 +15,11 @@
   "deleteAccount": "Delete account",
   "deleteAccountConfirm": "Are you sure you want to delete {{name}}?",
   "thisActionCannotBeUndone": "This action cannot be undone.",
-  "exportOpml": "Export OPML"
+  "exportOpml": "Export OPML",
+  "syncNow": "Sync now",
+  "editAccount": "Edit credentials",
+  "syncSuccess": "Sync complete",
+  "syncSuccessBody": "{{name}} synced successfully.",
+  "syncError": "Sync failed",
+  "syncErrorBody": "Failed to sync {{name}}: {{error}}"
 }

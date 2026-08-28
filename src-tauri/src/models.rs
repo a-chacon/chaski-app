@@ -30,6 +30,15 @@ pub struct NewAccount {
     pub server_url: Option<String>,
 }
 
+#[derive(AsChangeset, Debug, Serialize, Deserialize)]
+#[diesel(table_name = accounts)]
+pub struct UpdateAccount {
+    pub name: Option<String>,
+    pub auth_token: Option<String>,
+    pub credentials: Option<String>,
+    pub server_url: Option<String>,
+}
+
 #[derive(
     Identifiable,
     Queryable,

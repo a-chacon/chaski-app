@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -13,23 +13,30 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
+import { RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiRefreshLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import NewAccountModal from "./NewAccountModal";
 import { AccountInterface } from "../interfaces";
-import { deleteAccount } from "../helpers/accountsData";
+import { deleteAccount, fullSync } from "../helpers/accountsData";
 import SearchModal from "./SearchModal";
 import UserMenu from "./UserMenu";
 import { useTranslation } from "react-i18next";
+import { listen } from "@tauri-apps/api/event";
+import EditAccountModal from "./EditAccountModal";
+import { useNotification } from "../NotificationContext";
 
 const appWindow = getCurrentWindow();
 
 const WindowTitlebar: React.FC = () => {
   const newAccountModal = useDisclosure();
   const deleteModal = useDisclosure();
+  const editAccountModal = useDisclosure();
   const [accountToDelete, setAccountToDelete] = useState<AccountInterface | null>(null);
+  const [accountToEdit, setAccountToEdit] = useState<AccountInterface | null>(null);
+  const [syncingAccountId, setSyncingAccountId] = useState<number | null>(null);
   const { t } = useTranslation(["titlebar", "common"]);
+  const { addNotification } = useNotification();
 
   const {
     accounts,
@@ -39,6 +46,49 @@ const WindowTitlebar: React.FC = () => {
     sideBarOpen,
     setSideBarOpen,
   } = useAppContext();
+
+  const openEditModal = (account: AccountInterface) => {
+    setAccountToEdit(account);
+    editAccountModal.onOpen();
+  };
+
+  const handleSyncAccount = async (account: AccountInterface) => {
+    if (!account.id) return;
+    setSyncingAccountId(account.id);
+    try {
+      await fullSync(account.id);
+      addNotification(t("titlebar:syncSuccess"), t("titlebar:syncSuccessBody", { name: account.name }), "success");
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      addNotification(t("titlebar:syncError"), msg, "danger");
+    } finally {
+      setSyncingAccountId(null);
+    }
+  };
+
+  const handleAccountUpdated = (updated: AccountInterface) => {
+    setAccounts((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
+    if (currentAccount?.id === updated.id) {
+      setCurrentAccount(updated);
+    }
+  };
+
+  useEffect(() => {
+    const unlisten = listen<{ accountId: number; accountName: string; error: string }>(
+      "account://sync-error",
+      (event) => {
+        addNotification(
+          t("titlebar:syncError"),
+          t("titlebar:syncErrorBody", { name: event.payload.accountName, error: event.payload.error }),
+          "danger",
+          10000
+        );
+      }
+    );
+    return () => {
+      unlisten.then((f) => f());
+    };
+  }, []);
 
   const openDeleteModal = (account: AccountInterface) => {
     setAccountToDelete(account);
@@ -145,26 +195,57 @@ const WindowTitlebar: React.FC = () => {
                   >
                     <button
                       type="button"
-                      className="flex items-center gap-2 text-sm text-left flex-1"
+                      className="flex items-center gap-2 text-sm text-left flex-1 min-w-0"
                       onClick={() => setCurrentAccount(account)}
                     >
                       {currentAccount?.id === account.id ? (
-                        <RiCheckLine className="text-success" />
+                        <RiCheckLine className="text-success shrink-0" />
                       ) : (
-                        <span className="w-4" />
+                        <span className="w-4 shrink-0" />
                       )}
                       <span className="truncate">{account.name}</span>
                     </button>
 
-                    <Button
-                      size="sm"
-                      variant="light"
-                      color="danger"
-                      isIconOnly
-                      onPress={() => openDeleteModal(account)}
-                    >
-                      <RiCloseLine />
-                    </Button>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      {account.kind === "greaderapi" && (
+                        <>
+                          <Tooltip content={t("titlebar:syncNow")} delay={300}>
+                            <Button
+                              size="sm"
+                              variant="light"
+                              color="primary"
+                              isIconOnly
+                              isLoading={syncingAccountId === account.id}
+                              onPress={() => handleSyncAccount(account)}
+                            >
+                              <RiRefreshLine />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip content={t("titlebar:editAccount")} delay={300}>
+                            <Button
+                              size="sm"
+                              variant="light"
+                              color="default"
+                              isIconOnly
+                              onPress={() => openEditModal(account)}
+                            >
+                              <RiEditLine />
+                            </Button>
+                          </Tooltip>
+                        </>
+                      )}
+                      <Tooltip content={t("titlebar:deleteAccount")} delay={300}>
+                        <Button
+                          size="sm"
+                          variant="light"
+                          color="danger"
+                          isIconOnly
+                          onPress={() => openDeleteModal(account)}
+                        >
+                          <RiCloseLine />
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </div>
                 ))}
 
@@ -212,6 +293,15 @@ const WindowTitlebar: React.FC = () => {
         onClose={newAccountModal.onClose}
         onOpenChange={newAccountModal.onOpenChange}
       />
+
+      {accountToEdit && accountToEdit.kind === "greaderapi" && (
+        <EditAccountModal
+          account={accountToEdit}
+          isOpen={editAccountModal.isOpen}
+          onOpenChange={editAccountModal.onOpenChange}
+          onUpdate={handleAccountUpdated}
+        />
+      )}
 
       <Modal isOpen={deleteModal.isOpen} onOpenChange={deleteModal.onOpenChange} backdrop="blur">
         <ModalContent>

@@ -28,5 +28,8 @@
   "deleteFolderWarning": "¡Esto eliminará todas las fuentes incluidas en la carpeta!",
   "newName": "Nuevo nombre",
   "type": "Tipo",
-  "created": "Creado"
+  "created": "Creado",
+  "editAccount": "Editar cuenta",
+  "accountUpdated": "Cuenta actualizada",
+  "accountUpdatedBody": "Credenciales actualizadas correctamente."
 }

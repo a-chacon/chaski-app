@@ -1,9 +1,11 @@
 use crate::db::establish_connection;
 use crate::models::Account;
 use crate::models::NewAccount;
+use crate::models::UpdateAccount;
 use crate::schema::accounts::dsl::*;
 use crate::schema::{entries, feeds, filters};
 use diesel::prelude::*;
+use tauri::Emitter;
 use tokio::time::{sleep, Duration};
 
 pub fn index(app_handle: tauri::AppHandle) -> Vec<Account> {
@@ -41,8 +43,7 @@ pub fn destroy(account_id_eq: i32, app_handle: tauri::AppHandle) -> Result<(), S
             .filter(feeds::account_id.eq(account_id_eq))
             .load(conn)?;
 
-        diesel::delete(entries::table.filter(entries::feed_id.eq_any(&feed_ids)))
-            .execute(conn)?;
+        diesel::delete(entries::table.filter(entries::feed_id.eq_any(&feed_ids))).execute(conn)?;
 
         diesel::delete(filters::table.filter(filters::feed_id.eq_any(&feed_ids))).execute(conn)?;
 
@@ -56,6 +57,21 @@ pub fn destroy(account_id_eq: i32, app_handle: tauri::AppHandle) -> Result<(), S
         log::error!("Error deleting account {}: {}", account_id_eq, e);
         format!("Failed to delete account: {}", e)
     })
+}
+
+pub fn update(
+    account_id: i32,
+    changes: UpdateAccount,
+    app_handle: tauri::AppHandle,
+) -> Option<Account> {
+    let conn = &mut establish_connection(&app_handle);
+
+    diesel::update(accounts.find(account_id))
+        .set(&changes)
+        .returning(Account::as_returning())
+        .get_result(conn)
+        .optional()
+        .expect("Error updating account")
 }
 
 pub fn spawn_greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {
@@ -85,6 +101,14 @@ async fn greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {
                 }
                 Err(e) => {
                     log::error!(target: "chaski:sync", "Error syncing account {} (ID: {}): {}", account.name, account.id, e);
+                    let payload = serde_json::json!({
+                        "accountId": account.id,
+                        "accountName": account.name,
+                        "error": e.to_string()
+                    });
+                    if let Err(emit_err) = app_handle.emit("account://sync-error", payload) {
+                        log::warn!(target: "chaski:sync", "Failed to emit sync error event: {:?}", emit_err);
+                    }
                 }
             }
         }

@@ -161,6 +161,7 @@ pub fn run() {
             commands::accounts::full_sync,
             commands::accounts::show_account,
             commands::accounts::destroy_account,
+            commands::accounts::update_account,
             commands::logs::get_log_content
         ])
         .run(ctx)

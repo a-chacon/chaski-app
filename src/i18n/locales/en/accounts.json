@@ -28,5 +28,8 @@
   "deleteFolderWarning": "This will delete all the included feeds in the folder!",
   "newName": "New name",
   "type": "Type",
-  "created": "Created"
+  "created": "Created",
+  "editAccount": "Edit account",
+  "accountUpdated": "Account updated",
+  "accountUpdatedBody": "Credentials updated successfully."
 }

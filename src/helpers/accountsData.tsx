@@ -94,6 +94,31 @@ export const deleteAccount = async (accountId: number): Promise<void> => {
   }
 };
 
+export const updateAccount = async (accountId: number, updateData: {
+  name?: string;
+  auth_token?: string;
+  credentials?: string;
+  server_url?: string;
+}): Promise<AccountInterface> => {
+  try {
+    const message = await invoke<string>("update_account", {
+      accountId,
+      updateData,
+    });
+
+    const response: CommandResponse = JSON.parse(message);
+
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+
+    return response.data!;
+  } catch (error) {
+    console.error("Error updating account:", error);
+    throw error instanceof Error ? error : new Error("Failed to update account");
+  }
+};
+
 export const createAccount = async (account: AccountInterface): Promise<AccountInterface> => {
   try {
     const accountToCreate = {

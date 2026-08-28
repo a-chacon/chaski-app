@@ -128,6 +128,64 @@ pub async fn destroy_account(account_id: i32, app_handle: tauri::AppHandle) -> R
 }
 
 #[command]
+pub async fn update_account(
+    account_id: i32,
+    mut update_data: crate::models::UpdateAccount,
+    app_handle: tauri::AppHandle,
+) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command update_account for account_id: {}", account_id);
+
+    // For greaderapi accounts, re-authenticate to get a fresh token
+    if let (Some(ref credentials_str), Some(ref server_url)) = (
+        update_data.credentials.clone(),
+        update_data.server_url.clone(),
+    ) {
+        let creds: serde_json::Value = serde_json::from_str(credentials_str).map_err(|_| ())?;
+        let username = creds.get("username").ok_or(())?.as_str().ok_or(())?;
+        let password = creds.get("password").ok_or(())?.as_str().ok_or(())?;
+
+        let response = match crate::integrations::greader::GReaderClient::login(
+            server_url, username, password,
+        )
+        .await
+        {
+            Ok(result) => result,
+            Err(e) => {
+                log::error!("GReader login failed during update: {}", e);
+                let response = serde_json::json!({
+                    "success": false,
+                    "message": format!("GReader login failed: {}", e),
+                    "data": null
+                });
+                return Ok(response.to_string());
+            }
+        };
+
+        update_data.auth_token = Some(response.auth_token);
+        update_data.name = Some(format!("GReader ({})", username));
+    }
+
+    match crate::entities::accounts::update(account_id, update_data, app_handle) {
+        Some(account) => {
+            let response = serde_json::json!({
+                "success": true,
+                "message": "Account updated successfully",
+                "data": account
+            });
+            Ok(response.to_string())
+        }
+        None => {
+            let response = serde_json::json!({
+                "success": false,
+                "message": format!("Account with id {} not found", account_id),
+                "data": null
+            });
+            Ok(response.to_string())
+        }
+    }
+}
+
+#[command]
 pub async fn full_sync(account_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command full_sync for account_id: {}", account_id);
 

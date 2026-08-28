@@ -14,7 +14,12 @@ import FeedbackModal from "./FeedbackModal";
 import { RiFeedbackLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 
-export default function UserMenu() {
+interface UserMenuProps {
+  size?: "sm" | "md" | "lg";
+  iconSize?: number;
+}
+
+export default function UserMenu({ size = "sm", iconSize = 18 }: UserMenuProps) {
   const navigate = useNavigate();
   const feedbackModalState = useDisclosure();
   const { t } = useTranslation("titlebar");
@@ -52,11 +57,11 @@ export default function UserMenu() {
         <DropdownTrigger>
           <Button
             isIconOnly
-            size="sm"
+            size={size}
             variant="light"
             aria-label={t("applicationMenu")}
           >
-            <RiMenuLine className="p-0.5" />
+            <RiMenuLine size={iconSize} />
           </Button>
         </DropdownTrigger>
         <DropdownMenu

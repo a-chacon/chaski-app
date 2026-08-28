@@ -18,7 +18,12 @@ import { useAppContext } from "../AppContext";
 import { useTranslation } from 'react-i18next';
 
 
-export default function SearchModal() {
+interface SearchModalProps {
+  size?: "sm" | "md" | "lg";
+  iconSize?: number;
+}
+
+export default function SearchModal({ size = "sm", iconSize = 18 }: SearchModalProps) {
   const { t } = useTranslation('search');
   const { t: tTitlebar } = useTranslation('titlebar');
   const { currentAccount } = useAppContext();
@@ -56,11 +61,11 @@ export default function SearchModal() {
       <Button
         onPress={onOpen}
         variant="light"
-        size="sm"
+        size={size}
         isIconOnly
         aria-label={tTitlebar('searchFeedsAndEntries')}
       >
-        <RiSearchLine className="p-0.5" />
+        <RiSearchLine size={iconSize} />
       </Button>
 
       <Modal

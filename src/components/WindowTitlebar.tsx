@@ -45,6 +45,7 @@ const WindowTitlebar: React.FC = () => {
     setCurrentAccount,
     sideBarOpen,
     setSideBarOpen,
+    isMobile,
   } = useAppContext();
 
   const openEditModal = (account: AccountInterface) => {
@@ -113,55 +114,47 @@ const WindowTitlebar: React.FC = () => {
   };
 
   return (
-    <div className="h-10 border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none">
+    <div className={`border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none gap-1 ${isMobile ? "h-14 px-3" : "h-10"}`}>
       <div className="flex items-center gap-1 text-primary-500">
         <Tooltip content={sideBarOpen ? t("titlebar:collapseSidebar") : t("titlebar:expandSidebar")} delay={300}>
           <Button
             color="default"
             variant="light"
             isIconOnly
-            size="sm"
+            size={isMobile ? "md" : "sm"}
             aria-label={sideBarOpen ? t("titlebar:collapseSidebar") : t("titlebar:expandSidebar")}
             onPress={() => setSideBarOpen((prev) => !prev)}
           >
-            {sideBarOpen ? <RiSidebarFoldLine /> : <RiSidebarUnfoldLine />}
+            {sideBarOpen ? <RiSidebarFoldLine size={isMobile ? 22 : 18} /> : <RiSidebarUnfoldLine size={isMobile ? 22 : 18} />}
           </Button>
         </Tooltip>
         <Tooltip content={t("titlebar:applicationMenu")} delay={300}>
           <div>
-            <UserMenu />
+            <UserMenu size={isMobile ? "md" : "sm"} iconSize={isMobile ? 22 : 18} />
           </div>
         </Tooltip>
 
         <Tooltip content={t("titlebar:searchFeedsAndEntries")} delay={300}>
           <div>
-            <SearchModal />
+            <SearchModal size={isMobile ? "md" : "sm"} iconSize={isMobile ? 22 : 18} />
           </div>
         </Tooltip>
 
         <Tooltip content={t("titlebar:addNewFeed")} delay={300}>
-          <Button
-            color="default"
-            variant="light"
-            isIconOnly
-            size="sm"
+          <Link
+            to="/new_feed"
             aria-label={t("titlebar:addNewFeed")}
+            className={`flex items-center justify-center rounded-lg text-default-foreground hover:bg-default/40 transition-colors ${isMobile ? "w-10 h-10" : "w-8 h-8"}`}
+            activeProps={{ className: "text-primary-500" }}
           >
-            <Link
-              to="/new_feed"
-              activeProps={{
-                className: "text-primary-500",
-              }}
-            >
-              <RiAddCircleLine />
-            </Link>
-          </Button>
+            <RiAddCircleLine size={isMobile ? 22 : 18} />
+          </Link>
         </Tooltip>
       </div>
 
       <div
         data-tauri-drag-region
-        className="flex-1 h-full"
+        className="flex-1 h-full min-w-0"
       />
 
       <div className="flex items-center gap-1 text-primary-500">
@@ -169,13 +162,16 @@ const WindowTitlebar: React.FC = () => {
           <PopoverTrigger>
             <Button
               variant="light"
-              size="sm"
+              size={isMobile ? "md" : "sm"}
               aria-label="Accounts"
+              isIconOnly={isMobile}
             >
-              <RiUserLine size={18} />
-              <Tooltip content={currentAccount ? t("titlebar:currentAccount", { name: currentAccount.name }) : t("titlebar:noAccountSelected")} delay={300}>
-                <span className="text-xs text-foreground-500 max-w-40 truncate px-1">{currentAccount?.name || t("titlebar:noAccount")}</span>
-              </Tooltip>
+              <RiUserLine size={isMobile ? 22 : 18} />
+              {!isMobile && (
+                <Tooltip content={currentAccount ? t("titlebar:currentAccount", { name: currentAccount.name }) : t("titlebar:noAccountSelected")} delay={300}>
+                  <span className="text-xs text-foreground-500 max-w-40 truncate px-1">{currentAccount?.name || t("titlebar:noAccount")}</span>
+                </Tooltip>
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent>
@@ -258,33 +254,37 @@ const WindowTitlebar: React.FC = () => {
         </Popover>
 
 
-        <Button
-          color="default"
-          variant="light"
-          isIconOnly
-          size="sm"
-          onPress={() => appWindow.minimize()}
-        >
-          <RiSubtractLine />
-        </Button>
-        <Button
-          color="default"
-          variant="light"
-          isIconOnly
-          size="sm"
-          onPress={() => appWindow.toggleMaximize()}
-        >
-          <RiSquareLine />
-        </Button>
-        <Button
-          color="primary"
-          variant="light"
-          isIconOnly
-          size="sm"
-          onPress={() => appWindow.close()}
-        >
-          <RiCloseLine />
-        </Button>
+        {!isMobile && (
+          <>
+            <Button
+              color="default"
+              variant="light"
+              isIconOnly
+              size="sm"
+              onPress={() => appWindow.minimize()}
+            >
+              <RiSubtractLine />
+            </Button>
+            <Button
+              color="default"
+              variant="light"
+              isIconOnly
+              size="sm"
+              onPress={() => appWindow.toggleMaximize()}
+            >
+              <RiSquareLine />
+            </Button>
+            <Button
+              color="primary"
+              variant="light"
+              isIconOnly
+              size="sm"
+              onPress={() => appWindow.close()}
+            >
+              <RiCloseLine />
+            </Button>
+          </>
+        )}
       </div>
 
       <NewAccountModal

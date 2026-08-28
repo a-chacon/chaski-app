@@ -120,9 +120,9 @@ export default function Feed() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto">
+      <div className="flex flex-col max-w-screen-md mx-auto px-4">
         <div className="flex flex-col py-8 justify-between items-start">
-          <div className="flex flex-row justify-between w-full">
+          <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-2">
             <div className="flex flex-row">
               <img
                 src={feed?.icon}

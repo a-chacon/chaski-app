@@ -2,18 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
 :root {
   --letter-spacing: 0em;
   --font-size-base: 16px;
 }
 
 html,
-body,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent !important;
+}
+
+/* #root uses box-sizing so safe-area top padding doesn't break height: 100% */
 #root {
   width: 100%;
   height: 100%;
   margin: 0;
   background: transparent !important;
+  box-sizing: border-box;
+  /* Push content below the Android status bar / iOS notch */
+  padding-top: env(safe-area-inset-top);
 }
 
 html {

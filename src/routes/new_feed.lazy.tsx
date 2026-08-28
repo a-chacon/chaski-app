@@ -12,14 +12,12 @@ function NewFeed() {
 
   return (
     <MainSectionLayout>
-      <div className="grid p-4 h-full place-items-center">
-        <div>
-          <h1 className="text-3xl m-4 font-bold text-center">
+      <div className="flex flex-col items-center justify-center h-full px-4 py-8">
+        <div className="w-full max-w-md">
+          <h1 className="text-3xl mb-6 font-bold text-center">
             {t("addNewFeedsHere")}
           </h1>
-          <div className="w-80 md:w-96">
-            <NewFeedSite />
-          </div>
+          <NewFeedSite />
         </div>
       </div>
     </MainSectionLayout>

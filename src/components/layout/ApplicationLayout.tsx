@@ -426,7 +426,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       <NotificationProvider>
         <UpdaterBootstrap />
 
-        <div className="h-screen ">
+        <div className="h-screen">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
             {isTauriApp && <WindowResizeHandles />}
             {isTauriApp && <WindowTitlebar />}
@@ -459,7 +459,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
                 </div>
               )}
 
-              {children}
+              {(!isMobile || !sideBarOpen) && children}
               {showOpmlImportAlert && (
                 <div className="fixed bottom-4 left-4 z-50 max-w-lg">
                   <Alert

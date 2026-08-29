@@ -92,13 +92,13 @@ export default function ReadLater() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto">
-        <div className="flex py-8 justify-between items-start">
+      <div className="flex flex-col max-w-screen-md mx-auto px-4">
+        <div className="flex flex-col sm:flex-row py-8 sm:justify-between sm:items-start gap-2">
           <div>
             <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>
             <h2 className="pt-1 pb-4">{t('readLaterSubtitle')}</h2>
           </div>
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row items-center gap-2 sm:pt-2">
             <EntryLayoutSwitch />
             <EntriesFiltersSwitch />
             <Button color="default" isIconOnly variant="light" size="sm" onPress={handleReloadButton}>

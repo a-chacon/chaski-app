@@ -20,7 +20,7 @@ import NewAccountModal from "./NewAccountModal";
 import { AccountInterface } from "../interfaces";
 import { deleteAccount, fullSync } from "../helpers/accountsData";
 import SearchModal from "./SearchModal";
-import UserMenu from "./UserMenu";
+
 import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
 import EditAccountModal from "./EditAccountModal";
@@ -115,7 +115,7 @@ const WindowTitlebar: React.FC = () => {
 
   return (
     <div className={`border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none gap-1 ${isMobile ? "h-14 px-3" : "h-10"}`}>
-      <div className="flex items-center gap-1 text-primary-500">
+      <div className={`flex items-center ${isMobile ? "w-full justify-between" : ""} text-primary-500`}>
         <Tooltip content={sideBarOpen ? t("titlebar:collapseSidebar") : t("titlebar:expandSidebar")} delay={300}>
           <Button
             color="default"
@@ -128,12 +128,6 @@ const WindowTitlebar: React.FC = () => {
             {sideBarOpen ? <RiSidebarFoldLine size={isMobile ? 22 : 18} /> : <RiSidebarUnfoldLine size={isMobile ? 22 : 18} />}
           </Button>
         </Tooltip>
-        <Tooltip content={t("titlebar:applicationMenu")} delay={300}>
-          <div>
-            <UserMenu size={isMobile ? "md" : "sm"} iconSize={isMobile ? 22 : 18} />
-          </div>
-        </Tooltip>
-
         <Tooltip content={t("titlebar:searchFeedsAndEntries")} delay={300}>
           <div>
             <SearchModal size={isMobile ? "md" : "sm"} iconSize={isMobile ? 22 : 18} />
@@ -150,14 +144,7 @@ const WindowTitlebar: React.FC = () => {
             <RiAddCircleLine size={isMobile ? 22 : 18} />
           </Link>
         </Tooltip>
-      </div>
 
-      <div
-        data-tauri-drag-region
-        className="flex-1 h-full min-w-0"
-      />
-
-      <div className="flex items-center gap-1 text-primary-500">
         <Popover placement="bottom-end">
           <PopoverTrigger>
             <Button
@@ -252,8 +239,16 @@ const WindowTitlebar: React.FC = () => {
             </div>
           </PopoverContent>
         </Popover>
+      </div>
 
+      {!isMobile && (
+        <div
+          data-tauri-drag-region
+          className="flex-1 h-full min-w-0"
+        />
+      )}
 
+      <div className="flex items-center gap-1 text-primary-500">
         {!isMobile && (
           <>
             <Button

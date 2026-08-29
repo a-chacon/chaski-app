@@ -453,13 +453,27 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
                 </>
               )}
 
-              {sideBarOpen && (
+              {sideBarOpen && !isMobile && (
                 <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5 transition-all duration-200 ease-out">
                   <SideBar />
                 </div>
               )}
 
-              {(!isMobile || !sideBarOpen) && children}
+              {sideBarOpen && isMobile && (
+                <>
+                  {/* Dark backdrop — tap to close */}
+                  <div
+                    className="absolute inset-0 z-40 bg-black/50 transition-opacity duration-200"
+                    onClick={() => setSideBarOpen(false)}
+                  />
+                  {/* Sidebar panel — 80% wide, slides in from left */}
+                  <div className="absolute left-0 top-0 bottom-0 z-50 h-full w-[80%] shadow-2xl transition-transform duration-200 ease-out">
+                    <SideBar />
+                  </div>
+                </>
+              )}
+
+              {children}
               {showOpmlImportAlert && (
                 <div className="fixed bottom-4 left-4 z-50 max-w-lg">
                   <Alert

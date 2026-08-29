@@ -47,7 +47,7 @@ function EntriesList({
       return "flex flex-col";
     }
 
-    return "flex flex-col gap-2";
+    return "flex flex-col gap-4";
   }, [display]);
 
   return (

@@ -4,7 +4,7 @@ import { Button, Tooltip } from "@heroui/react"
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
@@ -22,8 +22,25 @@ export default function App() {
   const { t } = useTranslation('entries')
   const { addNotification } = useNotification()
   const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext()
-  const { entries, setEntries, page, setPage, hasMore, setHasMore } =
+  const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries('/')
+
+  const isMounted = useRef(false)
+
+  // Save scroll position when leaving, restore it on mount
+  useEffect(() => {
+    const el = document.getElementById('mainDiv')
+    if (el && scrollTop > 0) {
+      el.scrollTop = scrollTop
+    }
+
+    return () => {
+      const el = document.getElementById('mainDiv')
+      if (el) {
+        setScrollTop(el.scrollTop)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (page === 1 && entries.length == 0) {
@@ -32,6 +49,10 @@ export default function App() {
   }, [page, entries.length, currentAccount?.id, showReadEntries, showHiddenEntries])
 
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
     setEntries([])
     setPage(1)
     setHasMore(true)

@@ -1,6 +1,6 @@
 import { EntryInterface } from '../interfaces'
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
@@ -25,8 +25,24 @@ export default function Folder() {
   const { folderName: folderParam } = Route.useParams()
   const [accountIdStr, folderName] = folderParam.split('-')
   const accountId = Number(accountIdStr)
-  const { entries, setEntries, page, setPage, hasMore, setHasMore } =
+  const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries(folderName)
+
+  const isMounted = useRef(false)
+
+  useEffect(() => {
+    const el = document.getElementById('mainDiv')
+    if (el && scrollTop > 0) {
+      el.scrollTop = scrollTop
+    }
+
+    return () => {
+      const el = document.getElementById('mainDiv')
+      if (el) {
+        setScrollTop(el.scrollTop)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (page === 1 && entries.length == 0) {
@@ -35,6 +51,10 @@ export default function Folder() {
   }, [page, entries.length, showReadEntries, showHiddenEntries])
 
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
     setEntries([])
     setPage(1)
     setHasMore(true)

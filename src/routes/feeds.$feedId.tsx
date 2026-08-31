@@ -3,7 +3,7 @@ import { FeedInterface, EntryInterface } from "../interfaces";
 import moment from "moment";
 import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
 import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import EntriesList from "../components/EntriesList";
@@ -26,11 +26,26 @@ export default function Feed() {
   const { addNotification } = useNotification();
   const { showReadEntries, showHiddenEntries } = useAppContext();
   const { feedId } = Route.useParams();
-  const { entries, setEntries, page, setPage, hasMore, setHasMore } =
+  const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries(feedId);
 
   const [feed, setFeed] = useState<FeedInterface | undefined>(undefined);
   const [refreshLoading, setRefreshLoading] = useState(false);
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    const el = document.getElementById('mainDiv')
+    if (el && scrollTop > 0) {
+      el.scrollTop = scrollTop
+    }
+
+    return () => {
+      const el = document.getElementById('mainDiv')
+      if (el) {
+        setScrollTop(el.scrollTop)
+      }
+    }
+  }, []);
 
   useEffect(() => {
     getFeed(parseInt(feedId)).then((feed) => {
@@ -47,6 +62,10 @@ export default function Feed() {
   }, [page, entries.length, showReadEntries, showHiddenEntries]);
 
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
     setEntries([]);
     setPage(1);
     setHasMore(true);

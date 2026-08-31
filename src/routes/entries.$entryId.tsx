@@ -21,11 +21,10 @@ function Entry() {
   const { entryId } = Route.useParams();
   const [entry, setEntry] = useState<EntryInterface>();
   const [isLoadingEntry, setIsLoadingEntry] = useState(true);
-  const { setSideBarOpen, currentTheme } = useAppContext();
+  const { currentTheme } = useAppContext();
 
   useEffect(() => {
     const loadEntry = async () => {
-      setSideBarOpen(false);
       setIsLoadingEntry(true);
 
       try {

@@ -61,6 +61,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     AccountInterface[]>([]);
   const [currentAccount, setCurrentAccount] = useState<AccountInterface | null>(null);
   const [persistedCurrentAccountId, setPersistedCurrentAccountId] = useState<number | null>(null);
+  const [persistedAccountIdLoaded, setPersistedAccountIdLoaded] = useState<boolean>(false);
   const [currentFont, setCurrentFont] = useState<string>("font-opensans");
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
@@ -275,10 +276,10 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
 
     if (typeof persistedAccount?.value === "number") {
       setPersistedCurrentAccountId(persistedAccount.value);
-      return;
+    } else {
+      setPersistedCurrentAccountId(null);
     }
-
-    setPersistedCurrentAccountId(null);
+    setPersistedAccountIdLoaded(true);
   };
 
   const getCurrentConfigMarkAsReadOnHover = () => {
@@ -333,6 +334,10 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!persistedAccountIdLoaded) {
+      return;
+    }
+
     if (accounts.length === 0) {
       setCurrentAccount(null);
       return;
@@ -353,16 +358,20 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     }
 
     setCurrentAccount(accounts[0]);
-  }, [accounts, currentAccount, persistedCurrentAccountId]);
+  }, [accounts, currentAccount, persistedCurrentAccountId, persistedAccountIdLoaded]);
 
   useEffect(() => {
+    if (!persistedAccountIdLoaded) {
+      return;
+    }
+
     const persistCurrentAccount = async () => {
       const store = await load('settings.json', { autoSave: true });
       await store.set('current-account-id', { value: currentAccount?.id ?? null });
     };
 
     persistCurrentAccount();
-  }, [currentAccount]);
+  }, [currentAccount, persistedAccountIdLoaded]);
 
   const handleSetCurrentTheme = async (newTheme: string) => {
     const store = await load('settings.json', { autoSave: true });

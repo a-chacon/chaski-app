@@ -17,7 +17,7 @@
   },
   "behavior": {
     "title": "Comportamiento",
-    "markAsRead": "Marcar como leído al pasar el cursor.",
+    "markAsRead": "Marcar como leído al aparecer en pantalla.",
     "downloadEntries": "Descargar entradas siempre (de lo contrario, obtener bajo demanda)",
     "autostart": "Iniciar automáticamente la aplicación",
     "autostartFlatpak": "Iniciar automáticamente (no disponible en Flatpak)"

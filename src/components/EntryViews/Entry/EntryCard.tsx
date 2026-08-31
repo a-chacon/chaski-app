@@ -1,5 +1,5 @@
 import { EntryInterface } from "../../../interfaces";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import moment from "moment";
 import EntryActions from "../../EntryActions";
@@ -11,11 +11,8 @@ interface EntryCardProps {
   header: boolean;
 }
 
-const EntryCard: React.FC<EntryCardProps> = ({
-  entry: inputEntry,
-}) => {
+const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
   const [entry, setEntry] = useState(inputEntry);
-  const [isHovering, setIsHovering] = useState(false);
   const {
     currentMarkAsReadOnHover,
     entriesLayout: display,
@@ -25,25 +22,45 @@ const EntryCard: React.FC<EntryCardProps> = ({
   const isCompact = display === "compact";
   const isGrid = display === "grid";
 
-  const handleMouseOver = () => {
-    setIsHovering(true);
-  };
+  const cardRef = useRef<HTMLDivElement>(null);
+  const alreadyMarked = useRef(inputEntry.read === 1);
+  const entryRef = useRef(entry);
+  entryRef.current = entry;
 
-  const handleMouseOut = () => {
-    setIsHovering(false);
+  useEffect(() => {
+    if (!currentMarkAsReadOnHover || alreadyMarked.current || entry.read_later === 1) return;
 
-    if (currentMarkAsReadOnHover && entry.read === 0 && entry.read_later !== 1) {
-      updateEntryAsRead(entry);
-    }
-  };
+    // Collapses the observable area to a zero-height line at the top of the
+    // scroll container. Fires when the card's top edge touches that line —
+    // i.e. the card just reached the top of the screen while scrolling.
+    const observer = new IntersectionObserver(
+      ([obs]) => {
+        if (obs.isIntersecting) {
+          alreadyMarked.current = true;
+          observer.disconnect();
+          cardRef.current?.classList.add("opacity-75");
+          updateEntryAsRead(entryRef.current);
+        }
+      },
+      {
+        root: document.getElementById("mainDiv"),
+        rootMargin: "0px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+
+    const el = cardRef.current;
+    if (el) observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [currentMarkAsReadOnHover, entry.read_later]);
 
   if (isCompact) {
     return (
       <div
+        ref={cardRef}
         key={entry.id}
-        className={`px-2 py-2 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
+        className={`group px-2 py-2 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
       >
         <div className="flex items-center gap-2">
           {entry.feed && (
@@ -72,7 +89,7 @@ const EntryCard: React.FC<EntryCardProps> = ({
           </Link>
 
           <EntryActions
-            className={`${isHovering ? "visible" : "invisible"} shrink-0`}
+            className="invisible group-hover:visible shrink-0"
             entry={entry}
             setEntry={setEntry}
           />
@@ -83,10 +100,9 @@ const EntryCard: React.FC<EntryCardProps> = ({
 
   return (
     <div
+      ref={cardRef}
       key={entry.id}
-      className={`rounded-xl ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
-      onMouseOver={handleMouseOver}
-      onMouseOut={handleMouseOut}
+      className={`group rounded-xl ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
     >
       {entry.feed && (
         <div className="flex justify-between items-center pt-1 mt-1">
@@ -104,7 +120,7 @@ const EntryCard: React.FC<EntryCardProps> = ({
           </Link>
 
           <EntryActions
-            className={`${isHovering ? "visible" : "invisible"}`}
+            className="invisible group-hover:visible"
             entry={entry}
             setEntry={setEntry}
           />

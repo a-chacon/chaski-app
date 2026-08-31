@@ -17,7 +17,7 @@
   },
   "behavior": {
     "title": "Behavior",
-    "markAsRead": "Mark as Read on hover.",
+    "markAsRead": "Mark as Read when visible in feed.",
     "downloadEntries": "Download entries always (otherwise scrape on demand)",
     "autostart": "Autostart Application",
     "autostartFlatpak": "Autostart Application (not available in Flatpak)"

@@ -2,7 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import { Button } from "@heroui/react"
 import { RiRefreshLine } from '@remixicon/react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
@@ -18,8 +18,23 @@ export const Route = createLazyFileRoute('/read_later')({
 
 export default function ReadLater() {
   const { t } = useTranslation('entries')
-  const { entries, setEntries, page, setPage, hasMore, setHasMore } = useEntries("/read_later");
+  const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } = useEntries("/read_later");
   const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext();
+  const isMounted = useRef(false)
+
+  useEffect(() => {
+    const el = document.getElementById('mainDiv')
+    if (el && scrollTop > 0) {
+      el.scrollTop = scrollTop
+    }
+
+    return () => {
+      const el = document.getElementById('mainDiv')
+      if (el) {
+        setScrollTop(el.scrollTop)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (page === 1 && entries.length == 0) {
@@ -28,6 +43,10 @@ export default function ReadLater() {
   }, [page, entries.length, currentAccount?.id, showReadEntries, showHiddenEntries])
 
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
     setEntries([])
     setPage(1)
     setHasMore(true)

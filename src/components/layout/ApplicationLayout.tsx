@@ -167,6 +167,42 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentLanguage(lang);
   };
 
+  const handleSetEntriesLayout = async (layout: string) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('entries-layout', { value: layout });
+    setEntriesLayout(layout);
+  };
+
+  const handleSetShowReadEntries = async (show: boolean) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('show-read-entries', { value: show });
+    setShowReadEntries(show);
+  };
+
+  const handleSetShowHiddenEntries = async (show: boolean) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('show-hidden-entries', { value: show });
+    setShowHiddenEntries(show);
+  };
+
+  const getPersistedEntriesLayout = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: string }>('entries-layout');
+    setEntriesLayout(stored?.value ?? 'list');
+  };
+
+  const getPersistedShowReadEntries = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: boolean }>('show-read-entries');
+    setShowReadEntries(stored?.value ?? true);
+  };
+
+  const getPersistedShowHiddenEntries = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: boolean }>('show-hidden-entries');
+    setShowHiddenEntries(stored?.value ?? false);
+  };
+
   const getCurrentConfigLanguage = async () => {
     const store = await load('settings.json', { autoSave: true });
     const persisted = await store.get<{ value: string }>('app-language');
@@ -184,6 +220,9 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentConfigurations();
     getCurrentAccounts();
     getPersistedCurrentAccountId();
+    getPersistedEntriesLayout();
+    getPersistedShowReadEntries();
+    getPersistedShowHiddenEntries();
     getCurrentConfigLanguage().then((lang) => {
       i18n.changeLanguage(lang);
       setCurrentLanguage(lang);
@@ -395,11 +434,11 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         sideBarOpen,
         setSideBarOpen,
         entriesLayout,
-        setEntriesLayout,
+        handleSetEntriesLayout,
         showReadEntries,
-        setShowReadEntries,
+        handleSetShowReadEntries,
         showHiddenEntries,
-        setShowHiddenEntries,
+        handleSetShowHiddenEntries,
         currentTheme,
         handleSetCurrentTheme,
         isMobile,

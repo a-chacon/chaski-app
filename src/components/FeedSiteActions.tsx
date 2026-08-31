@@ -25,10 +25,13 @@ import { useNavigate } from "@tanstack/react-router";
 interface FeedSiteActionsProps {
   feed: FeedInterface;
   setFeed: (feed: FeedInterface) => void;
+  onMarkAsRead?: () => void;
+  onRefresh?: () => void;
+  refreshLoading?: boolean;
 }
 
-const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
-  const { t } = useTranslation(['feeds', 'common']);
+const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMarkAsRead, onRefresh }) => {
+  const { t } = useTranslation(['feeds', 'common', 'entries']);
   const navigate = useNavigate();
   const { addNotification } = useNotification();
   const [isSaved, setIsSaved] = useState<boolean>(!!feed.id);
@@ -98,7 +101,17 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed }) => {
               <RiMoreLine className="w-5"></RiMoreLine>
             </Button>
           </DropdownTrigger>
-          <DropdownMenu variant="light" aria-label="Static Actions">
+          <DropdownMenu variant="light" aria-label="Feed actions" className="sm:min-w-0 min-w-[200px]">
+            {onMarkAsRead ? (
+              <DropdownItem key="markRead" onPress={onMarkAsRead}>
+                {t('entries:updateFeedAsRead')}
+              </DropdownItem>
+            ) : null}
+            {onRefresh ? (
+              <DropdownItem key="refresh" onPress={onRefresh}>
+                {t('entries:fetchNewEntries')}
+              </DropdownItem>
+            ) : null}
             <DropdownItem key="edit" onClick={editModal.onOpen}>
               {t('feeds:edit')}
             </DropdownItem>

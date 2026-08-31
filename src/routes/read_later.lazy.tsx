@@ -1,14 +1,13 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import { Button } from "@heroui/react"
-import { RiRefreshLine } from '@remixicon/react'
 import { useEffect, useRef } from 'react'
+import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react"
+import { RiMoreLine } from '@remixicon/react'
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
-import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
-import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
+
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
 
@@ -98,12 +97,26 @@ export default function ReadLater() {
             <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>
             <h2 className="pt-1 pb-4">{t('readLaterSubtitle')}</h2>
           </div>
-          <div className="flex flex-row items-center gap-2 sm:pt-2">
-            <EntryLayoutSwitch />
-            <EntriesFiltersSwitch />
-            <Button color="default" isIconOnly variant="light" size="sm" onPress={handleReloadButton}>
-              <RiRefreshLine></RiRefreshLine>
-            </Button>
+          <div className="sm:pt-2">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button isIconOnly variant="light" size="sm">
+                  <RiMoreLine />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                variant="light"
+                aria-label="Read later actions"
+                className="sm:min-w-0 min-w-[200px]"
+              >
+                <DropdownItem
+                  key="reload"
+                  onPress={handleReloadButton}
+                >
+                  {t('reloadEntries')}
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
         </div>
         <EntriesList

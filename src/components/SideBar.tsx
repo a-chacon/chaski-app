@@ -8,7 +8,7 @@ function SideBar() {
   const { currentAccount, isMobile, setSideBarOpen } = useAppContext();
   const { t } = useTranslation("sidebar");
 
-  const classes = "overflow-auto px-2 py-4 h-full w-full absolute z-30 top-0 left-0 right-0 md:static bg-primary-50";
+  const classes = "overflow-auto px-2 py-4 h-full w-full absolute z-30 top-0 left-0 right-0 md:static bg-background/90 border-r border-default-200/70";
   const linkClass = `w-full h-full flex flex-row items-center gap-3 hover:bg-default/40 rounded-md px-3 ${isMobile ? "py-3.5 text-base" : "py-1.5 text-sm"
     }`;
   const iconSize = isMobile ? 22 : 20;

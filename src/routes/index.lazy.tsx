@@ -1,10 +1,9 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import { Button, Tooltip } from "@heroui/react"
-import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
-import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
-import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useEffect, useRef } from 'react'
+import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react"
+
+import { RiMoreLine } from '@remixicon/react'
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
@@ -112,35 +111,34 @@ export default function App() {
   return (
     <MainSectionLayout>
       <div className="flex flex-col max-w-screen-md mx-auto px-4">
-        <div className="flex flex-col sm:flex-row py-8 sm:justify-between sm:items-start gap-2">
-          <div>
-            <h1 className="text-3xl pt-2 font-bold">{t('allEntries')}</h1>
-            <h2 className="pt-1 pb-2 sm:pb-4">{t('allEntriesSubtitle')}</h2>
-          </div>
-          <div className="flex flex-row items-center gap-2 sm:pt-2">
-            <EntryLayoutSwitch />
-            <EntriesFiltersSwitch />
-            <Tooltip content={t('updateAllAsRead')}>
-              <Button
-                isIconOnly
+        <div className="flex flex-row justify-between items-center sm:flex-row py-8 sm:justify-between sm:items-start gap-2">
+          <h1 className="text-3xl pt-2 font-bold">{t('allEntries')}</h1>
+          <div className="sm:pt-2">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button isIconOnly variant="light" size="sm">
+                  <RiMoreLine />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
                 variant="light"
-                size="sm"
-                onPress={handleUpdateEntriesAsRead}
+                aria-label="Entry list actions"
+                className="sm:min-w-0 min-w-[200px]"
               >
-                <RiCheckDoubleLine></RiCheckDoubleLine>
-              </Button>
-            </Tooltip>
-            <Tooltip content={t('reloadEntries')}>
-              <Button
-                color="default"
-                isIconOnly
-                variant="light"
-                size="sm"
-                onPress={handleReloadButton}
-              >
-                <RiRefreshLine></RiRefreshLine>
-              </Button>
-            </Tooltip>
+                <DropdownItem
+                  key="markRead"
+                  onPress={handleUpdateEntriesAsRead}
+                >
+                  {t('updateAllAsRead')}
+                </DropdownItem>
+                <DropdownItem
+                  key="reload"
+                  onPress={handleReloadButton}
+                >
+                  {t('reloadEntries')}
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
         </div>
         <EntriesList

@@ -3,12 +3,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
-import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
+
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
-import { Button, Tooltip } from '@heroui/react'
-import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
+import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react'
+import { RiMoreLine } from '@remixicon/react'
 import { useNotification } from '../NotificationContext'
 import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
@@ -111,34 +110,33 @@ export default function Folder() {
       <div className="flex flex-col max-w-screen-md mx-auto px-4">
         <div className="flex flex-col py-8 justify-between items-start">
           <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-2">
-            <div className="flex flex-row">
+            <div className="flex flex-row justify-between">
               <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
-            </div>
-
-            <div className="flex flex-row items-center gap-2">
-              <EntryLayoutSwitch />
-              <EntriesFiltersSwitch />
-              <Tooltip content={t('updateFolderAsRead')}>
-                <Button
-                  isIconOnly
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly variant="light" size="sm">
+                    <RiMoreLine />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
                   variant="light"
-                  size="sm"
-                  onPress={handleUpdateEntriesAsRead}
+                  aria-label="Folder entry actions"
+                  className="sm:min-w-0 min-w-[200px]"
                 >
-                  <RiCheckDoubleLine></RiCheckDoubleLine>
-                </Button>
-              </Tooltip>
-              <Tooltip content={t('reloadEntries')}>
-                <Button
-                  color="default"
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={handleReloadButton}
-                >
-                  <RiRefreshLine></RiRefreshLine>
-                </Button>
-              </Tooltip>
+                  <DropdownItem
+                    key="markRead"
+                    onPress={handleUpdateEntriesAsRead}
+                  >
+                    {t('updateFolderAsRead')}
+                  </DropdownItem>
+                  <DropdownItem
+                    key="reload"
+                    onPress={handleReloadButton}
+                  >
+                    {t('reloadEntries')}
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </div>
           </div>
         </div>

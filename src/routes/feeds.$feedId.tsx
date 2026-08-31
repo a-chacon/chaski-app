@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FeedInterface, EntryInterface } from "../interfaces";
 import moment from "moment";
-import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
-import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import EntriesList from "../components/EntriesList";
 import FeedSiteActions from "../components/FeedSiteActions";
-import { Button, Spinner, Snippet, Tooltip } from "@heroui/react";
-import { RiRefreshLine, RiCheckDoubleLine } from "@remixicon/react";
+import { Snippet } from "@heroui/react";
+
 import { updateEntriesAsReadByFeedId, refreshEntries } from "../helpers/feedsData";
 import { getFeed } from "../helpers/feedsData";
 import { useEntries } from "../IndexEntriesContext";
@@ -123,43 +121,24 @@ export default function Feed() {
       <div className="flex flex-col max-w-screen-md mx-auto px-4">
         <div className="flex flex-col py-8 justify-between items-start">
           <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-2">
-            <div className="flex flex-row">
-              <img
-                src={feed?.icon}
-                alt={feed?.title}
-                className="h-10 my-auto mr-4"
-              />
-              <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
-            </div>
-            <div className="flex flex-row items-center gap-2">
-              <EntryLayoutSwitch />
-              <EntriesFiltersSwitch />
-              <Tooltip content={t('updateFeedAsRead')}>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={handleUpdateAllEntriesAsRead}
-                >
-                  <RiCheckDoubleLine></RiCheckDoubleLine>
-                </Button>
-              </Tooltip>
-              <Tooltip content={t('fetchNewEntries')}>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={handleRefreshEntries}
-                >
-                  {refreshLoading ? (
-                    <Spinner color="primary" size="sm" />
-                  ) : (
-                    <RiRefreshLine></RiRefreshLine>
-                  )}
-                </Button>
-              </Tooltip >
-
-              {feed && <FeedSiteActions feed={feed} setFeed={setFeed} />}
+            <div className="flex flex-row justify-between">
+              <div className="flex flex-row">
+                <img
+                  src={feed?.icon}
+                  alt={feed?.title}
+                  className="h-10 my-auto mr-4"
+                />
+                <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
+              </div>
+              {feed && (
+                <FeedSiteActions
+                  feed={feed}
+                  setFeed={setFeed}
+                  onMarkAsRead={handleUpdateAllEntriesAsRead}
+                  onRefresh={handleRefreshEntries}
+                  refreshLoading={refreshLoading}
+                />
+              )}
             </div>
           </div>
 

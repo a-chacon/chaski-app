@@ -6,12 +6,11 @@ import MainSectionLayout from '../components/layout/MainSectionLayout'
 
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
-import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react'
-import { RiMoreLine } from '@remixicon/react'
 import { useNotification } from '../NotificationContext'
 import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
 import { useTranslation } from 'react-i18next'
+import EntryListActionsModal from '../components/EntryListActionsModal'
 
 export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
@@ -109,35 +108,14 @@ export default function Folder() {
     <MainSectionLayout>
       <div className="flex flex-col max-w-screen-md mx-auto px-4">
         <div className="flex flex-col py-8 justify-between items-start">
-          <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-2">
-            <div className="flex flex-row justify-between">
-              <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button isIconOnly variant="light" size="sm">
-                    <RiMoreLine />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  variant="light"
-                  aria-label="Folder entry actions"
-                  className="sm:min-w-0 min-w-[200px]"
-                >
-                  <DropdownItem
-                    key="markRead"
-                    onPress={handleUpdateEntriesAsRead}
-                  >
-                    {t('updateFolderAsRead')}
-                  </DropdownItem>
-                  <DropdownItem
-                    key="reload"
-                    onPress={handleReloadButton}
-                  >
-                    {t('reloadEntries')}
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </div>
+          <div className="w-full flex flex-row justify-between">
+            <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
+            <EntryListActionsModal
+              actions={[
+                { key: "markRead", label: t('updateFolderAsRead'), onPress: handleUpdateEntriesAsRead },
+                { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
+              ]}
+            />
           </div>
         </div>
         <EntriesList
@@ -146,8 +124,9 @@ export default function Folder() {
           fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
+          onRefresh={resetEntryList}
         />
       </div>
-    </MainSectionLayout>
+    </MainSectionLayout >
   )
 }

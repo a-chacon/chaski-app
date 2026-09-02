@@ -1,12 +1,11 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 import { useEffect, useRef } from 'react'
-import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react"
-import { RiMoreLine } from '@remixicon/react'
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
+import EntryListActionsModal from '../components/EntryListActionsModal'
 
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
@@ -97,27 +96,11 @@ export default function ReadLater() {
             <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>
             <h2 className="pt-1 pb-4">{t('readLaterSubtitle')}</h2>
           </div>
-          <div className="sm:pt-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly variant="light" size="sm">
-                  <RiMoreLine />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                variant="light"
-                aria-label="Read later actions"
-                className="sm:min-w-0 min-w-[200px]"
-              >
-                <DropdownItem
-                  key="reload"
-                  onPress={handleReloadButton}
-                >
-                  {t('reloadEntries')}
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+          <EntryListActionsModal
+            actions={[
+              { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
+            ]}
+          />
         </div>
         <EntriesList
           key="index"
@@ -125,6 +108,7 @@ export default function ReadLater() {
           fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
+          onRefresh={handleReloadButton}
         />
       </div>
     </MainSectionLayout>

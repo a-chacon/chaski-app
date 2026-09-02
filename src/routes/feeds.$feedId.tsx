@@ -120,26 +120,24 @@ export default function Feed() {
     <MainSectionLayout>
       <div className="flex flex-col max-w-screen-md mx-auto px-4">
         <div className="flex flex-col py-8 justify-between items-start">
-          <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-2">
-            <div className="flex flex-row justify-between">
-              <div className="flex flex-row">
-                <img
-                  src={feed?.icon}
-                  alt={feed?.title}
-                  className="h-10 my-auto mr-4"
-                />
-                <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
-              </div>
-              {feed && (
-                <FeedSiteActions
-                  feed={feed}
-                  setFeed={setFeed}
-                  onMarkAsRead={handleUpdateAllEntriesAsRead}
-                  onRefresh={handleRefreshEntries}
-                  refreshLoading={refreshLoading}
-                />
-              )}
+          <div className="w-full flex flex-row justify-between">
+            <div className="flex flex-row">
+              <img
+                src={feed?.icon}
+                alt={feed?.title}
+                className="h-10 my-auto mr-4"
+              />
+              <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
             </div>
+            {feed && (
+              <FeedSiteActions
+                feed={feed}
+                setFeed={setFeed}
+                onMarkAsRead={handleUpdateAllEntriesAsRead}
+                onRefresh={handleRefreshEntries}
+                refreshLoading={refreshLoading}
+              />
+            )}
           </div>
 
           <p className="my-4 line-clamp-3 opacity-80">{feed?.description}</p>
@@ -171,6 +169,7 @@ export default function Feed() {
           fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={false}
+          onRefresh={resetEntryList}
         />
       </div>
     </MainSectionLayout>

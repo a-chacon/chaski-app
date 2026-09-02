@@ -32,10 +32,9 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
-  background: transparent !important;
   box-sizing: border-box;
-  /* Push content below the Android status bar / iOS notch */
   padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 html {

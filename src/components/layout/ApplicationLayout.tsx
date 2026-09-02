@@ -421,11 +421,34 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentTheme(newTheme);
   };
 
+  // Converts a HeroUI HSL CSS variable value like "0 0% 100%" to "#rrggbb"
+  const hslCssVarToHex = (hsl: string): string => {
+    const [h, s, l] = hsl.split(' ').map(parseFloat);
+    const sRatio = s / 100;
+    const lRatio = l / 100;
+    const k = (n: number) => (n + h / 30) % 12;
+    const a = sRatio * Math.min(lRatio, 1 - lRatio);
+    const f = (n: number) => lRatio - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const toHex = (x: number) => Math.round(x * 255).toString(16).padStart(2, '0');
+    return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+  };
+
   const setThemeClasses = (newTheme: string, oldTheme: string) => {
-    document.body.classList.remove(
-      oldTheme
-    );
+    document.body.classList.remove(oldTheme);
     document.body.classList.add(newTheme);
+
+    const androidBridge = (window as any).AndroidThemeBridge;
+    if (androidBridge) {
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark =
+        newTheme.endsWith('-dark') ||
+        (newTheme === 'AUTO' && systemDark);
+      // Read the background color HeroUI already injected as a CSS variable
+      // and convert to hex so Android Color.parseColor() can handle it
+      const hsl = getComputedStyle(document.body).getPropertyValue('--heroui-background').trim();
+      const bgColor = hsl ? hslCssVarToHex(hsl) : (isDark ? '#000000' : '#ffffff');
+      androidBridge.setTheme(isDark, bgColor);
+    }
   };
 
   return (
@@ -464,8 +487,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     >
       <NotificationProvider>
         <UpdaterBootstrap />
-
-        <div className="h-screen">
+        <div className="h-dvh">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
             {isTauriApp && <WindowResizeHandles />}
             {isTauriApp && <WindowTitlebar />}

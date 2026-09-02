@@ -1,22 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-} from "@heroui/react";
-import { RiMoreLine } from "@remixicon/react";
+import { Button, useDisclosure } from "@heroui/react";
 import { FeedInterface } from "../interfaces";
 import FeedSiteEditModal from "./FeedSiteEditModal";
 import FeedSiteFiltersModal from "./FeedSiteFiltersModal";
-import { useDisclosure } from "@heroui/react";
-import FolderField from "./FolderField";
+import FeedFollowModal from "./FeedFollowModal";
+import EntryListActionsModal from "./EntryListActionsModal";
 import { save } from "@tauri-apps/plugin-dialog";
 import { createFeed, exportOPML, destroyFeed } from "../helpers/feedsData";
 import { useNotification } from "../NotificationContext";
@@ -38,6 +28,8 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const editModal = useDisclosure();
   const filtersModal = useDisclosure();
+  const followModal = useDisclosure();
+
   const handleFollowNewFeed = async (
     event: React.FormEvent<HTMLFormElement>,
   ) => {
@@ -50,6 +42,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
         feed.id = response.data.id;
         setFeed(response.data);
         setIsSaved(true);
+        followModal.onClose();
         addNotification(t('feeds:feedCreated'), response.message, 'success');
       } else {
         addNotification(t('feeds:failedToCreate'), response.message, 'danger');
@@ -65,7 +58,6 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
 
   const handleDeleteFeed = async () => {
     try {
-
       const response = await destroyFeed(feed);
 
       if (response.success) {
@@ -90,47 +82,21 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
     if (path_to_save) {
       exportOPML(path_to_save, [feed.id!]);
     }
-  }
+  };
 
   if (isSaved) {
+    const actions = [
+      ...(onMarkAsRead ? [{ key: "markRead", label: t('entries:updateFeedAsRead'), onPress: onMarkAsRead }] : []),
+      ...(onRefresh ? [{ key: "refresh", label: t('entries:fetchNewEntries'), onPress: onRefresh }] : []),
+      { key: "edit", label: t('feeds:edit'), onPress: editModal.onOpen },
+      { key: "filters", label: t('feeds:filters'), onPress: filtersModal.onOpen },
+      { key: "export", label: t('feeds:exportAsOpml'), onPress: handleExportFeed },
+      { key: "delete", label: t('common:delete'), onPress: handleDeleteFeed, color: "danger" as const },
+    ];
+
     return (
       <div className="flex flex-row items-center gap-2">
-        <Dropdown>
-          <DropdownTrigger>
-            <Button size="sm" variant="light" isIconOnly className="h-full">
-              <RiMoreLine className="w-5"></RiMoreLine>
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu variant="light" aria-label="Feed actions" className="sm:min-w-0 min-w-[200px]">
-            {onMarkAsRead ? (
-              <DropdownItem key="markRead" onPress={onMarkAsRead}>
-                {t('entries:updateFeedAsRead')}
-              </DropdownItem>
-            ) : null}
-            {onRefresh ? (
-              <DropdownItem key="refresh" onPress={onRefresh}>
-                {t('entries:fetchNewEntries')}
-              </DropdownItem>
-            ) : null}
-            <DropdownItem key="edit" onClick={editModal.onOpen}>
-              {t('feeds:edit')}
-            </DropdownItem>
-            <DropdownItem key="filters" onClick={filtersModal.onOpen}>
-              {t('feeds:filters')}
-            </DropdownItem>
-            <DropdownItem key="filters" onClick={handleExportFeed}>
-              {t('feeds:exportAsOpml')}
-            </DropdownItem>
-            <DropdownItem
-              key="delete"
-              className="text-danger"
-              color="danger"
-              onClick={handleDeleteFeed}
-            >
-              {t('common:delete')}
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+        <EntryListActionsModal actions={actions} aria-label="Feed actions" />
         <FeedSiteEditModal
           key={"edit-modal-" + feed.id}
           feed={feed}
@@ -138,7 +104,6 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
           isOpen={editModal.isOpen}
           onOpenChange={editModal.onOpenChange}
         />
-
         <FeedSiteFiltersModal
           key={"filters-" + feed.id}
           feed={feed}
@@ -147,57 +112,27 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
         />
       </div>
     );
-  } else {
-    return (
-      <Popover placement="bottom" showArrow offset={10}>
-        <PopoverTrigger>
-          <Button variant="bordered" color="warning" size="sm">
-            follow
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[240px}">
-          <form onSubmit={handleFollowNewFeed}>
-            <div className="mt-2 flex flex-col gap-2 w-full">
-              <FolderField feed={feed} />
-            </div>
-            <div className="flex p-2 justify-end">
-              <Button
-                variant="bordered"
-                color="success"
-                size="sm"
-                type="submit"
-                isLoading={isLoading}
-                spinner={
-                  <svg
-                    className="animate-spin h-4 w-4 text-current"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                }
-              >
-                {isLoading ? t('common:adding') : t('common:add')}
-              </Button>
-            </div>
-          </form>
-        </PopoverContent >
-      </Popover >
-    );
   }
+
+  return (
+    <>
+      <Button
+        variant="bordered"
+        color="warning"
+        size="sm"
+        onPress={followModal.onOpen}
+      >
+        {t('feeds:follow')}
+      </Button>
+      <FeedFollowModal
+        feed={feed}
+        isOpen={followModal.isOpen}
+        isLoading={isLoading}
+        onOpenChange={followModal.onOpenChange}
+        onSubmit={handleFollowNewFeed}
+      />
+    </>
+  );
 };
 
 export default FeedSiteActions;

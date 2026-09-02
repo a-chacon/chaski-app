@@ -1,10 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import { Button, Tooltip } from "@heroui/react"
-import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
-import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
-import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useEffect, useRef } from 'react'
+
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
@@ -13,6 +10,7 @@ import { useNotification } from '../NotificationContext'
 import { updateAllEntriesAsRead } from '../helpers/feedsData'
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
+import EntryListActionsModal from '../components/EntryListActionsModal'
 
 export const Route = createLazyFileRoute('/')({
   component: App,
@@ -27,7 +25,6 @@ export default function App() {
 
   const isMounted = useRef(false)
 
-  // Save scroll position when leaving, restore it on mount
   useEffect(() => {
     const el = document.getElementById('mainDiv')
     if (el && scrollTop > 0) {
@@ -111,37 +108,15 @@ export default function App() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto">
-        <div className="flex py-8 justify-between items-start">
-          <div>
-            <h1 className="text-3xl pt-2 font-bold">{t('allEntries')}</h1>
-            <h2 className="pt-1 pb-4">{t('allEntriesSubtitle')}</h2>
-          </div>
-          <div className="flex flex-row items-center gap-2">
-            <EntryLayoutSwitch />
-            <EntriesFiltersSwitch />
-            <Tooltip content={t('updateAllAsRead')}>
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                onPress={handleUpdateEntriesAsRead}
-              >
-                <RiCheckDoubleLine></RiCheckDoubleLine>
-              </Button>
-            </Tooltip>
-            <Tooltip content={t('reloadEntries')}>
-              <Button
-                color="default"
-                isIconOnly
-                variant="light"
-                size="sm"
-                onPress={handleReloadButton}
-              >
-                <RiRefreshLine></RiRefreshLine>
-              </Button>
-            </Tooltip>
-          </div>
+      <div className="flex flex-col max-w-screen-md mx-auto px-4">
+        <div className="flex flex-row justify-between items-center sm:flex-row py-8 sm:justify-between sm:items-start gap-2">
+          <h1 className="text-3xl pt-2 font-bold">{t('allEntries')}</h1>
+          <EntryListActionsModal
+            actions={[
+              { key: "markRead", label: t('updateAllAsRead'), onPress: handleUpdateEntriesAsRead },
+              { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
+            ]}
+          />
         </div>
         <EntriesList
           key="index"
@@ -149,6 +124,7 @@ export default function App() {
           fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
+          onRefresh={resetEntryList}
         />
       </div>
     </MainSectionLayout>

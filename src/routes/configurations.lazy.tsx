@@ -2,6 +2,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
 import { useAppContext } from "../AppContext";
+import { RiListUnordered, RiLayoutHorizontalLine, RiLayoutGridLine } from "@remixicon/react";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,8 @@ export default function Configurations() {
     currentFontSpace, handleSetCurrentFontSpace, currentMarkAsReadOnHover,
     handleSetMarkAsReadOnHover, currentEntryScrapeMode, handleSetCurrentEntryScrapeMode,
     currentLanguage, handleSetCurrentLanguage,
+    handleSetEntriesLayout, entriesLayout, handleSetShowReadEntries, showReadEntries,
+    handleSetShowHiddenEntries, showHiddenEntries,
   } = useAppContext();
 
   const [autostartState, setAutostartState] = useState(false);
@@ -206,6 +209,70 @@ export default function Configurations() {
                 isSelected={autostartState}
                 onValueChange={handleAutostartChange}
                 isDisabled={isFlatpak}
+                color="primary"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* ── Entries ── */}
+        <section className="pb-10">
+          <SectionTitle title={t('entries.title')} />
+
+          <div className="flex flex-col gap-5">
+            {/* Layout */}
+            <div>
+              <p className="font-medium pb-3">{t('entries.layout')}</p>
+              <div className="flex flex-col items-start gap-2">
+                <Button
+                  color="primary"
+                  size="sm"
+                  variant={entriesLayout === "list" ? "flat" : "light"}
+                  onPress={() => handleSetEntriesLayout("list")}
+                  startContent={<RiListUnordered />}
+                >
+                  {t('entries.listView')}
+                </Button>
+                <Button
+                  color="primary"
+                  size="sm"
+                  variant={entriesLayout === "compact" ? "flat" : "light"}
+                  onPress={() => handleSetEntriesLayout("compact")}
+                  startContent={<RiLayoutHorizontalLine />}
+                >
+                  {t('entries.compactView')}
+                </Button>
+                <Button
+                  color="primary"
+                  size="sm"
+                  variant={entriesLayout === "grid" ? "flat" : "light"}
+                  onPress={() => handleSetEntriesLayout("grid")}
+                  startContent={<RiLayoutGridLine />}
+                >
+                  {t('entries.gridView')}
+                </Button>
+              </div>
+            </div>
+
+            <div className="h-px bg-divider" />
+
+            {/* Filters */}
+            <div className="flex items-center justify-between">
+              <p className="font-medium">{t('entries.showRead')}</p>
+              <Switch
+                isSelected={showReadEntries}
+                onValueChange={handleSetShowReadEntries}
+                color="primary"
+              />
+            </div>
+
+            <div className="h-px bg-divider" />
+
+            <div className="flex items-center justify-between">
+              <p className="font-medium">{t('entries.showHidden')}</p>
+              <Switch
+                isSelected={showHiddenEntries}
+                onValueChange={handleSetShowHiddenEntries}
                 color="primary"
               />
             </div>

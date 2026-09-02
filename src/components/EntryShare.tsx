@@ -19,6 +19,7 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { useState } from "react";
+import { type } from "@tauri-apps/plugin-os";
 import { useNotification } from "../NotificationContext";
 import { useTranslation } from "react-i18next";
 
@@ -65,6 +66,20 @@ const EntryShare: React.FC<EntryShareProps> = ({
     window.open(mastodonUrl + mastodonShareUrl, "_blank");
     onOpenChange();
   };
+
+  const isMobile = type() === "android" || type() === "ios";
+
+  if (isMobile) {
+    return (
+      <div className={`flex gap-2 items-center ${className}`}>
+        <Tooltip content={t("share:copyToClipboard")}>
+          <button onClick={copyLinkToClipboard} className="flex items-center">
+            <RiLinkUnlink className="w-6" />
+          </button>
+        </Tooltip>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex gap-2 items-center ${className}`}>

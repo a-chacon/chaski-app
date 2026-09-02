@@ -25,6 +25,8 @@
   "hide": "Ocultar",
   "unhide": "Mostrar",
   "visitWebsite": "Visitar sitio web: {{link}}",
+  "pullDownToRefresh": "Desliza hacia abajo para actualizar",
+  "releaseToRefresh": "Suelta para actualizar",
   "reloadingTitle": "Recargando",
   "reloadingBody": "¡Las entradas han sido recargadas!",
   "updatedTitle": "Actualizado",

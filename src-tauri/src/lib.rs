@@ -29,10 +29,11 @@ use crate::entities::accounts;
 use crate::entities::feeds;
 use serde_json::json;
 use std::collections::HashMap;
+use tauri::Manager;
+#[cfg(desktop)]
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Manager,
 };
 use tauri_plugin_store::StoreExt;
 
@@ -44,13 +45,19 @@ pub fn run() {
     let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_store::Builder::new().build())
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+        .plugin(tauri_plugin_process::init());
+
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = app
                 .get_webview_window("main")
                 .expect("no main window")
                 .set_focus();
-        }))
-        .plugin(tauri_plugin_process::init())
+        }));
+    }
+
+    let mut builder = builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
@@ -69,6 +76,7 @@ pub fn run() {
                 .build(),
         );
 
+    #[cfg(desktop)]
     if !is_flatpak {
         builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
         builder = builder.plugin(tauri_plugin_autostart::init(
@@ -79,6 +87,7 @@ pub fn run() {
 
     builder
         .setup(move |app| {
+            #[cfg(desktop)]
             if !is_flatpak {
                 let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
                 let open_i = MenuItem::with_id(app, "open", "Open", true, None::<&str>)?;
@@ -123,10 +132,13 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
+            #[cfg(desktop)]
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 window.hide().unwrap();
                 api.prevent_close();
             }
+            #[cfg(mobile)]
+            let _ = (window, event);
         })
         .invoke_handler(tauri::generate_handler![
             commands::feeds::fetch_site_feeds,

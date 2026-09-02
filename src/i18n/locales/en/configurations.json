@@ -22,6 +22,15 @@
     "autostart": "Autostart Application",
     "autostartFlatpak": "Autostart Application (not available in Flatpak)"
   },
+  "entries": {
+    "title": "Entries",
+    "layout": "Default layout",
+    "listView": "List view",
+    "compactView": "Compact view",
+    "gridView": "Grid view",
+    "showRead": "Show read entries",
+    "showHidden": "Show hidden entries"
+  },
   "language": {
     "title": "Language",
     "select": "Select your preferred language"

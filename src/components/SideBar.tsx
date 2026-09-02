@@ -1,48 +1,69 @@
-import { RiBookmarkFill, RiAlignJustify, RiCompassDiscoverLine } from "@remixicon/react";
+import { RiBookmarkFill, RiFileListLine, RiCompassDiscoverLine, RiSettings4Line, RiInformationLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
 import { useTranslation } from "react-i18next";
 
 function SideBar() {
-  const { currentAccount } = useAppContext();
+  const { currentAccount, isMobile, setSideBarOpen } = useAppContext();
   const { t } = useTranslation("sidebar");
 
-  const classes = "overflow-auto px-2 py-4 h-full w-full absolute z-30 top-0 left-0 right-0 md:static bg-primary-50";
+  const classes = "overflow-auto px-2 py-4 h-full w-full absolute z-30 top-0 left-0 right-0 md:static bg-background/90 border-r border-default-200/70";
+  const linkClass = `w-full h-full flex flex-row items-center gap-3 hover:bg-default/40 rounded-md px-3 ${isMobile ? "py-3.5 text-base" : "py-1.5 text-sm"
+    }`;
+  const iconSize = isMobile ? 22 : 20;
+  const handleLinkClick = () => {
+    if (isMobile) setSideBarOpen(false);
+  };
 
   return (
     <nav className={classes}>
       <div className="flex flex-col gap-1">
-        <div className="px-1 flex flex-col py-2 gap-1.5">
+        <div className="px-1 flex flex-col py-2 gap-1">
           <Link
             to="/"
-            className="w-full h-full flex flex-row items-center gap-2 hover:bg-default/40 rounded-md py-1.5 px-2 text-sm"
-            activeProps={{
-              className: "bg-default/40"
-            }}
+            className={linkClass}
+            activeProps={{ className: "bg-default/40" }}
+            onClick={handleLinkClick}
           >
-            <RiAlignJustify className="h-5 opacity-90"></RiAlignJustify>
+            <RiFileListLine size={iconSize} className="opacity-90 shrink-0" />
             {t("entries")}
           </Link>
           <Link
             to="/read_later"
-            className="w-full h-full flex flex-row items-center gap-2 hover:bg-default/40 rounded-md py-1.5 px-2 text-sm"
-            activeProps={{
-              className: "bg-default/40"
-            }}
+            className={linkClass}
+            activeProps={{ className: "bg-default/40" }}
+            onClick={handleLinkClick}
           >
-            <RiBookmarkFill className="h-5 opacity-90"></RiBookmarkFill>
+            <RiBookmarkFill size={iconSize} className="opacity-90 shrink-0" />
             {t("readLater")}
           </Link>
           <Link
             to="/discover"
-            className="w-full h-full flex flex-row items-center gap-2 hover:bg-default/40 rounded-md py-1.5 px-2 text-sm"
-            activeProps={{
-              className: "bg-default/40"
-            }}
+            className={linkClass}
+            activeProps={{ className: "bg-default/40" }}
+            onClick={handleLinkClick}
           >
-            <RiCompassDiscoverLine className="h-5 opacity-90" />
+            <RiCompassDiscoverLine size={iconSize} className="opacity-90 shrink-0" />
             {t("discover")}
+          </Link>
+          <Link
+            to="/configurations"
+            className={linkClass}
+            activeProps={{ className: "bg-default/40" }}
+            onClick={handleLinkClick}
+          >
+            <RiSettings4Line size={iconSize} className="opacity-90 shrink-0" />
+            {t("configurations")}
+          </Link>
+          <Link
+            to="/about"
+            className={linkClass}
+            activeProps={{ className: "bg-default/40" }}
+            onClick={handleLinkClick}
+          >
+            <RiInformationLine size={iconSize} className="opacity-90 shrink-0" />
+            {t("about")}
           </Link>
         </div>
 

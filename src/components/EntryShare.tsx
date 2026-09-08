@@ -20,6 +20,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import { type } from "@tauri-apps/plugin-os";
+import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { useNotification } from "../NotificationContext";
 import { useTranslation } from "react-i18next";
 
@@ -49,17 +50,13 @@ const EntryShare: React.FC<EntryShareProps> = ({
   const redditShareUrl = `https://www.reddit.com/submit?title=${encodedTitle}&url=${encodedLink}`;
   const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedLink}`;
 
-  const copyLinkToClipboard = () => {
-    navigator.clipboard
-      .writeText(link)
-      .then(() => {
-        console.log("Copied");
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-      });
-
-    addNotification(t("share:copiedTitle"), t("share:copiedBody"), "primary");
+  const copyLinkToClipboard = async () => {
+    try {
+      await writeText(link);
+      addNotification(t("share:copiedTitle"), t("share:copiedBody"), "primary");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
   };
 
   const handleMastodonShare = () => {

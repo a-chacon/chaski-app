@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import MainSectionLayout from '../components/layout/MainSectionLayout';
 import FeedbackModal from '../components/FeedbackModal';
 import { getVersion } from '@tauri-apps/api/app';
@@ -13,6 +13,7 @@ function RouteComponent() {
   const { t } = useTranslation('about');
   const [appVersion, setAppVersion] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAppVersion = async () => {
@@ -94,17 +95,16 @@ function RouteComponent() {
 
             <div className="h-px bg-divider" />
 
-            <Link to="/logs" className="w-full">
-              <Button
-                variant="flat"
-                color="default"
-                startContent={<RiFileListLine size={18} />}
-                className="justify-start"
-                fullWidth
-              >
-                {t('viewLogs')}
-              </Button>
-            </Link>
+            <Button
+              variant="flat"
+              color="default"
+              startContent={<RiFileListLine size={18} />}
+              className="justify-start"
+              fullWidth
+              onPress={() => navigate({ to: '/logs' })}
+            >
+              {t('viewLogs')}
+            </Button>
           </div>
 
         </div>

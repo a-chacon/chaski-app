@@ -29,7 +29,9 @@ use crate::entities::accounts;
 use crate::entities::feeds;
 use serde_json::json;
 use std::collections::HashMap;
+#[cfg(desktop)]
 use tauri::Manager;
+
 #[cfg(desktop)]
 use tauri::{
     menu::{Menu, MenuItem},
@@ -40,50 +42,58 @@ use tauri_plugin_store::StoreExt;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let ctx = tauri::generate_context!();
-    let is_flatpak = is_flatpak_sandbox();
-
-    let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_store::Builder::new().build())
-        .plugin(tauri_plugin_process::init());
-
     #[cfg(desktop)]
-    {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+    let is_flatpak = is_flatpak_sandbox();
+    #[cfg(not(desktop))]
+    let _is_flatpak = false;
+
+    let builder = {
+        let b = tauri::Builder::default()
+            .plugin(tauri_plugin_os::init())
+            .plugin(tauri_plugin_store::Builder::new().build())
+            .plugin(tauri_plugin_process::init())
+            .plugin(tauri_plugin_clipboard_manager::init())
+            .plugin(tauri_plugin_dialog::init())
+            .plugin(tauri_plugin_notification::init())
+            .plugin(tauri_plugin_opener::init())
+            .plugin(
+                tauri_plugin_log::Builder::new()
+                    .filter(|metadata| metadata.target().contains("chaski"))
+                    .level(log::LevelFilter::Debug)
+                    .max_file_size(10_000_000)
+                    .targets([
+                        tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir {
+                            file_name: None,
+                        }),
+                        tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
+                    ])
+                    .build(),
+            );
+
+        #[cfg(desktop)]
+        let b = b.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = app
                 .get_webview_window("main")
                 .expect("no main window")
                 .set_focus();
         }));
-    }
 
-    let mut builder = builder
-        .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(
-            tauri_plugin_log::Builder::new()
-                .filter(|metadata| metadata.target().contains("chaski"))
-                .level(log::LevelFilter::Debug)
-                .max_file_size(10_000_000)
-                .targets([
-                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir {
-                        file_name: None,
-                    }),
-                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
-                ])
-                .build(),
-        );
+        #[cfg(desktop)]
+        let b = {
+            if !is_flatpak {
+                let b = b.plugin(tauri_plugin_updater::Builder::new().build());
+                let b = b.plugin(tauri_plugin_autostart::init(
+                    tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+                    None,
+                ));
+                b
+            } else {
+                b
+            }
+        };
 
-    #[cfg(desktop)]
-    if !is_flatpak {
-        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
-        builder = builder.plugin(tauri_plugin_autostart::init(
-            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            None,
-        ));
-    }
+        b
+    };
 
     builder
         .setup(move |app| {
@@ -180,6 +190,7 @@ pub fn run() {
         .expect("error while building tauri application");
 }
 
+#[cfg(desktop)]
 fn is_flatpak_sandbox() -> bool {
     #[cfg(target_os = "linux")]
     {

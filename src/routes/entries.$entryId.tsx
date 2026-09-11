@@ -61,7 +61,7 @@ function Entry() {
   return (
     entry && (
       <MainSectionLayout>
-        <div className="flex flex-col p-4 mx-auto max-w-prose">
+        <div className="flex flex-col p-4 mx-auto max-w-prose w-full min-w-0">
           <div className="mx-2 flex justify-between bg-primary-100 border border-primary-500 sticky top-3 p-1.5 rounded-xl shadow-xl">
             <div className="flex flex-row">
               <EntryActions
@@ -112,7 +112,7 @@ function Entry() {
           </div>
 
 
-          <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
+          <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto w-full min-w-0 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:max-w-full [&_iframe]:max-w-full ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
             <p className="py-6 line-clamp-3">
               {parse(entry.description || "")}
             </p>

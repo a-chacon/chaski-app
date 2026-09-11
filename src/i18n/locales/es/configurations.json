@@ -22,6 +22,15 @@
     "autostart": "Iniciar automáticamente la aplicación",
     "autostartFlatpak": "Iniciar automáticamente (no disponible en Flatpak)"
   },
+  "entries": {
+    "title": "Entradas",
+    "layout": "Diseño predeterminado",
+    "listView": "Vista de lista",
+    "compactView": "Vista compacta",
+    "gridView": "Vista de cuadrícula",
+    "showRead": "Mostrar entradas leídas",
+    "showHidden": "Mostrar entradas ocultas"
+  },
   "language": {
     "title": "Idioma",
     "select": "Selecciona tu idioma preferido"

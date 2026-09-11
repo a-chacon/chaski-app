@@ -28,6 +28,7 @@ export default {
         "blue-light": {
           "extend": "light",
           "colors": {
+            "sidebar": "#000e1b",
             "background": "#ffffff",
             "foreground": "#000000",
             "primary": {

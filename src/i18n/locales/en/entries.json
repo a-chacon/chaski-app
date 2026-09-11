@@ -25,6 +25,8 @@
   "hide": "Hide",
   "unhide": "Unhide",
   "visitWebsite": "Visit Website: {{link}}",
+  "pullDownToRefresh": "Pull down to refresh",
+  "releaseToRefresh": "Release to refresh",
   "reloadingTitle": "Reloading",
   "reloadingBody": "Entries are reloaded!",
   "updatedTitle": "Updated",

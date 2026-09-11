@@ -3,16 +3,14 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import EntryLayoutSwitch from "../components/EntriesLayoutSwitch"
-import EntriesFiltersSwitch from "../components/EntriesFiltersSwitch"
+
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
-import { Button, Tooltip } from '@heroui/react'
-import { RiRefreshLine, RiCheckDoubleLine } from '@remixicon/react'
 import { useNotification } from '../NotificationContext'
 import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
 import { useTranslation } from 'react-i18next'
+import EntryListActionsModal from '../components/EntryListActionsModal'
 
 export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
@@ -108,38 +106,16 @@ export default function Folder() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto">
+      <div className="flex flex-col max-w-screen-md mx-auto px-4">
         <div className="flex flex-col py-8 justify-between items-start">
-          <div className="flex flex-row justify-between w-full">
-            <div className="flex flex-row">
-              <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
-            </div>
-
-            <div className="flex flex-row items-center gap-2">
-              <EntryLayoutSwitch />
-              <EntriesFiltersSwitch />
-              <Tooltip content={t('updateFolderAsRead')}>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={handleUpdateEntriesAsRead}
-                >
-                  <RiCheckDoubleLine></RiCheckDoubleLine>
-                </Button>
-              </Tooltip>
-              <Tooltip content={t('reloadEntries')}>
-                <Button
-                  color="default"
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={handleReloadButton}
-                >
-                  <RiRefreshLine></RiRefreshLine>
-                </Button>
-              </Tooltip>
-            </div>
+          <div className="w-full flex flex-row justify-between">
+            <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
+            <EntryListActionsModal
+              actions={[
+                { key: "markRead", label: t('updateFolderAsRead'), onPress: handleUpdateEntriesAsRead },
+                { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
+              ]}
+            />
           </div>
         </div>
         <EntriesList
@@ -148,8 +124,9 @@ export default function Folder() {
           fetchEntries={fetchEntries}
           hasMore={hasMore}
           header={true}
+          onRefresh={resetEntryList}
         />
       </div>
-    </MainSectionLayout>
+    </MainSectionLayout >
   )
 }

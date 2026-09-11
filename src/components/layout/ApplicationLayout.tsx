@@ -167,6 +167,42 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentLanguage(lang);
   };
 
+  const handleSetEntriesLayout = async (layout: string) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('entries-layout', { value: layout });
+    setEntriesLayout(layout);
+  };
+
+  const handleSetShowReadEntries = async (show: boolean) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('show-read-entries', { value: show });
+    setShowReadEntries(show);
+  };
+
+  const handleSetShowHiddenEntries = async (show: boolean) => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('show-hidden-entries', { value: show });
+    setShowHiddenEntries(show);
+  };
+
+  const getPersistedEntriesLayout = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: string }>('entries-layout');
+    setEntriesLayout(stored?.value ?? 'list');
+  };
+
+  const getPersistedShowReadEntries = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: boolean }>('show-read-entries');
+    setShowReadEntries(stored?.value ?? true);
+  };
+
+  const getPersistedShowHiddenEntries = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: boolean }>('show-hidden-entries');
+    setShowHiddenEntries(stored?.value ?? false);
+  };
+
   const getCurrentConfigLanguage = async () => {
     const store = await load('settings.json', { autoSave: true });
     const persisted = await store.get<{ value: string }>('app-language');
@@ -184,6 +220,9 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentConfigurations();
     getCurrentAccounts();
     getPersistedCurrentAccountId();
+    getPersistedEntriesLayout();
+    getPersistedShowReadEntries();
+    getPersistedShowHiddenEntries();
     getCurrentConfigLanguage().then((lang) => {
       i18n.changeLanguage(lang);
       setCurrentLanguage(lang);
@@ -382,11 +421,34 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentTheme(newTheme);
   };
 
+  // Converts a HeroUI HSL CSS variable value like "0 0% 100%" to "#rrggbb"
+  const hslCssVarToHex = (hsl: string): string => {
+    const [h, s, l] = hsl.split(' ').map(parseFloat);
+    const sRatio = s / 100;
+    const lRatio = l / 100;
+    const k = (n: number) => (n + h / 30) % 12;
+    const a = sRatio * Math.min(lRatio, 1 - lRatio);
+    const f = (n: number) => lRatio - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const toHex = (x: number) => Math.round(x * 255).toString(16).padStart(2, '0');
+    return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+  };
+
   const setThemeClasses = (newTheme: string, oldTheme: string) => {
-    document.body.classList.remove(
-      oldTheme
-    );
+    document.body.classList.remove(oldTheme);
     document.body.classList.add(newTheme);
+
+    const androidBridge = (window as any).AndroidThemeBridge;
+    if (androidBridge) {
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark =
+        newTheme.endsWith('-dark') ||
+        (newTheme === 'AUTO' && systemDark);
+      // Read the background color HeroUI already injected as a CSS variable
+      // and convert to hex so Android Color.parseColor() can handle it
+      const hsl = getComputedStyle(document.body).getPropertyValue('--heroui-background').trim();
+      const bgColor = hsl ? hslCssVarToHex(hsl) : (isDark ? '#000000' : '#ffffff');
+      androidBridge.setTheme(isDark, bgColor);
+    }
   };
 
   return (
@@ -395,11 +457,11 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         sideBarOpen,
         setSideBarOpen,
         entriesLayout,
-        setEntriesLayout,
+        handleSetEntriesLayout,
         showReadEntries,
-        setShowReadEntries,
+        handleSetShowReadEntries,
         showHiddenEntries,
-        setShowHiddenEntries,
+        handleSetShowHiddenEntries,
         currentTheme,
         handleSetCurrentTheme,
         isMobile,
@@ -425,8 +487,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     >
       <NotificationProvider>
         <UpdaterBootstrap />
-
-        <div className="h-screen ">
+        <div className="h-dvh">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
             {isTauriApp && <WindowResizeHandles />}
             {isTauriApp && <WindowTitlebar />}
@@ -453,10 +514,24 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
                 </>
               )}
 
-              {sideBarOpen && (
+              {sideBarOpen && !isMobile && (
                 <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5 transition-all duration-200 ease-out">
                   <SideBar />
                 </div>
+              )}
+
+              {sideBarOpen && isMobile && (
+                <>
+                  {/* Dark backdrop — tap to close */}
+                  <div
+                    className="absolute inset-0 z-40 bg-black/50 transition-opacity duration-200"
+                    onClick={() => setSideBarOpen(false)}
+                  />
+                  {/* Sidebar panel — 80% wide, slides in from left */}
+                  <div className="absolute left-0 top-0 bottom-0 z-50 h-full w-[80%] shadow-2xl transition-transform duration-200 ease-out">
+                    <SideBar />
+                  </div>
+                </>
               )}
 
               {children}

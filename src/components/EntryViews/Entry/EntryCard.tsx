@@ -17,6 +17,7 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
     currentMarkAsReadOnHover,
     entriesLayout: display,
     showHiddenEntries,
+    isMobile,
   } = useAppContext();
 
   const isCompact = display === "compact";
@@ -56,11 +57,32 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
   }, [currentMarkAsReadOnHover, entry.read_later]);
 
   if (isCompact) {
+    if (isMobile) {
+      return (
+        <Link
+          to="/entries/$entryId"
+          params={{ entryId: entry.id?.toString() || "" }}
+          className={`flex items-center gap-2 py-3 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
+        >
+          {entry.feed && (
+            <img
+              alt={entry.feed.title}
+              className="h-4 w-4 object-cover rounded-sm shrink-0"
+              src={entry.feed.icon}
+            />
+          )}
+          <h3 className="text-sm font-medium truncate flex-1">
+            {entry.title?.trim() || entry.description?.trim() || "Untitled entry"}
+          </h3>
+        </Link>
+      );
+    }
+
     return (
       <div
         ref={cardRef}
         key={entry.id}
-        className={`group px-2 py-2 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
+        className={`py-2 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
       >
         <div className="flex items-center gap-2">
           {entry.feed && (

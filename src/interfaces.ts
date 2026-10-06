@@ -40,6 +40,7 @@ export interface EntryInterface {
   author: string;
   feed?: FeedInterface;
   entry_type: string;
+  external_id?: number;
   media_content_url?: string;
   media_content_type?: string;
 }

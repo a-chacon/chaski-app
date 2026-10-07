@@ -21,6 +21,7 @@ interface EntriesContextType {
   setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
   setScrollTop: (value: number) => void;
   setPath: (newPath: string) => void;
+  dropCache: () => void;
 }
 
 const EntriesContext = createContext<EntriesContextType | undefined>(undefined);
@@ -56,8 +57,7 @@ export const EntriesProvider: React.FC<EntriesProviderProps> = ({ children }) =>
     if (cached && cached.path === newPath) {
       setCurrent(cached.state);
     } else {
-      setCached(null);
-      setCurrent(DEFAULT_STATE);
+      dropCache();
     }
   };
 
@@ -92,6 +92,11 @@ export const EntriesProvider: React.FC<EntriesProviderProps> = ({ children }) =>
     updateCurrent((prev) => ({ ...prev, scrollTop: value }));
   };
 
+  const dropCache = () => {
+    setCached(null);
+    setCurrent(DEFAULT_STATE);
+  }
+
   const contextValue = useMemo(() => ({
     path,
     entries: current.entries,
@@ -103,6 +108,7 @@ export const EntriesProvider: React.FC<EntriesProviderProps> = ({ children }) =>
     setHasMore,
     setScrollTop,
     setPath,
+    dropCache
   }), [path, current]);
 
   return (

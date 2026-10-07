@@ -13,13 +13,15 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiRefreshLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
-import { Link } from "@tanstack/react-router";
+import { RiHome2Line, RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiRefreshLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
+import { useEntries } from '../IndexEntriesContext'
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import NewAccountModal from "./NewAccountModal";
 import { AccountInterface } from "../interfaces";
 import { deleteAccount, fullSync } from "../helpers/accountsData";
 import SearchModal from "./SearchModal";
+
 
 import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
@@ -37,6 +39,8 @@ const WindowTitlebar: React.FC = () => {
   const [syncingAccountId, setSyncingAccountId] = useState<number | null>(null);
   const { t } = useTranslation(["titlebar", "common"]);
   const { addNotification } = useNotification();
+  const { dropCache } = useEntries();
+  const navigate = useNavigate();
 
   const {
     accounts,
@@ -113,6 +117,11 @@ const WindowTitlebar: React.FC = () => {
     setAccountToDelete(null);
   };
 
+  const handleHomeRedirect = () => {
+    dropCache();
+    navigate({ to: '/' });
+  }
+
   return (
     <div className={`border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none gap-1 ${isMobile ? "h-14 px-3" : "h-10"}`}>
       <div className={`flex items-center ${isMobile ? "w-full justify-between" : ""} text-primary-500`}>
@@ -126,6 +135,18 @@ const WindowTitlebar: React.FC = () => {
             onPress={() => setSideBarOpen((prev) => !prev)}
           >
             {sideBarOpen ? <RiSidebarFoldLine size={isMobile ? 22 : 18} /> : <RiSidebarUnfoldLine size={isMobile ? 22 : 18} />}
+          </Button>
+        </Tooltip>
+        <Tooltip content={t("titlebar:home")} delay={300}>
+          <Button
+            color="default"
+            variant="light"
+            isIconOnly
+            size={isMobile ? "md" : "sm"}
+            aria-label={t("titlebar:home")}
+            onPress={handleHomeRedirect}
+          >
+            <RiHome2Line size={isMobile ? 22 : 18} />
           </Button>
         </Tooltip>
         <Tooltip content={t("titlebar:searchFeedsAndEntries")} delay={300}>

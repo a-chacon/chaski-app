@@ -640,20 +640,8 @@ pub fn greader_item_to_new_entry(item: &GReaderItem, feed_id: i32) -> NewEntry {
         .map(|c| c.content.clone())
         .or_else(|| item.summary.as_ref().map(|s| s.content.clone()));
 
-    // Categories are strings like "user/-/state/com.google/read" or
-    // "user/USERID/state/com.google/starred". Match by suffix to handle
-    // both the canonical "-" form and real user-ID forms.
-    let is_read = item
-        .categories
-        .as_ref()
-        .map(|cats| {
-            cats.iter().any(|c| {
-                // Must end with /read but NOT /read-later (avoid false match)
-                (c.ends_with("/state/com.google/read") || c.contains("/state/com.google/read"))
-                    && !c.contains("read-later")
-            })
-        })
-        .unwrap_or(false);
+    // a new item is always not readed.
+    let is_read = false;
 
     let is_starred = item
         .categories

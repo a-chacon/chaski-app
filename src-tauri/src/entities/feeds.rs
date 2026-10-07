@@ -547,83 +547,108 @@ async fn sync_entries(
         }
     }
 
-    // ── 5. Reconcile read state ───────────────────────────────────────────────
-    // Remote is the source of truth, but we must be careful:
-    //   - If remote says UNREAD  → always trust it (mark local as unread)
-    //   - If remote says READ    → only trust it if the entry is in remote_ids
-    //     (unread OR starred). Entries absent from both streams may simply be
-    //     beyond the sync limit or old read items we don't need to touch.
-    //   - Starred: same logic — only unstar locally if remote explicitly has
-    //     the entry in its starred stream and it's not starred there.
-    let mut to_mark_read: Vec<i32> = Vec::new();
-    let mut to_mark_unread: Vec<i32> = Vec::new();
-    let mut to_mark_starred: Vec<i32> = Vec::new();
-    let mut to_mark_unstarred: Vec<i32> = Vec::new();
+    // ── 5. Reconcile read / starred state ────────────────────────────────────
+    //
+    // For each locally-known entry we compare local state vs remote state:
+    //
+    // READ:
+    //   remote=unread, local=read   → local was changed offline → push read to remote
+    //   remote=read,   local=unread → changed elsewhere → mark local as read
+    //
+    // STARRED:
+    //   remote=starred,   local=unstarred → changed elsewhere → mark local starred
+    //   remote=unstarred, local=starred   → local changed offline → push starred to remote
+    //
+    // Entries NOT in remote_ids are outside the remote sync window (already read
+    // on the server long ago). If locally still unread, that's an offline change
+    // → push read to remote.
+
+    // Changes to apply locally
+    let mut to_mark_read_locally: Vec<i32> = Vec::new();
+    let mut to_mark_starred_locally: Vec<i32> = Vec::new();
+    let to_mark_unstarred_locally: Vec<i32> = Vec::new();
+
+    // IDs to push upstream (use external_id string for the API)
+    let mut to_mark_read_remotely: Vec<String> = Vec::new();
+    let mut to_mark_starred_remotely: Vec<String> = Vec::new();
 
     for (ext_id, (entry_id, local_read, local_read_later)) in &local_map {
         let remote_is_unread = unread_ids.contains(ext_id);
         let remote_is_starred = starred_ids.contains(ext_id);
-        let in_remote_window = remote_ids.contains(ext_id);
 
-        // read reconcile
-        if remote_is_unread && *local_read == 1 {
-            // Remote says unread, local says read → correct locally
-            to_mark_unread.push(*entry_id);
-        } else if in_remote_window && !remote_is_unread && *local_read == 0 {
-            // Entry is known to remote (in unread or starred window) but not
-            // in the unread list → remote considers it read
-            to_mark_read.push(*entry_id);
+        // READ reconcile
+        if !remote_is_unread && *local_read == 0 {
+            // Remote does not list this entry as unread → remote considers it read.
+            // Mark local as read.
+            to_mark_read_locally.push(*entry_id);
+        } else if remote_is_unread && *local_read == 1 {
+            // Remote says unread but local says read → user read it offline.
+            // Push read to remote.
+            to_mark_read_remotely.push(ext_id.clone());
         }
 
-        // starred reconcile
+        // STARRED reconcile
         if remote_is_starred && *local_read_later == 0 {
-            to_mark_starred.push(*entry_id);
-        } else if in_remote_window && !remote_is_starred && *local_read_later == 1 {
-            to_mark_unstarred.push(*entry_id);
+            // Starred on another client → mark local starred
+            to_mark_starred_locally.push(*entry_id);
+        } else if !remote_is_starred && *local_read_later == 1 {
+            // Starred locally (offline) → push to remote
+            to_mark_starred_remotely.push(ext_id.clone());
         }
     }
 
-    if !to_mark_read.is_empty() {
+    // Apply local DB changes
+    if !to_mark_read_locally.is_empty() {
         match crate::db::with_retry(|| {
-            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_read)))
+            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_read_locally)))
                 .set(entries::read.eq(1))
                 .execute(conn)
         }) {
-            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as read", n),
-            Err(e) => log::error!(target: "chaski:sync", "Failed to mark entries read: {}", e),
+            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as read locally", n),
+            Err(e) => {
+                log::error!(target: "chaski:sync", "Failed to mark entries read locally: {}", e)
+            }
         }
     }
 
-    if !to_mark_unread.is_empty() {
+    if !to_mark_starred_locally.is_empty() {
         match crate::db::with_retry(|| {
-            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_unread)))
-                .set(entries::read.eq(0))
-                .execute(conn)
-        }) {
-            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as unread", n),
-            Err(e) => log::error!(target: "chaski:sync", "Failed to mark entries unread: {}", e),
-        }
-    }
-
-    if !to_mark_starred.is_empty() {
-        match crate::db::with_retry(|| {
-            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_starred)))
+            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_starred_locally)))
                 .set(entries::read_later.eq(1))
                 .execute(conn)
         }) {
-            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as starred", n),
-            Err(e) => log::error!(target: "chaski:sync", "Failed to mark entries starred: {}", e),
+            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as starred locally", n),
+            Err(e) => {
+                log::error!(target: "chaski:sync", "Failed to mark entries starred locally: {}", e)
+            }
         }
     }
 
-    if !to_mark_unstarred.is_empty() {
+    if !to_mark_unstarred_locally.is_empty() {
         match crate::db::with_retry(|| {
-            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_unstarred)))
+            diesel::update(entries::table.filter(entries::id.eq_any(&to_mark_unstarred_locally)))
                 .set(entries::read_later.eq(0))
                 .execute(conn)
         }) {
-            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as unstarred", n),
-            Err(e) => log::error!(target: "chaski:sync", "Failed to mark entries unstarred: {}", e),
+            Ok(n) => log::info!(target: "chaski:sync", "Marked {} entries as unstarred locally", n),
+            Err(e) => {
+                log::error!(target: "chaski:sync", "Failed to mark entries unstarred locally: {}", e)
+            }
+        }
+    }
+
+    // Push offline changes upstream
+    if !to_mark_read_remotely.is_empty() {
+        log::info!(target: "chaski:sync", "Pushing {} read entries to remote", to_mark_read_remotely.len());
+        if let Err(e) = client.mark_as_read(&to_mark_read_remotely).await {
+            log::warn!(target: "chaski:sync", "Failed to push read state to remote: {}", e);
+        }
+    }
+
+    if !to_mark_starred_remotely.is_empty() {
+        log::info!(target: "chaski:sync", "Pushing {} starred entries to remote", to_mark_starred_remotely.len());
+        if let Err(e) = client.mark_as_starred(&to_mark_starred_remotely).await {
+            log::warn!(target: "chaski:sync", "Failed to push starred state to remote: {}", e);
         }
     }
 

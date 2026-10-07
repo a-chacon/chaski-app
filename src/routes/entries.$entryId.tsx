@@ -2,7 +2,8 @@ import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { useEffect, useState } from "react";
 import { EntryInterface } from "../interfaces";
-import parse from "html-react-parser";
+import parse, { Element, domToReact, HTMLReactParserOptions } from "html-react-parser";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import EntryActions from "../components/EntryActions";
 import ThumbnailOrMedia from "../components/ThumbnailOrMedia";
 import EntryShare from "../components/EntryShare";
@@ -44,6 +45,26 @@ function Entry() {
   }, [entryId]);
 
   const { history } = useRouter();
+
+  const parseOptions: HTMLReactParserOptions = {
+    replace(node) {
+      if (node instanceof Element && node.name === "a") {
+        const { href, ...rest } = node.attribs;
+        return (
+          <a
+            {...rest}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (href) openUrl(href);
+            }}
+          >
+            {domToReact(node.children as Parameters<typeof domToReact>[0], parseOptions)}
+          </a>
+        );
+      }
+    },
+  };
 
   const isDarkTheme = (theme: string) => theme.endsWith('-dark');
 
@@ -114,10 +135,10 @@ function Entry() {
 
           <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto w-full min-w-0 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:max-w-full [&_iframe]:max-w-full ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
             <p className="py-6 line-clamp-3">
-              {parse(entry.description || "")}
+              {parse(entry.description || "", parseOptions)}
             </p>
             <hr />
-            {parse(entry.content || "")}
+            {parse(entry.content || "", parseOptions)}
           </div>
         </div>
       </MainSectionLayout>

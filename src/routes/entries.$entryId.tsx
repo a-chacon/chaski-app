@@ -48,6 +48,9 @@ function Entry() {
 
   const parseOptions: HTMLReactParserOptions = {
     replace(node) {
+      if (node instanceof Element && node.name === "h1") {
+        return <></>;
+      }
       if (node instanceof Element && node.name === "a") {
         const { href, ...rest } = node.attribs;
         return (

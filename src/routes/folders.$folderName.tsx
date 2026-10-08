@@ -11,6 +11,8 @@ import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
 import { useTranslation } from 'react-i18next'
 import EntryListActionsModal from '../components/EntryListActionsModal'
+import { Button } from '@heroui/react'
+import { RiRefreshLine } from '@remixicon/react'
 
 export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
@@ -19,7 +21,7 @@ export const Route = createFileRoute('/folders/$folderName')({
 export default function Folder() {
   const { t } = useTranslation('entries')
   const { addNotification } = useNotification()
-  const { showReadEntries, showHiddenEntries } = useAppContext()
+  const { showReadEntries, showHiddenEntries, isMobile } = useAppContext()
   const { folderName: folderParam } = Route.useParams()
   const [accountIdStr, folderName] = folderParam.split('-')
   const accountId = Number(accountIdStr)
@@ -110,12 +112,25 @@ export default function Folder() {
         <div className="flex flex-col py-8 justify-between items-start">
           <div className="w-full flex flex-row justify-between">
             <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
-            <EntryListActionsModal
-              actions={[
-                { key: "markRead", label: t('updateFolderAsRead'), onPress: handleUpdateEntriesAsRead },
-                { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
-              ]}
-            />
+            <div className="flex items-center gap-1">
+              {!isMobile && (
+                <Button
+                  isIconOnly
+                  variant="light"
+                  onPress={handleReloadButton}
+                  aria-label={t('reloadEntries')}
+                  className="text-foreground-500"
+                >
+                  <RiRefreshLine className="w-5 h-5" />
+                </Button>
+              )}
+              <EntryListActionsModal
+                actions={[
+                  { key: "markRead", label: t('updateFolderAsRead'), onPress: handleUpdateEntriesAsRead },
+                  { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
+                ]}
+              />
+            </div>
           </div>
         </div>
         <EntriesList

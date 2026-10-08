@@ -229,7 +229,21 @@ pub async fn collect_feed_content(
 
     let feed = crate::entities::feeds::show(feed_id, app_handle.clone()).unwrap();
 
+    if let Err(err) = app_handle.emit(
+        "feed://fetch-start",
+        serde_json::json!({ "feedId": feed.id, "accountId": feed.account_id }),
+    ) {
+        log::warn!(target: "chaski:commands", "Failed to emit feed fetch start event: {err:?}");
+    }
+
     crate::core::jobs::collect_feed_content(&feed, app_handle.clone()).await;
+
+    if let Err(err) = app_handle.emit(
+        "feed://fetch-complete",
+        serde_json::json!({ "feedId": feed.id, "accountId": feed.account_id }),
+    ) {
+        log::warn!(target: "chaski:commands", "Failed to emit feed fetch complete event: {err:?}");
+    }
 
     Ok(String::from("Ok"))
 }

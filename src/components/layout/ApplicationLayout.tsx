@@ -16,6 +16,8 @@ import {
   updateConfiguration,
 } from "../../helpers/configurationsData";
 import { NotificationProvider, useNotification } from "../../NotificationContext";
+import { SyncStatusProvider } from "../../SyncStatusContext";
+import StatusIndicator from "../StatusIndicator";
 import { Alert, Button } from "@heroui/react";
 import updater from "../../helpers/updater";
 
@@ -462,6 +464,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         setCurrentAccount
       }}
     >
+      <SyncStatusProvider>
       <NotificationProvider>
         <UpdaterBootstrap />
         <div className="h-dvh">
@@ -572,9 +575,11 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
                 onOpenChange={feedbackModalState.onOpenChange}
               />
             </div>
+            <StatusIndicator />
           </div>
         </div>
       </NotificationProvider>
+      </SyncStatusProvider>
     </AppContext.Provider>
   );
 };

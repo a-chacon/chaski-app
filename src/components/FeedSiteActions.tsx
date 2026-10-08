@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button, useDisclosure } from "@heroui/react";
+import { RiRefreshLine } from "@remixicon/react";
 import { FeedInterface } from "../interfaces";
 import FeedSiteEditModal from "./FeedSiteEditModal";
 import FeedSiteFiltersModal from "./FeedSiteFiltersModal";
@@ -11,6 +12,7 @@ import { save } from "@tauri-apps/plugin-dialog";
 import { createFeed, exportOPML, destroyFeed } from "../helpers/feedsData";
 import { useNotification } from "../NotificationContext";
 import { useNavigate } from "@tanstack/react-router";
+import { useAppContext } from "../AppContext";
 
 interface FeedSiteActionsProps {
   feed: FeedInterface;
@@ -24,6 +26,7 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
   const { t } = useTranslation(['feeds', 'common', 'entries']);
   const navigate = useNavigate();
   const { addNotification } = useNotification();
+  const { isMobile } = useAppContext();
   const [isSaved, setIsSaved] = useState<boolean>(!!feed.id);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const editModal = useDisclosure();
@@ -96,6 +99,17 @@ const FeedSiteActions: React.FC<FeedSiteActionsProps> = ({ feed, setFeed, onMark
 
     return (
       <div className="flex flex-row items-center gap-2">
+        {!isMobile && onRefresh && (
+          <Button
+            isIconOnly
+            variant="light"
+            onPress={onRefresh}
+            aria-label={t('entries:fetchNewEntries')}
+            className="text-foreground-500"
+          >
+            <RiRefreshLine className="w-5 h-5" />
+          </Button>
+        )}
         <EntryListActionsModal actions={actions} aria-label="Feed actions" />
         <FeedSiteEditModal
           key={"edit-modal-" + feed.id}

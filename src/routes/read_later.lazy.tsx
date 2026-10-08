@@ -17,7 +17,7 @@ export const Route = createLazyFileRoute('/read_later')({
 export default function ReadLater() {
   const { t } = useTranslation('entries')
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } = useEntries("/read_later");
-  const { currentAccount, showReadEntries, showHiddenEntries } = useAppContext();
+  const { currentAccount, showHiddenEntries } = useAppContext();
   const isMounted = useRef(false)
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function ReadLater() {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page, entries.length, currentAccount?.id, showReadEntries, showHiddenEntries])
+  }, [page, entries.length, currentAccount?.id, showHiddenEntries])
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -48,7 +48,7 @@ export default function ReadLater() {
     setEntries([])
     setPage(1)
     setHasMore(true)
-  }, [currentAccount?.id, showReadEntries, showHiddenEntries])
+  }, [currentAccount?.id, showHiddenEntries])
 
   const fetchEntries = async () => {
     try {
@@ -63,7 +63,6 @@ export default function ReadLater() {
         filters: {
           read_later_eq: 1,
           account_id_eq: currentAccount.id,
-          ...(showReadEntries ? {} : { read_eq: 0 }),
           ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         }
       })

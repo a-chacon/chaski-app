@@ -13,13 +13,13 @@ use crate::schema::feeds::dsl::*;
 
 #[derive(Deserialize, Debug)]
 pub struct EntriesFilters {
-    feed_id_eq: Option<i32>,
-    read_later_eq: Option<i32>,
-    read_eq: Option<i32>,
-    hidden_eq: Option<i32>,
-    pub_date_eq: Option<String>,
-    folder_eq: Option<String>,
-    account_id_eq: Option<i32>,
+    pub feed_id_eq: Option<i32>,
+    pub read_later_eq: Option<i32>,
+    pub read_eq: Option<i32>,
+    pub hidden_eq: Option<i32>,
+    pub pub_date_eq: Option<String>,
+    pub folder_eq: Option<String>,
+    pub account_id_eq: Option<i32>,
 }
 
 pub fn get_entries_with_feed(

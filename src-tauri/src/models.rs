@@ -179,6 +179,7 @@ pub struct ShortEntry {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub entry_type: String,
+    pub external_id: Option<String>,
     pub media_content_url: Option<String>,
     pub media_content_type: Option<String>,
 }

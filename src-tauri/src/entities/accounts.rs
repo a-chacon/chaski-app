@@ -93,7 +93,7 @@ async fn greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {
             log::info!(target: "chaski:sync", "Starting sync for account: {} (ID: {})", account.name, account.id);
 
             let cloned_app_handle = app_handle.clone();
-            match crate::feeds::full_sync_greaderapi_account_feeds(&account, cloned_app_handle)
+            match crate::entities::feeds::full_sync_greaderapi_account(&account, cloned_app_handle)
                 .await
             {
                 Ok(_) => {

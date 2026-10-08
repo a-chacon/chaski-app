@@ -12,6 +12,25 @@ pub async fn list_entries(
 ) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command list_entries. Page: {page:?}, Items: {items:?}, Filters: {filters:?}");
 
+    if let Some(ref f) = filters {
+        if let Some(acc_id) = f.account_id_eq {
+            let handle = app_handle.clone();
+            tauri::async_runtime::spawn(async move {
+                if let Some(account) = crate::entities::accounts::show(acc_id, handle.clone()) {
+                    if account.kind == "greaderapi" {
+                        log::debug!(target: "chaski:sync", "list_entries triggering background sync for account {}", acc_id);
+                        if let Err(e) =
+                            crate::entities::feeds::full_sync_greaderapi_account(&account, handle)
+                                .await
+                        {
+                            log::warn!(target: "chaski:sync", "Background sync on list_entries failed: {}", e);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
     let result = crate::entities::entries::get_entries_with_feed(page, items, filters, app_handle);
 
     match serde_json::to_string(&result) {
@@ -68,7 +87,7 @@ pub async fn update_entry(
     mut entry: Entry,
     app_handle: tauri::AppHandle,
 ) -> Result<String, ()> {
-    log::debug!(target: "chaski:commands","Command update_entry. entry_id: {entry_id:?}");
+    log::debug!(target: "chaski:commands","Command update_entry. entry_id: {entry_id:?} {entry:?}");
 
     let has_content = entry
         .content
@@ -83,10 +102,13 @@ pub async fn update_entry(
         entry.content = completed_entry.content;
     }
 
-    let result = match crate::entities::entries::update(entry_id, entry, app_handle) {
+    let result = match crate::entities::entries::update(entry_id, entry.clone(), app_handle.clone())
+    {
         Ok(r) => r,
         Err(_) => return Err(()),
     };
+
+    push_entry_state_to_greader(entry, app_handle);
 
     match serde_json::to_string(&result) {
         Ok(json_string) => Ok(json_string),
@@ -109,4 +131,66 @@ pub async fn update_entries_as_read_by_feed_id(
     log::debug!(target: "chaski:commands","Command update_entries_as_read_by_feed. feed_id: {feed_id:?}");
     crate::entities::entries::update_all_as_read_by_feed_id(feed_id, app_handle);
     Ok(())
+}
+
+fn push_entry_state_to_greader(entry: Entry, app_handle: tauri::AppHandle) {
+    let external_id = match entry.external_id.clone() {
+        Some(eid) if !eid.is_empty() => eid,
+        _ => return,
+    };
+
+    tauri::async_runtime::spawn(async move {
+        // Load the feed to check if it belongs to a GReader account
+        let feed = match crate::entities::feeds::show(entry.feed_id, app_handle.clone()) {
+            Some(f) => f,
+            None => return,
+        };
+
+        let acc_id = match feed.account_id {
+            Some(id) => id,
+            None => return,
+        };
+
+        let account = match crate::entities::accounts::show(acc_id, app_handle.clone()) {
+            Some(a) => a,
+            None => return,
+        };
+
+        if account.kind != "greaderapi" {
+            return;
+        }
+
+        let client = match crate::integrations::greader::GReaderClient::new(
+            account.server_url.unwrap_or_default(),
+            account.auth_token.unwrap_or_default(),
+        ) {
+            Ok(c) => c,
+            Err(e) => {
+                log::warn!(target: "chaski:sync", "Could not create GReader client for push: {}", e);
+                return;
+            }
+        };
+
+        let ids = vec![external_id];
+
+        // Sync read state
+        let read_result = if entry.read == 1 {
+            client.mark_as_read(&ids).await
+        } else {
+            client.mark_as_unread(&ids).await
+        };
+        if let Err(e) = read_result {
+            log::warn!(target: "chaski:sync", "Failed to push read state upstream: {}", e);
+        }
+
+        // Sync starred / read_later state
+        let starred_result = if entry.read_later == 1 {
+            client.mark_as_starred(&ids).await
+        } else {
+            client.mark_as_unstarred(&ids).await
+        };
+        if let Err(e) = starred_result {
+            log::warn!(target: "chaski:sync", "Failed to push starred state upstream: {}", e);
+        }
+    });
 }

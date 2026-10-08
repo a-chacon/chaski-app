@@ -28,7 +28,7 @@ export default function Configurations() {
   const {
     handleSetCurrentFont, currentFont, currentFontSize, handleSetCurrentFontSize,
     currentFontSpace, handleSetCurrentFontSpace, currentMarkAsReadOnHover,
-    handleSetMarkAsReadOnHover, currentEntryScrapeMode, handleSetCurrentEntryScrapeMode,
+    handleSetMarkAsReadOnHover,
     currentLanguage, handleSetCurrentLanguage,
     handleSetEntriesLayout, entriesLayout, handleSetShowReadEntries, showReadEntries,
     handleSetShowHiddenEntries, showHiddenEntries,
@@ -178,21 +178,6 @@ export default function Configurations() {
               <Switch
                 isSelected={currentMarkAsReadOnHover}
                 onValueChange={handleSetMarkAsReadOnHover}
-                color="primary"
-              />
-            </div>
-
-            <div className="h-px bg-divider" />
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">{t('behavior.downloadEntries')}</p>
-              </div>
-              <Switch
-                isSelected={currentEntryScrapeMode === "ALWAYS"}
-                onValueChange={(enabled) =>
-                  handleSetCurrentEntryScrapeMode(enabled ? "ALWAYS" : "ON_DEMAND")
-                }
                 color="primary"
               />
             </div>

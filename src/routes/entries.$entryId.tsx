@@ -7,9 +7,9 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import EntryActions from "../components/EntryActions";
 import ThumbnailOrMedia from "../components/ThumbnailOrMedia";
 import EntryShare from "../components/EntryShare";
-import { RiArrowLeftLine } from "@remixicon/react";
-import { Button, Spinner } from "@heroui/react";
-import { getEntry, updateEntryAsRead } from "../helpers/entriesData";
+import { RiArrowLeftLine, RiDownloadCloud2Line } from "@remixicon/react";
+import { Button, Spinner, Tooltip } from "@heroui/react";
+import { getEntry, scrapeEntry, updateEntryAsRead } from "../helpers/entriesData";
 import { useAppContext } from "../AppContext";
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +22,7 @@ function Entry() {
   const { entryId } = Route.useParams();
   const [entry, setEntry] = useState<EntryInterface>();
   const [isLoadingEntry, setIsLoadingEntry] = useState(true);
+  const [isScrapingEntry, setIsScrapingEntry] = useState(false);
   const { currentTheme } = useAppContext();
 
   useEffect(() => {
@@ -43,6 +44,19 @@ function Entry() {
 
     loadEntry();
   }, [entryId]);
+
+  const handleScrapeEntry = async () => {
+    if (!entry?.id) return;
+    setIsScrapingEntry(true);
+    try {
+      const scraped = await scrapeEntry(entry.id);
+      if (scraped) {
+        setEntry(scraped);
+      }
+    } finally {
+      setIsScrapingEntry(false);
+    }
+  };
 
   const { history } = useRouter();
 
@@ -106,7 +120,21 @@ function Entry() {
 
               </EntryActions>
             </div>
-            <EntryShare entry={entry} />
+            <div className="flex items-center gap-1">
+              <Tooltip content={t('fetchFullContent')}>
+                <Button
+                  color="primary"
+                  variant="flat"
+                  isIconOnly
+                  size="sm"
+                  isLoading={isScrapingEntry}
+                  onPress={handleScrapeEntry}
+                >
+                  {!isScrapingEntry && <RiDownloadCloud2Line className="text-primary-500" />}
+                </Button>
+              </Tooltip>
+              <EntryShare entry={entry} />
+            </div>
           </div>
           <div className="flex flex-col justify-between w-full">
             <Link

@@ -158,6 +158,7 @@ pub fn run() {
             commands::entries::list_entries,
             commands::folders::list_folders,
             commands::entries::show_entry,
+            commands::entries::scrape_entry,
             commands::entries::update_entry,
             commands::feeds::update_feed,
             commands::entries::update_entries_as_read,

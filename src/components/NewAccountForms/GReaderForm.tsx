@@ -14,6 +14,7 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
   const { t } = useTranslation(['accounts', 'common']);
   const {
     setAccounts,
+    setCurrentAccount,
   } = useAppContext();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,7 +54,8 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
       setAccounts((prevAccounts: AccountInterface[]) => {
         const updatedAccounts: AccountInterface[] = [...prevAccounts, newAccount];
         return updatedAccounts;
-      })
+      });
+      setCurrentAccount(newAccount);
       onClose();
     } catch (error) {
       setErrorMessage(`Please try again. Error: ${error instanceof Error ? error.message : 'Unknown error'}`);

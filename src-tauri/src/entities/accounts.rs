@@ -92,12 +92,30 @@ async fn greaderapi_accounts_sync_loop(app_handle: tauri::AppHandle) {
         for account in greader_accounts {
             log::info!(target: "chaski:sync", "Starting sync for account: {} (ID: {})", account.name, account.id);
 
+            let sync_start_payload = serde_json::json!({
+                "accountId": account.id,
+                "accountName": account.name
+            });
+            if let Err(emit_err) = app_handle.emit("account://sync-start", sync_start_payload) {
+                log::warn!(target: "chaski:sync", "Failed to emit sync start event: {:?}", emit_err);
+            }
+
             let cloned_app_handle = app_handle.clone();
             match crate::entities::feeds::full_sync_greaderapi_account(&account, cloned_app_handle)
                 .await
             {
                 Ok(_) => {
                     log::info!(target: "chaski:sync", "Successfully synced account: {} (ID: {})", account.name, account.id);
+
+                    let sync_complete_payload = serde_json::json!({
+                        "accountId": account.id,
+                        "accountName": account.name
+                    });
+                    if let Err(emit_err) =
+                        app_handle.emit("account://sync-complete", sync_complete_payload)
+                    {
+                        log::warn!(target: "chaski:sync", "Failed to emit sync complete event: {:?}", emit_err);
+                    }
                 }
                 Err(e) => {
                     log::error!(target: "chaski:sync", "Error syncing account {} (ID: {}): {}", account.name, account.id, e);

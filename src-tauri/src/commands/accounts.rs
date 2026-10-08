@@ -210,6 +210,14 @@ pub async fn full_sync(account_id: i32, app_handle: tauri::AppHandle) -> Result<
         return Ok(response.to_string());
     }
 
+    let sync_start_payload = json!({
+        "accountId": account_id,
+        "accountName": account.name
+    });
+    if let Err(err) = app_handle.emit("account://sync-start", sync_start_payload) {
+        log::warn!(target: "chaski:commands", "Failed to emit sync start event: {err:?}");
+    }
+
     match crate::entities::feeds::full_sync_greaderapi_account_feeds(&account, app_handle.clone())
         .await
     {
@@ -224,6 +232,14 @@ pub async fn full_sync(account_id: i32, app_handle: tauri::AppHandle) -> Result<
                 log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
             }
 
+            let sync_complete_payload = json!({
+                "accountId": account_id,
+                "accountName": account.name
+            });
+            if let Err(err) = app_handle.emit("account://sync-complete", sync_complete_payload) {
+                log::warn!(target: "chaski:commands", "Failed to emit sync complete event: {err:?}");
+            }
+
             let response = json!({
                 "success": true,
                 "message": "Full sync completed successfully",
@@ -232,6 +248,15 @@ pub async fn full_sync(account_id: i32, app_handle: tauri::AppHandle) -> Result<
             Ok(response.to_string())
         }
         Err(e) => {
+            let sync_error_payload = json!({
+                "accountId": account_id,
+                "accountName": account.name,
+                "error": e.to_string()
+            });
+            if let Err(err) = app_handle.emit("account://sync-error", sync_error_payload) {
+                log::warn!(target: "chaski:commands", "Failed to emit sync error event: {err:?}");
+            }
+
             let response = json!({
                 "success": false,
                 "message": format!("Full sync failed: {}", e),

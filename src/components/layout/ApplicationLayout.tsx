@@ -66,7 +66,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
-  const [currentEntryScrapeMode, setCurrentEntryScrapeMode] = useState<string>("ON_DEMAND");
   const [currentLanguage, setCurrentLanguage] = useState<string>("en");
   const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
   const [showOpmlImportAlert, setShowOpmlImportAlert] = useState<boolean>(false);
@@ -119,16 +118,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     }
 
     setCurrentMarkAsReadOnHover(mark_as_read_on_hover);
-  };
-
-  const handleSetCurrentEntryScrapeMode = (mode: string) => {
-    let configuration = configurations.find((x) => x.name === "ENTRY_SCRAPE_MODE");
-    if (configuration && configuration.value !== mode) {
-      configuration.value = mode;
-      updateConfiguration(configuration);
-    }
-
-    setCurrentEntryScrapeMode(mode);
   };
 
   const handleSetCurrentFontSize = (font_size: number) => {
@@ -249,7 +238,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentConfigFontSize();
     getCurrentConfigFontSpace();
     getCurrentConfigMarkAsReadOnHover();
-    getCurrentConfigEntryScrapeMode();
   }, [configurations]);
 
   useEffect(() => {
@@ -327,15 +315,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       handleSetMarkAsReadOnHover(result.value === "true");
     } else {
       handleSetMarkAsReadOnHover(false);
-    }
-  };
-
-  const getCurrentConfigEntryScrapeMode = () => {
-    let result = configurations.find((x) => x.name === "ENTRY_SCRAPE_MODE");
-    if (result) {
-      handleSetCurrentEntryScrapeMode(result.value);
-    } else {
-      handleSetCurrentEntryScrapeMode("ON_DEMAND");
     }
   };
 
@@ -475,8 +454,6 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         handleSetCurrentFontSpace,
         currentMarkAsReadOnHover,
         handleSetMarkAsReadOnHover,
-        currentEntryScrapeMode,
-        handleSetCurrentEntryScrapeMode,
         currentLanguage,
         handleSetCurrentLanguage,
         setAccounts,

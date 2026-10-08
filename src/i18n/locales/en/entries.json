@@ -25,6 +25,7 @@
   "hide": "Hide",
   "unhide": "Unhide",
   "visitWebsite": "Visit Website: {{link}}",
+  "fetchFullContent": "Fetch full content from website",
   "pullDownToRefresh": "Pull down to refresh",
   "releaseToRefresh": "Release to refresh",
   "reloadingTitle": "Reloading",

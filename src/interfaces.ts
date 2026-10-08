@@ -98,8 +98,6 @@ export interface AppContextInterface {
   isMobile: boolean;
   handleSetMarkAsReadOnHover: (mark_as_read_on_hover: boolean) => void;
   currentMarkAsReadOnHover: boolean;
-  currentEntryScrapeMode: string;
-  handleSetCurrentEntryScrapeMode: (mode: string) => void;
   currentLanguage: string;
   handleSetCurrentLanguage: (lang: string) => void;
   setConfigurations: React.Dispatch<

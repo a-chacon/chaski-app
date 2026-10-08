@@ -15,6 +15,20 @@ export const getEntry = async (entry_id: number) => {
   }
 };
 
+export const scrapeEntry = async (entry_id: number) => {
+  try {
+    const message = await invoke<string>("scrape_entry", {
+      entryId: entry_id,
+    });
+
+    const response_entry: EntryInterface = JSON.parse(message);
+
+    return response_entry;
+  } catch (error) {
+    console.error("Error scraping entry:", error);
+  }
+};
+
 export const updateEntry = async (entry: EntryInterface) => {
   try {
     let id = entry.id || 0;

@@ -1,4 +1,3 @@
-use crate::core::jobs::complete_entry;
 use crate::db::establish_connection;
 use crate::models::{Entry, EntryWithFeed, Feed, NewEntry, ShortEntry, ShortEntryWithFeed};
 use chrono::{NaiveDate, NaiveDateTime};
@@ -264,16 +263,7 @@ pub async fn create_list(list_entries: Vec<NewEntry>, app_handle: tauri::AppHand
         .filter(|entry| !existing_links.contains(&entry.link))
         .collect();
 
-    let scrape_mode =
-        crate::entities::configurations::find_by_name("ENTRY_SCRAPE_MODE", app_handle.clone())
-            .map(|configuration| configuration.value)
-            .unwrap_or(String::from("ON_DEMAND"));
-
-    for mut new_entry in filtered_entries {
-        if scrape_mode == "ALWAYS" && new_entry.content.is_none() {
-            new_entry = complete_entry(new_entry).await;
-        }
-
+    for new_entry in filtered_entries {
         let result = diesel::insert_into(entries)
             .values(new_entry)
             .returning(Entry::as_returning())

@@ -43,35 +43,35 @@ pub async fn list_entries(
 pub async fn show_entry(entry_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command show_entry. entry_id: {entry_id:?}");
 
+    let result = crate::entities::entries::show(entry_id, app_handle.clone());
+
+    match serde_json::to_string(&result) {
+        Ok(json_string) => Ok(json_string),
+        Err(_) => Err(()),
+    }
+}
+
+/// Scrapes the entry's web page and overwrites title/description/content with the scraped data.
+/// This is always a forced fetch — existing content is replaced.
+#[command]
+pub async fn scrape_entry(entry_id: i32, app_handle: tauri::AppHandle) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command scrape_entry. entry_id: {entry_id:?}");
+
     let mut result = crate::entities::entries::show(entry_id, app_handle.clone());
 
     if let Some(entry_with_feed) = result.as_mut() {
-        let scrape_mode =
-            crate::entities::configurations::find_by_name("ENTRY_SCRAPE_MODE", app_handle.clone())
-                .map(|configuration| configuration.value)
-                .unwrap_or(String::from("ON_DEMAND"));
+        let completed_entry = complete_entry(NewEntry::from(&entry_with_feed.entry)).await;
 
-        let has_content = entry_with_feed
-            .entry
-            .content
-            .as_ref()
-            .map(|content| !content.trim().is_empty())
-            .unwrap_or(false);
+        entry_with_feed.entry.title = completed_entry.title;
+        entry_with_feed.entry.description = completed_entry.description;
+        entry_with_feed.entry.content = completed_entry.content;
 
-        if scrape_mode == "ON_DEMAND" && !has_content {
-            let completed_entry = complete_entry(NewEntry::from(&entry_with_feed.entry)).await;
-
-            entry_with_feed.entry.title = completed_entry.title;
-            entry_with_feed.entry.description = completed_entry.description;
-            entry_with_feed.entry.content = completed_entry.content;
-
-            if let Ok(updated) = crate::entities::entries::update(
-                entry_id,
-                entry_with_feed.entry.clone(),
-                app_handle.clone(),
-            ) {
-                entry_with_feed.entry = updated;
-            }
+        if let Ok(updated) = crate::entities::entries::update(
+            entry_id,
+            entry_with_feed.entry.clone(),
+            app_handle.clone(),
+        ) {
+            entry_with_feed.entry = updated;
         }
     }
 

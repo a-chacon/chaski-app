@@ -14,6 +14,7 @@ const LocalForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
 
   const {
     setAccounts,
+    setCurrentAccount,
   } = useAppContext();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,6 +34,7 @@ const LocalForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
         const updatedAccounts: AccountInterface[] = [...prevAccounts, newAccount];
         return updatedAccounts;
       });
+      setCurrentAccount(newAccount);
       onClose();
     } catch (error) {
       console.error('Failed to create account:', error);

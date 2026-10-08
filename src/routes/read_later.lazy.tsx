@@ -6,6 +6,8 @@ import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import EntryListActionsModal from '../components/EntryListActionsModal'
+import { Button } from '@heroui/react'
+import { RiRefreshLine } from '@remixicon/react'
 
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
@@ -17,7 +19,7 @@ export const Route = createLazyFileRoute('/read_later')({
 export default function ReadLater() {
   const { t } = useTranslation('entries')
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } = useEntries("/read_later");
-  const { currentAccount, showHiddenEntries } = useAppContext();
+  const { currentAccount, showHiddenEntries, isMobile } = useAppContext();
   const isMounted = useRef(false)
 
   useEffect(() => {
@@ -95,11 +97,24 @@ export default function ReadLater() {
             <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>
             <h2 className="pt-1 pb-4">{t('readLaterSubtitle')}</h2>
           </div>
-          <EntryListActionsModal
-            actions={[
-              { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
-            ]}
-          />
+          <div className="flex items-center gap-1">
+            {!isMobile && (
+              <Button
+                isIconOnly
+                variant="light"
+                onPress={handleReloadButton}
+                aria-label={t('reloadEntries')}
+                className="text-foreground-500"
+              >
+                <RiRefreshLine className="w-5 h-5" />
+              </Button>
+            )}
+            <EntryListActionsModal
+              actions={[
+                { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
+              ]}
+            />
+          </div>
         </div>
         <EntriesList
           key="index"

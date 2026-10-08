@@ -22,5 +22,10 @@
   "syncSuccess": "Sync complete",
   "syncSuccessBody": "{{name}} synced successfully.",
   "syncError": "Sync failed",
-  "syncErrorBody": "Failed to sync {{name}}: {{error}}"
+  "syncErrorBody": "Failed to sync {{name}}: {{error}}",
+  "status": {
+    "idle": "Up to date",
+    "syncing": "Syncing",
+    "fetching": "Fetching"
+  }
 }

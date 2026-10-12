@@ -12,10 +12,7 @@ interface SyncLoginFormProps {
 
 const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
   const { t } = useTranslation(['accounts', 'common']);
-  const {
-    setAccounts,
-    setCurrentAccount,
-  } = useAppContext();
+  const { setAccounts, setCurrentAccount } = useAppContext();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,11 +26,10 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
     const formData = new FormData(e.currentTarget);
     const credentials = {
       username: formData.get('username') as string,
-      password: formData.get('password') as string
+      password: formData.get('password') as string,
     };
 
     let serverUrl = formData.get('server') as string;
-
     if (!/^https?:\/\//i.test(serverUrl)) {
       serverUrl = `http://${serverUrl}`;
     }
@@ -41,20 +37,16 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
     const accountData: AccountInterface = {
       name: serverUrl,
       kind: 'greaderapi',
-      credentials: credentials,
+      credentials,
       server_url: serverUrl,
       updated_at: new Date(),
-      created_at: new Date()
+      created_at: new Date(),
     };
 
     try {
       const newAccount = await createAccount(accountData);
       fullSync(newAccount.id!);
-
-      setAccounts((prevAccounts: AccountInterface[]) => {
-        const updatedAccounts: AccountInterface[] = [...prevAccounts, newAccount];
-        return updatedAccounts;
-      });
+      setAccounts((prevAccounts: AccountInterface[]) => [...prevAccounts, newAccount]);
       setCurrentAccount(newAccount);
       onClose();
     } catch (error) {
@@ -79,6 +71,7 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
         name="server"
         placeholder={t('accounts:serverUrlPlaceholder')}
         type="url"
+        description={t('accounts:serverUrlHint')}
       />
 
       <Input
@@ -106,19 +99,13 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
             onClick={() => setIsPasswordVisible(!isPasswordVisible)}
             aria-label={isPasswordVisible ? t('accounts:hidePassword') : t('accounts:showPassword')}
           >
-            {isPasswordVisible ? (
-              <RiEyeLine></RiEyeLine>
-            ) : (
-              <RiEyeOffLine></RiEyeOffLine>
-            )}
+            {isPasswordVisible ? <RiEyeLine /> : <RiEyeOffLine />}
           </button>
         }
       />
 
       {errorMessage && (
-        <div className="text-red-500 text-sm mt-2">
-          {errorMessage}
-        </div>
+        <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
       )}
 
       <div className="flex w-full justify-end gap-2">
@@ -133,6 +120,6 @@ const GReaderForm: React.FC<SyncLoginFormProps> = ({ onClose }) => {
       </div>
     </Form>
   );
-}
+};
 
 export default GReaderForm;

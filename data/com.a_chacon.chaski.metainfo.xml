@@ -32,6 +32,38 @@
   </provides>
 
   <releases>
+    <release version="0.8.0" date="2026-10-12">
+      <description>
+        <p>Added:</p>
+        <ul>
+          <li>Android support. The app now runs on Android devices. This required a substantial UI refactor, so the app's appearance may change in this release.</li>
+          <li>Internationalization (i18n) support. Spanish and English are supported.</li>
+          <li>Home link in the window bar for quickly returning to the home view.</li>
+          <li>Logs page to inspect application logs. This page helps diagnose problems in production.</li>
+          <li>Improved Google Reader–compatible sync support; entries are now synced as well.</li>
+        </ul>
+        <p>Changed:</p>
+        <ul>
+          <li>Mark entries as read on scroll instead of on hover (behavior change; may be a breaking UX change). Hover behavior does not work well on mobile, and marking on scroll is a more common pattern.</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Removed the account sync button from the accounts menu; Google Reader–style accounts now sync when entries are loaded.</li>
+          <li>Scraping is now optional and must be triggered manually to be more respectful of publishers' pages.</li>
+          <li>Removed duplicated titles from entry content.</li>
+          <li>New accounts are set as the current account when created.</li>
+          <li>"Read later" entries are always shown even if they were already marked as read.</li>
+          <li>Links inside article views open in the external browser by default.</li>
+          <li>Cache entries to preserve index/scroll position when returning to a list.</li>
+          <li>Ensure the current account is correctly checked when loading local config and database data.</li>
+          <li>Implement edit and sync for Google Reader–style accounts.</li>
+        </ul>
+        <p>CI:</p>
+        <ul>
+          <li>Added Android build to CI pipelines.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.7.0" date="2026-08-22">
       <description>
         <p>New features:</p>
@@ -53,6 +85,16 @@
   </branding>
 
   <content_rating type="oars-1.1"/>
+
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
 
   <screenshots>
     <screenshot type="default">

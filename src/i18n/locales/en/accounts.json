@@ -8,6 +8,7 @@
   "serverUrl": "Server Url",
   "serverUrlPlaceholder": "Enter your server url",
   "serverUrlError": "Please enter a valid url",
+  "serverUrlHint": "Enter the full API endpoint, not just the base URL. e.g. FreshRSS → https://yourserver.com/api/greader.php, Miniflux → https://yourserver.com/googlereader/api/0",
   "username": "Username",
   "usernamePlaceholder": "Enter your username",
   "usernameError": "Please enter a valid username",

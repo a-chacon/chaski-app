@@ -13,13 +13,13 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { RiHome2Line, RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiRefreshLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
+import { RiHome2Line, RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
 import { useEntries } from '../IndexEntriesContext'
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import NewAccountModal from "./NewAccountModal";
 import { AccountInterface } from "../interfaces";
-import { deleteAccount, fullSync } from "../helpers/accountsData";
+import { deleteAccount } from "../helpers/accountsData";
 import SearchModal from "./SearchModal";
 
 
@@ -36,7 +36,6 @@ const WindowTitlebar: React.FC = () => {
   const editAccountModal = useDisclosure();
   const [accountToDelete, setAccountToDelete] = useState<AccountInterface | null>(null);
   const [accountToEdit, setAccountToEdit] = useState<AccountInterface | null>(null);
-  const [syncingAccountId, setSyncingAccountId] = useState<number | null>(null);
   const { t } = useTranslation(["titlebar", "common"]);
   const { addNotification } = useNotification();
   const { dropCache } = useEntries();
@@ -55,20 +54,6 @@ const WindowTitlebar: React.FC = () => {
   const openEditModal = (account: AccountInterface) => {
     setAccountToEdit(account);
     editAccountModal.onOpen();
-  };
-
-  const handleSyncAccount = async (account: AccountInterface) => {
-    if (!account.id) return;
-    setSyncingAccountId(account.id);
-    try {
-      await fullSync(account.id);
-      addNotification(t("titlebar:syncSuccess"), t("titlebar:syncSuccessBody", { name: account.name }), "success");
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : "Unknown error";
-      addNotification(t("titlebar:syncError"), msg, "danger");
-    } finally {
-      setSyncingAccountId(null);
-    }
   };
 
   const handleAccountUpdated = (updated: AccountInterface) => {
@@ -213,18 +198,6 @@ const WindowTitlebar: React.FC = () => {
                     <div className="flex items-center gap-0.5 shrink-0">
                       {account.kind === "greaderapi" && (
                         <>
-                          <Tooltip content={t("titlebar:syncNow")} delay={300}>
-                            <Button
-                              size="sm"
-                              variant="light"
-                              color="primary"
-                              isIconOnly
-                              isLoading={syncingAccountId === account.id}
-                              onPress={() => handleSyncAccount(account)}
-                            >
-                              <RiRefreshLine />
-                            </Button>
-                          </Tooltip>
                           <Tooltip content={t("titlebar:editAccount")} delay={300}>
                             <Button
                               size="sm"

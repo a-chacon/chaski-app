@@ -31,15 +31,19 @@ export const updateEntriesAsReadByFeedId = async (feed_id: number) => {
   }
 };
 
-export const refreshEntries = async (feed_id: number) => {
+export const refreshEntries = async (feed_id: number): Promise<string | null> => {
   try {
-    await invoke<string>("collect_feed_content", {
+    const response = await invoke<string>("collect_feed_content", {
       feedId: feed_id,
     });
+    return response;
   } catch (error) {
     console.error("Error refreshing entries by feed:", error);
+    throw error;
   }
 };
+
+
 
 export const getFolders = async (account_id: number): Promise<string[]> => {
   const response = await invoke<string>("list_folders", { accountId: account_id });

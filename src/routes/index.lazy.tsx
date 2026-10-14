@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
@@ -8,6 +8,7 @@ import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
 import { useNotification } from '../NotificationContext'
 import { updateAllEntriesAsRead } from '../helpers/feedsData'
+import { fullSync } from '../helpers/accountsData'
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
 import EntryListActionsModal from '../components/EntryListActionsModal'
@@ -25,6 +26,7 @@ export default function App() {
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries('/')
 
+  const [refreshLoading, setRefreshLoading] = useState(false)
   const isMounted = useRef(false)
 
   useEffect(() => {
@@ -42,20 +44,19 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (page === 1 && entries.length == 0) {
-      fetchEntries()
-    }
-  }, [page, entries.length, currentAccount?.id, showReadEntries, showHiddenEntries])
-
-  useEffect(() => {
     if (!isMounted.current) {
       isMounted.current = true
       return
     }
-    setEntries([])
-    setPage(1)
+    resetEntryList()
     setHasMore(true)
   }, [currentAccount?.id, showReadEntries, showHiddenEntries])
+
+  useEffect(() => {
+    if (page === 1 && entries.length === 0 && currentAccount?.id) {
+      fetchEntries()
+    }
+  }, [page, currentAccount?.id, showReadEntries, showHiddenEntries])
 
   const fetchEntries = async () => {
     try {
@@ -88,12 +89,20 @@ export default function App() {
     }
   }
 
-  const handleReloadButton = () => {
-    setPage(1)
-    setEntries([])
-    setHasMore(true)
-
-    addNotification(t('reloadingTitle'), t('reloadingBody'), 'secondary')
+  const handleReloadButton = async () => {
+    setRefreshLoading(true)
+    try {
+      if (currentAccount?.id && currentAccount.kind !== 'local') {
+        await fullSync(currentAccount.id)
+      }
+      resetEntryList()
+      addNotification(t('reloadingTitle'), t('reloadingBody'), 'secondary')
+    } catch (error) {
+      console.error('Error reloading entries:', error)
+      addNotification('Error', 'Failed to reload entries', 'danger')
+    } finally {
+      setRefreshLoading(false)
+    }
   }
 
   const handleUpdateEntriesAsRead = async () => {
@@ -119,6 +128,7 @@ export default function App() {
                 isIconOnly
                 variant="light"
                 onPress={handleReloadButton}
+                isLoading={refreshLoading}
                 aria-label={t('reloadEntries')}
                 className="text-foreground-500"
               >
@@ -128,7 +138,6 @@ export default function App() {
             <EntryListActionsModal
               actions={[
                 { key: "markRead", label: t('updateAllAsRead'), onPress: handleUpdateEntriesAsRead },
-                { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
               ]}
             />
           </div>

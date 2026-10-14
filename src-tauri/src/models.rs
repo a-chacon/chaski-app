@@ -7,7 +7,7 @@ use diesel::prelude::*;
 use diesel::sql_types::{BigInt, Integer, Text};
 use serde::{Deserialize, Serialize};
 
-#[derive(Identifiable, Queryable, Selectable, Serialize, Debug)]
+#[derive(Identifiable, Queryable, Selectable, Serialize, Debug, Clone)]
 #[diesel(table_name = accounts)]
 pub struct Account {
     pub id: i32,

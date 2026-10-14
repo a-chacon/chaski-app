@@ -55,8 +55,7 @@ export default function Folder() {
       isMounted.current = true
       return
     }
-    setEntries([])
-    setPage(1)
+    resetEntryList()
     setHasMore(true)
   }, [folderParam, showReadEntries, showHiddenEntries])
 
@@ -88,8 +87,7 @@ export default function Folder() {
   }
 
   const handleReloadButton = () => {
-    setPage(1)
-    setEntries([])
+    resetEntryList()
 
     addNotification(t('reloadedTitle'), t('reloadingBody'), 'primary')
   }

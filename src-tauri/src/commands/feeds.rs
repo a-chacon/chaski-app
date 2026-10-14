@@ -47,11 +47,13 @@ pub async fn fetch_site_feeds(site_url: String, account_id: i32) -> Result<Strin
 
 #[command]
 pub async fn create_feed(
-    new_feed: NewFeed,
+    mut new_feed: NewFeed,
     app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
     log::debug!(target: "chaski:commands","Command created_feed. Params: {new_feed:?}");
     use serde_json::json;
+
+    let mut collect_locally = true;
 
     if let Some(account_id) = new_feed.account_id {
         use crate::entities::accounts;
@@ -63,12 +65,20 @@ pub async fn create_feed(
                     (account.server_url, account.auth_token)
                 {
                     if let Ok(client) = GReaderClient::new(server_url, auth_token) {
-                        if client.create_feed(&new_feed).await.is_err() {
-                            return Ok(json!({
-                            "success": false,
-                            "message": "We couldn't create the feed in the remote server. Please try again later.",
-                            "data": null
-                        }).to_string());
+                        match client.create_feed(&new_feed).await {
+                            Ok(stream_id) => {
+                                log::debug!(target: "chaski:commands", "Remote feed created for greader account with stream_id: {}; skipping local collection.", stream_id);
+                                new_feed.external_id = Some(stream_id);
+                                collect_locally = false;
+                            }
+                            Err(e) => {
+                                log::error!(target: "chaski:commands", "Failed to create feed on remote server: {}", e);
+                                return Ok(json!({
+                                    "success": false,
+                                    "message": "We couldn't create the feed in the remote server. Please try again later.",
+                                    "data": null
+                                }).to_string());
+                            }
                         }
                     }
                 }
@@ -76,18 +86,18 @@ pub async fn create_feed(
         }
     }
 
-    let created_feed = match crate::entities::feeds::create_feed(new_feed, true, app_handle.clone())
-    {
-        Ok(f) => f,
-        Err(e) => {
-            return Ok(json!({
-                "success": false,
-                "message": format!("Failed to create feed: {}", e),
-                "data": null
-            })
-            .to_string());
-        }
-    };
+    let created_feed =
+        match crate::entities::feeds::create_feed(new_feed, collect_locally, app_handle.clone()) {
+            Ok(f) => f,
+            Err(e) => {
+                return Ok(json!({
+                    "success": false,
+                    "message": format!("Failed to create feed: {}", e),
+                    "data": null
+                })
+                .to_string());
+            }
+        };
 
     emit_sidebar_updated(&app_handle, created_feed.account_id, "feed", "create");
 
@@ -224,14 +234,55 @@ pub async fn update_feed(
 pub async fn collect_feed_content(
     feed_id: i32,
     app_handle: tauri::AppHandle,
-) -> Result<String, ()> {
+) -> Result<String, String> {
     log::debug!(target: "chaski:commands","Command collect_feed_content. feed_id: {feed_id:?}");
+    use crate::entities::accounts;
+    use serde_json::json;
 
-    let feed = crate::entities::feeds::show(feed_id, app_handle.clone()).unwrap();
+    let feed = match crate::entities::feeds::show(feed_id, app_handle.clone()) {
+        Some(f) => f,
+        None => {
+            return Err("Feed not found".to_string());
+        }
+    };
 
+    if let Some(account_id) = feed.account_id {
+        if let Some(account) = accounts::show(account_id, app_handle.clone()) {
+            if account.kind == "greaderapi" {
+                log::debug!(target: "chaski:commands", "Syncing greader account for feed {}", feed.id);
+                match crate::entities::feeds::full_sync_greaderapi_account(
+                    &account,
+                    app_handle.clone(),
+                )
+                .await
+                {
+                    Ok(_) => {
+                        log::info!(target: "chaski:commands", "Greader account sync completed");
+                        return Ok(json!({
+                            "success": true,
+                            "message": "Feed synced from remote server",
+                            "data": null
+                        })
+                        .to_string());
+                    }
+                    Err(e) => {
+                        log::error!(target: "chaski:commands", "Greader account sync failed: {}", e);
+                        return Err(e);
+                    }
+                }
+            }
+        }
+    }
+
+    log::info!(target: "chaski:commands", "Collecting feed content for local feed {}", feed.id);
     crate::core::jobs::collect_feed_content(&feed, app_handle.clone()).await;
 
-    Ok(String::from("Ok"))
+    Ok(json!({
+        "success": true,
+        "message": "Feed entries collected",
+        "data": null
+    })
+    .to_string())
 }
 
 #[command]

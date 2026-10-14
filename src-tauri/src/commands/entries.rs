@@ -12,25 +12,6 @@ pub async fn list_entries(
 ) -> Result<String, ()> {
     log::debug!(target: "chaski:commands","Command list_entries. Page: {page:?}, Items: {items:?}, Filters: {filters:?}");
 
-    if let Some(ref f) = filters {
-        if let Some(acc_id) = f.account_id_eq {
-            let handle = app_handle.clone();
-            tauri::async_runtime::spawn(async move {
-                if let Some(account) = crate::entities::accounts::show(acc_id, handle.clone()) {
-                    if account.kind == "greaderapi" {
-                        log::debug!(target: "chaski:sync", "list_entries triggering background sync for account {}", acc_id);
-                        if let Err(e) =
-                            crate::entities::feeds::full_sync_greaderapi_account(&account, handle)
-                                .await
-                        {
-                            log::warn!(target: "chaski:sync", "Background sync on list_entries failed: {}", e);
-                        }
-                    }
-                }
-            });
-        }
-    }
-
     let result = crate::entities::entries::get_entries_with_feed(page, items, filters, app_handle);
 
     match serde_json::to_string(&result) {

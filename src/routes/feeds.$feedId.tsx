@@ -175,14 +175,18 @@ export default function Feed() {
             </div>
           </div>
         </div>
-        <EntriesList
-          entries={entries}
-          key={feed?.id}
-          fetchEntries={fetchEntries}
-          hasMore={hasMore}
-          header={false}
-          onRefresh={resetEntryList}
-        />
+        {entries.length > 0 || !hasMore ? (
+          <EntriesList
+            entries={entries}
+            key={feed?.id}
+            fetchEntries={fetchEntries}
+            hasMore={hasMore}
+            header={false}
+            onRefresh={resetEntryList}
+          />
+        ) : (
+          <div className="flex justify-center p-6">Loading initial data...</div>
+        )}
       </div>
     </MainSectionLayout>
   );

@@ -131,14 +131,18 @@ export default function Folder() {
             </div>
           </div>
         </div>
-        <EntriesList
-          key={folderParam}
-          entries={entries}
-          fetchEntries={fetchEntries}
-          hasMore={hasMore}
-          header={true}
-          onRefresh={resetEntryList}
-        />
+        {entries.length > 0 || !hasMore ? (
+          <EntriesList
+            key={folderParam}
+            entries={entries}
+            fetchEntries={fetchEntries}
+            hasMore={hasMore}
+            header={true}
+            onRefresh={resetEntryList}
+          />
+        ) : (
+          <div className="flex justify-center p-6">Loading initial data...</div>
+        )}
       </div>
     </MainSectionLayout >
   )

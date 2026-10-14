@@ -119,14 +119,18 @@ export default function ReadLater() {
             />
           </div>
         </div>
-        <EntriesList
-          key="index"
-          entries={entries}
-          fetchEntries={fetchEntries}
-          hasMore={hasMore}
-          header={true}
-          onRefresh={handleReloadButton}
-        />
+        {entries.length > 0 || !hasMore ? (
+          <EntriesList
+            key="index"
+            entries={entries}
+            fetchEntries={fetchEntries}
+            hasMore={hasMore}
+            header={true}
+            onRefresh={handleReloadButton}
+          />
+        ) : (
+          <div className="flex justify-center p-6">Loading initial data...</div>
+        )}
       </div>
     </MainSectionLayout>
   )

@@ -36,7 +36,7 @@ export const useEntries = (path?: string): EntriesContextType => {
     if (path && context.path !== path) {
       context.setPath(path);
     }
-  }, [path]);
+  }, [path, context.path]);
 
   return context;
 };

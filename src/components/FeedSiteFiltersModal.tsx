@@ -34,8 +34,10 @@ const FeedSiteFiltersModal: React.FC<FeedSiteFiltersModalProps> = ({
   const [filters, setFilters] = useState<FilterInterface[]>([]);
 
   useEffect(() => {
-    setCurrentFilters();
-  }, [feed]);
+    if (isOpen) {
+      setCurrentFilters();
+    }
+  }, [feed.id, isOpen]);
 
   const setCurrentFilters = async () => {
     let current_filters = await indexFilters(parseInt(feed.id!.toString()));

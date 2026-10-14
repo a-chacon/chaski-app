@@ -45,7 +45,7 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
     } else {
       setLoading(false);
     }
-  }, [account.kind, fetchFeeds]);
+  }, [account.kind, account.id]);
 
   useEffect(() => {
     if (account.kind !== 'local' && account.kind !== 'greaderapi') {
@@ -71,7 +71,7 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
         unlisten();
       }
     };
-  }, [account.id, account.kind, fetchFeeds]);
+  }, [account.id, account.kind]);
 
   if (loading) {
     return <div className="px-3 text-sm text-foreground-500">Loading feeds...</div>;

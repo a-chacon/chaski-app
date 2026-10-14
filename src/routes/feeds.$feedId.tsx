@@ -54,18 +54,17 @@ export default function Feed() {
   }, [feedId]);
 
   useEffect(() => {
-    if (page === 1 && entries.length == 0) {
+    if (page === 1 && entries.length === 0) {
       fetchEntries();
     }
-  }, [page, entries.length, showReadEntries, showHiddenEntries]);
+  }, [page, entries.length, showReadEntries, showHiddenEntries, feedId]);
 
   useEffect(() => {
     if (!isMounted.current) {
       isMounted.current = true;
       return;
     }
-    setEntries([]);
-    setPage(1);
+    resetEntryList()
     setHasMore(true);
   }, [feedId, showReadEntries, showHiddenEntries]);
 
@@ -104,11 +103,24 @@ export default function Feed() {
 
   const handleRefreshEntries = async () => {
     setRefreshLoading(true);
-    await refreshEntries(parseInt(feed!.id!.toString()));
-    resetEntryList();
-    setRefreshLoading(false);
-
-    addNotification(t('reloadedTitle'), t('reloadingBody'), 'primary');
+    try {
+      const result = await refreshEntries(parseInt(feed!.id!.toString()));
+      if (result && typeof result === 'string') {
+        const response = JSON.parse(result);
+        if (response.success) {
+          resetEntryList();
+          await fetchEntries();
+          addNotification(t('reloadedTitle'), t('reloadingBody'), 'primary');
+        } else {
+          addNotification('Error', response.message || 'Failed to refresh entries', 'danger');
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing entries:', error);
+      addNotification('Error', 'Failed to refresh entries', 'danger');
+    } finally {
+      setRefreshLoading(false);
+    }
   };
 
   const resetEntryList = () => {

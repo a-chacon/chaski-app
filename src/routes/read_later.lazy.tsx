@@ -47,8 +47,7 @@ export default function ReadLater() {
       isMounted.current = true
       return
     }
-    setEntries([])
-    setPage(1)
+    resetEntryList()
     setHasMore(true)
   }, [currentAccount?.id, showHiddenEntries])
 
@@ -84,9 +83,13 @@ export default function ReadLater() {
   }
 
   const handleReloadButton = () => {
-    setPage(1);
-    setEntries([]);
+    resetEntryList()
     setHasMore(true);
+  }
+
+  const resetEntryList = () => {
+    setEntries([])
+    setPage(1)
   }
 
   return (

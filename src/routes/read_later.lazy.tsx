@@ -94,7 +94,7 @@ export default function ReadLater() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto px-4">
+      <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
         <div className="flex flex-col sm:flex-row py-8 sm:justify-between sm:items-start gap-2">
           <div>
             <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>

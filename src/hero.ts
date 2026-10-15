@@ -1,33 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-const { heroui } = require("@heroui/react");
-const defaultTheme = require("tailwindcss/defaultTheme");
+import { heroui } from "@heroui/react";
 
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {
-      fontFamily: {
-        opensans: ['"OpenSans"', ...defaultTheme.fontFamily.sans],
-        arial: ['"Arial"', ...defaultTheme.fontFamily.sans],
-        roboto: ['"Roboto"', ...defaultTheme.fontFamily.sans],
-        tisa: ['"Tisa"', ...defaultTheme.fontFamily.sans],
-        garamond: ['"Garamond"', ...defaultTheme.fontFamily.sans],
-      },
-    },
-  },
-  darkMode: "class",
-  plugins: [
-    require("@tailwindcss/typography"),
-    heroui({
+export default heroui({
       themes: {
 
         "blue-light": {
           "extend": "light",
           "colors": {
+            // custom color token, not part of HeroUI's ThemeColors type
+            // @ts-expect-error
             "sidebar": "#000e1b",
             "background": "#ffffff",
             "foreground": "#000000",
@@ -303,6 +283,4 @@ export default {
           }
         },
       },
-    }),
-  ],
-};
+    });

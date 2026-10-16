@@ -41,7 +41,7 @@ export default function FolderField({ feed }: FolderFieldInterface) {
       onInputChange={onInputChange}
     >
       {(item: FolderItem) => (
-        <AutocompleteItem key={item.label} value={item.label}>
+        <AutocompleteItem key={item.label}>
           {item.label}
         </AutocompleteItem>
       )}

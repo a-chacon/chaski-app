@@ -1,17 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "./hero.ts";
+@plugin "@tailwindcss/typography";
+@source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+@custom-variant dark (&:is(.dark *));
 
-@layer utilities {
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .mb-safe {
-    margin-bottom: env(safe-area-inset-bottom);
-  }
-  .pt-safe {
-    padding-top: env(safe-area-inset-top);
-  }
+@theme {
+  --font-opensans: "OpenSans", ui-sans-serif, system-ui, sans-serif;
+  --font-arial: "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-roboto: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-tisa: "Tisa", ui-sans-serif, system-ui, sans-serif;
+  --font-garamond: "Garamond", ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility mb-safe {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
 
 :root {

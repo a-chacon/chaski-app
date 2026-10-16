@@ -143,7 +143,7 @@ export default function Discover() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto px-4">
+      <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
         {/* Header */}
         <div className="py-8">
           <h1 className="text-3xl pt-2 font-bold">{t('title')}</h1>

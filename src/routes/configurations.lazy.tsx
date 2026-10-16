@@ -69,7 +69,7 @@ export default function Configurations() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-screen-md mx-auto px-4">
+      <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
 
         {/* Page header */}
         <div className="py-8">

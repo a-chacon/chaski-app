@@ -6,7 +6,7 @@ import { EntriesProvider } from "../IndexEntriesContext";
 export const Route = createRootRoute({
   component: () => (
     <>
-      <HeroUIProvider>
+      <HeroUIProvider disableAnimation>
         <EntriesProvider >
           <ApplicationLayout>
             <Outlet />

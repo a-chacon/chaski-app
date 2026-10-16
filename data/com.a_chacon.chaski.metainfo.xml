@@ -32,6 +32,24 @@
   </provides>
 
   <releases>
+    <release version="0.8.1" date="2026-10-16">
+      <description>
+        <p>Added:</p>
+        <ul>
+          <li>Pull down on the entry page to download the full content of the article.</li>
+        </ul>
+        <p>Changed:</p>
+        <ul>
+          <li>Upgraded Tailwind CSS.</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Set external_id after adding a new feed in the app and syncing with Google Reader.</li>
+          <li>Prevent duplicated entries being pulled on first page load.</li>
+          <li>Fixes following the Tailwind CSS upgrade.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.8.0" date="2026-10-12">
       <description>
         <p>Added:</p>

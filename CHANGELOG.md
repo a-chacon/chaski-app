@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.8.1 - 2026-10-16
+
+### Added
+
+- Pull down on the entry page to download the full content of the article.
+
+### Changed
+
+- Upgraded Tailwind CSS.
+
+### Fixed
+
+- Set external_id after adding a new feed in the app and syncing with Google Reader.
+- Prevent duplicated entries being pulled on first page load.
+- Fixes following the Tailwind CSS upgrade.
+
 ## 0.8.0 - 2026-10-12
 
 ### Added

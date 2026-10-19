@@ -62,12 +62,12 @@ pub async fn import_opml(
                 ),
             );
 
-            let mut feeds_with_account = report.new_feeds.unwrap();
-            for feed in &mut feeds_with_account {
-                feed.account_id = Some(account_id);
+            let mut scraped_feeds = report.new_feeds.unwrap_or_default();
+            for scraped in &mut scraped_feeds {
+                scraped.feed.account_id = Some(account_id);
             }
 
-            crate::entities::feeds::create_list(feeds_with_account, app_handle.clone());
+            crate::entities::feeds::create_scraped_list(scraped_feeds, app_handle.clone());
             emit_sidebar_updated(&app_handle, account_id, "import");
         }
         Err(err) => {

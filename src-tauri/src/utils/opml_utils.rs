@@ -1,4 +1,4 @@
-use crate::models::{Feed, NewFeed};
+use crate::models::{Feed, ScrapedFeed};
 use diesel::prelude::*;
 use diesel::ExpressionMethods;
 use opml::{Outline, OPML};
@@ -10,7 +10,7 @@ use tauri::Emitter;
 pub const OPML_IMPORT_PROGRESS_EVENT: &str = "opml://import-progress";
 
 pub struct OmplImportStats {
-    pub new_feeds: Option<Vec<NewFeed>>,
+    pub new_feeds: Option<Vec<ScrapedFeed>>,
     pub detected: usize,
     pub processed: usize,
     pub good: usize,
@@ -120,8 +120,11 @@ pub async fn opml_file_to_new_feeds(
     const MAX_CONCURRENT: usize = 10;
     let semaphore = Arc::new(tokio::sync::Semaphore::new(MAX_CONCURRENT));
 
-    let mut join_set: tokio::task::JoinSet<(String, Option<String>, Result<Vec<NewFeed>, String>)> =
-        tokio::task::JoinSet::new();
+    let mut join_set: tokio::task::JoinSet<(
+        String,
+        Option<String>,
+        Result<Vec<ScrapedFeed>, String>,
+    )> = tokio::task::JoinSet::new();
 
     for (url, folder) in sources.into_iter() {
         let sem = semaphore.clone();
@@ -134,7 +137,7 @@ pub async fn opml_file_to_new_feeds(
         });
     }
 
-    let mut new_feeds: Vec<NewFeed> = Vec::new();
+    let mut new_feeds: Vec<ScrapedFeed> = Vec::new();
     let mut good = 0usize;
     let mut bad = 0usize;
     let mut processed = 0usize;
@@ -145,7 +148,7 @@ pub async fn opml_file_to_new_feeds(
         let (url, current_url_opt) = match task_result {
             Ok((url, folder, Ok(mut found_feeds))) => {
                 if let Some(mut first_feed) = found_feeds.pop() {
-                    first_feed.folder = folder;
+                    first_feed.feed.folder = folder;
                     new_feeds.push(first_feed);
                     good += 1;
                 } else {

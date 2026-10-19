@@ -1,4 +1,4 @@
-use crate::models::{Feed, NewEntry, NewFeed};
+use crate::models::{Feed, NewEntry, ScrapedFeed};
 use chrono::NaiveDateTime;
 use readabilityrs::Readability;
 use reqwest::{
@@ -65,7 +65,9 @@ async fn fetch_with_retries(
     unreachable!()
 }
 
-pub async fn scrape_site_feeds(link: String) -> Result<Vec<NewFeed>, Box<dyn std::error::Error>> {
+pub async fn scrape_site_feeds(
+    link: String,
+) -> Result<Vec<ScrapedFeed>, Box<dyn std::error::Error>> {
     let client = create_async_client()?;
     let response = fetch_with_retries(&client, link.as_str(), 3).await?;
 
@@ -78,10 +80,8 @@ pub async fn scrape_site_feeds(link: String) -> Result<Vec<NewFeed>, Box<dyn std
     let body_bytes = response.bytes().await?;
     let body = String::from_utf8_lossy(&body_bytes);
 
-    if body.contains("<rss") {
-        add_rss_feed(&body_bytes, &mut new_feeds, &link).await?;
-    } else if body.contains("<feed") {
-        add_atom_feed(&body_bytes, &mut new_feeds, &link).await?;
+    if is_feed_body(&body) {
+        add_feed(&body_bytes, &mut new_feeds, &link).await?;
     } else if body.contains("<html") {
         extract_feeds_from_html(body.to_string(), &mut new_feeds, &link).await?;
     }
@@ -93,45 +93,48 @@ pub async fn scrape_site_feeds(link: String) -> Result<Vec<NewFeed>, Box<dyn std
     Ok(new_feeds)
 }
 
-async fn add_rss_feed(
-    body_bytes: &[u8],
-    new_feeds: &mut Vec<NewFeed>,
-    link: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let channel = Channel::read_from(body_bytes)?;
-    let mut new_feed = NewFeed::from(channel);
-    new_feed.link = String::from(link);
-
-    if new_feed.icon.is_none() {
-        let client = create_async_client()?;
-        new_feed.icon = discover_favicon(&client, link).await;
-    }
-
-    new_feeds.push(new_feed);
-    Ok(())
+fn is_feed_body(body: &str) -> bool {
+    body.contains("<rss") || body.contains("<feed")
 }
 
-async fn add_atom_feed(
+fn sort_newest_first(entries: &mut [NewEntry]) {
+    entries.sort_by(|a, b| {
+        let pub_date_a = a.pub_date.unwrap_or(NaiveDateTime::MIN);
+        let pub_date_b = b.pub_date.unwrap_or(NaiveDateTime::MIN);
+
+        pub_date_b.cmp(&pub_date_a)
+    });
+}
+
+async fn add_feed(
     body_bytes: &[u8],
-    new_feeds: &mut Vec<NewFeed>,
+    new_feeds: &mut Vec<ScrapedFeed>,
     link: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let feed = atom_syndication::Feed::read_from(body_bytes)?;
-    let mut new_feed = NewFeed::from(feed);
-    new_feed.link = String::from(link);
+    let body = String::from_utf8_lossy(body_bytes);
 
-    if new_feed.icon.is_none() {
+    let mut scraped = if body.contains("<rss") {
+        ScrapedFeed::from_rss(Channel::read_from(body_bytes)?, link)
+    } else if body.contains("<feed") {
+        ScrapedFeed::from_atom(atom_syndication::Feed::read_from(body_bytes)?, link)
+    } else {
+        return Ok(());
+    };
+
+    sort_newest_first(&mut scraped.entries);
+
+    if scraped.feed.icon.is_none() {
         let client = create_async_client()?;
-        new_feed.icon = discover_favicon(&client, link).await;
+        scraped.feed.icon = discover_favicon(&client, link).await;
     }
 
-    new_feeds.push(new_feed);
+    new_feeds.push(scraped);
     Ok(())
 }
 
 async fn extract_feeds_from_html(
     body: String,
-    new_feeds: &mut Vec<NewFeed>,
+    new_feeds: &mut Vec<ScrapedFeed>,
     link: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let hrefs = parse_html_for_feeds(&body);
@@ -145,13 +148,7 @@ async fn extract_feeds_from_html(
 
         if feed_response.status().is_success() {
             let feed_body_bytes = feed_response.bytes().await?;
-            let feed_body_str = String::from_utf8_lossy(&feed_body_bytes);
-
-            if feed_body_str.contains("<rss") {
-                add_rss_feed(&feed_body_bytes, new_feeds, href_url.as_str()).await?;
-            } else if feed_body_str.contains("<feed") {
-                add_atom_feed(&feed_body_bytes, new_feeds, href_url.as_str()).await?;
-            }
+            add_feed(&feed_body_bytes, new_feeds, href_url.as_str()).await?;
         }
     }
 
@@ -254,7 +251,7 @@ async fn discover_favicon(client: &Client, link: &str) -> Option<String> {
 
 async fn autodiscover_feeds(
     link: &str,
-    new_feeds: &mut Vec<NewFeed>,
+    new_feeds: &mut Vec<ScrapedFeed>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let possible_paths = ["/feed/", "/rss/", "/feed.xml", "/index.xml", "/feed.rss"];
     let client = create_async_client()?;
@@ -267,14 +264,7 @@ async fn autodiscover_feeds(
 
         if feed_response.status().is_success() {
             let feed_body_bytes = feed_response.bytes().await?;
-            let feed_body_str = String::from_utf8_lossy(&feed_body_bytes);
-            let feed_url_str = feed_url.as_str();
-
-            if feed_body_str.contains("<rss") {
-                add_rss_feed(&feed_body_bytes, new_feeds, feed_url_str).await?;
-            } else if feed_body_str.contains("<feed") {
-                add_atom_feed(&feed_body_bytes, new_feeds, feed_url_str).await?;
-            }
+            add_feed(&feed_body_bytes, new_feeds, feed_url.as_str()).await?;
         }
 
         // Check the root path
@@ -283,14 +273,7 @@ async fn autodiscover_feeds(
 
             if root_response.status().is_success() {
                 let root_body_bytes = root_response.bytes().await?;
-                let root_body_str = String::from_utf8_lossy(&root_body_bytes);
-                let root_url_str = root_url.as_str();
-
-                if root_body_str.contains("<rss") {
-                    add_rss_feed(&root_body_bytes, new_feeds, root_url_str).await?;
-                } else if root_body_str.contains("<feed") {
-                    add_atom_feed(&root_body_bytes, new_feeds, root_url_str).await?;
-                }
+                add_feed(&root_body_bytes, new_feeds, root_url.as_str()).await?;
             }
         }
     }
@@ -326,18 +309,16 @@ pub async fn scrape_feed_entries(feed: &Feed) -> Result<Vec<NewEntry>, ()> {
         } else if feed_body_str.contains("<feed") {
             let atom_syndication_feed = atom_syndication::Feed::read_from(cursor).unwrap();
 
-            for entry in atom_syndication_feed.entries {
-                new_entries.push(NewEntry::from_feed_and_entry(feed, entry))
-            }
+            new_entries.extend(
+                atom_syndication_feed
+                    .entries
+                    .into_iter()
+                    .filter_map(|entry| NewEntry::from_feed_and_entry(feed, entry)),
+            );
         }
     }
 
-    new_entries.sort_by(|a, b| {
-        let pub_date_a = a.pub_date.unwrap_or(NaiveDateTime::MIN);
-        let pub_date_b = b.pub_date.unwrap_or(NaiveDateTime::MIN);
-
-        pub_date_b.cmp(&pub_date_a)
-    });
+    sort_newest_first(&mut new_entries);
 
     Ok(new_entries)
 }

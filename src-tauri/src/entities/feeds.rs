@@ -1,8 +1,9 @@
 use crate::core::jobs::collect_feed_content;
 use crate::db::establish_connection;
+use crate::entities::entries::{create_list as create_entries, limit_for_feed};
 use crate::integrations::greader::{greader_item_to_new_entry, GReaderClient};
 use crate::models::Account;
-use crate::models::{Feed, IndexFeed, NewFeed};
+use crate::models::{Feed, IndexFeed, NewFeed, ScrapedFeed};
 use crate::schema::entries;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
@@ -44,26 +45,22 @@ pub fn get_folders(account_id_eq: i32, app_handle: tauri::AppHandle) -> Vec<Stri
     result.into_iter().flatten().collect()
 }
 
-pub fn create_feed(
-    mut new_feed: NewFeed,
-    should_collect_data: bool,
-    app_handle: tauri::AppHandle,
-) -> Result<Feed, String> {
-    use crate::schema::feeds;
-
-    let conn = &mut establish_connection(&app_handle);
-
+fn normalize_new_feed(new_feed: &mut NewFeed) {
     if new_feed.folder.is_none() {
         new_feed.folder = Some(String::from("Quipu"));
     }
 
-    if !should_collect_data {
-        new_feed.last_fetch = None;
-    }
-
     new_feed.default_entry_type = String::from("entry");
+}
 
-    let created_feed = crate::db::with_retry(|| {
+fn insert_feed(mut new_feed: NewFeed, app_handle: &tauri::AppHandle) -> Result<Feed, String> {
+    use crate::schema::feeds;
+
+    let conn = &mut establish_connection(app_handle);
+
+    normalize_new_feed(&mut new_feed);
+
+    crate::db::with_retry(|| {
         diesel::insert_into(feeds::table)
             .values(&new_feed)
             .returning(Feed::as_returning())
@@ -72,7 +69,19 @@ pub fn create_feed(
     .map_err(|e| {
         log::error!(target: "chaski:entities", "Failed to create feed: {}", e);
         e
-    })?;
+    })
+}
+
+pub fn create_feed(
+    mut new_feed: NewFeed,
+    should_collect_data: bool,
+    app_handle: tauri::AppHandle,
+) -> Result<Feed, String> {
+    if !should_collect_data {
+        new_feed.last_fetch = None;
+    }
+
+    let created_feed = insert_feed(new_feed, &app_handle)?;
 
     let created_feed_clone = created_feed.clone();
     let cloned_app_handle = app_handle.clone();
@@ -171,20 +180,30 @@ pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec
         .expect("Error loading feeds with unread count")
 }
 
-pub fn create_list(new_feeds: Vec<NewFeed>, app_handle: tauri::AppHandle) -> Vec<Feed> {
-    new_feeds
-        .into_iter()
-        .filter_map(|nf| {
-            let cloned_app_handle = app_handle.clone();
-            match create_feed(nf, false, cloned_app_handle) {
-                Ok(feed) => Some(feed),
-                Err(e) => {
-                    log::error!(target: "chaski:entities", "Skipping feed in create_list: {}", e);
-                    None
-                }
+pub async fn create_scraped_list(
+    scraped_feeds: Vec<ScrapedFeed>,
+    app_handle: tauri::AppHandle,
+) -> Vec<Feed> {
+    let mut created_feeds = Vec::new();
+
+    for scraped in scraped_feeds {
+        match insert_feed(scraped.feed, &app_handle) {
+            Ok(feed) => {
+                let feed_entries = scraped
+                    .entries
+                    .into_iter()
+                    .map(|entry| entry.with_feed_id(feed.id))
+                    .collect();
+                create_entries(limit_for_feed(&feed, feed_entries), app_handle.clone()).await;
+                created_feeds.push(feed);
             }
-        })
-        .collect()
+            Err(e) => {
+                log::error!(target: "chaski:entities", "Skipping feed in create_scraped_list: {}", e);
+            }
+        }
+    }
+
+    created_feeds
 }
 
 pub fn delete_list(feed_ids: Vec<i32>, app_handle: tauri::AppHandle) {
@@ -343,7 +362,14 @@ async fn sync_feeds(
     }
 
     if !to_create.is_empty() {
-        create_list(to_create, app_handle.clone());
+        let scraped_feeds = to_create
+            .into_iter()
+            .map(|feed| ScrapedFeed {
+                feed,
+                entries: Vec::new(),
+            })
+            .collect();
+        create_scraped_list(scraped_feeds, app_handle.clone()).await;
     }
     if !to_delete.is_empty() {
         delete_list(to_delete, app_handle.clone());

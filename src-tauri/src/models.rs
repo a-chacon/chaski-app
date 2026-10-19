@@ -143,7 +143,7 @@ pub struct Entry {
     pub media_content_type: Option<String>,
 }
 
-#[derive(Insertable, Debug)]
+#[derive(Insertable, Debug, Clone)]
 #[diesel(table_name = entries)]
 pub struct NewEntry {
     pub title: Option<String>,
@@ -249,8 +249,44 @@ pub struct Configuration {
     pub created_at: NaiveDateTime,
 }
 
-impl From<rss::Channel> for NewFeed {
-    fn from(channel: rss::Channel) -> Self {
+/// A feed together with the entries found while scraping it. The entries have
+/// `feed_id == 0` until the feed is inserted and its real id is known.
+#[derive(Debug, Clone)]
+pub struct ScrapedFeed {
+    pub feed: NewFeed,
+    pub entries: Vec<NewEntry>,
+}
+
+impl ScrapedFeed {
+    pub fn from_rss(mut channel: rss::Channel, link: &str) -> Self {
+        let mut feed = NewFeed::from(&channel);
+        feed.link = link.to_string();
+
+        let entries = std::mem::take(&mut channel.items)
+            .into_iter()
+            .map(|item| NewEntry::from_rss_item(item, link, &feed.default_entry_type))
+            .collect();
+
+        ScrapedFeed { feed, entries }
+    }
+
+    pub fn from_atom(mut atom: atom_syndication::Feed, link: &str) -> Self {
+        let mut feed = NewFeed::from(&atom);
+        feed.link = link.to_string();
+
+        let entries = std::mem::take(&mut atom.entries)
+            .into_iter()
+            .filter_map(|entry| {
+                NewEntry::from_atom_entry(entry, &feed.title, &feed.default_entry_type)
+            })
+            .collect();
+
+        ScrapedFeed { feed, entries }
+    }
+}
+
+impl From<&rss::Channel> for NewFeed {
+    fn from(channel: &rss::Channel) -> Self {
         let entries_pub_dates: Vec<DateTime<Utc>> = channel
             .items
             .iter()
@@ -265,7 +301,7 @@ impl From<rss::Channel> for NewFeed {
             link: channel.link.to_string(),
             icon: channel.image().map(|img| img.url().to_string()),
             last_fetch: Some(Utc::now().naive_utc()),
-            latest_entry: parse_rfc822_to_naive_datetime(channel.pub_date),
+            latest_entry: parse_rfc822_to_naive_datetime(channel.pub_date.clone()),
             kind: String::from("rss"),
             items_count: Some(channel.items.len() as i32),
             folder: None,
@@ -278,8 +314,8 @@ impl From<rss::Channel> for NewFeed {
     }
 }
 
-impl From<atom_syndication::Feed> for NewFeed {
-    fn from(feed: atom_syndication::Feed) -> Self {
+impl From<&atom_syndication::Feed> for NewFeed {
+    fn from(feed: &atom_syndication::Feed) -> Self {
         let entries_pub_dates: Vec<DateTime<Utc>> = feed
             .entries
             .iter()
@@ -291,6 +327,7 @@ impl From<atom_syndication::Feed> for NewFeed {
             title: feed.title.to_string(),
             description: feed
                 .subtitle
+                .as_ref()
                 .map(|text| text.as_str().to_string())
                 .unwrap_or("".to_string()),
             link: feed.base.clone().unwrap_or("".to_string()),
@@ -333,6 +370,20 @@ impl From<&Entry> for NewEntry {
 
 impl NewEntry {
     pub fn from_feed_and_item(feed: &Feed, item: rss::Item) -> Self {
+        Self::from_rss_item(item, &feed.link, &feed.default_entry_type).with_feed_id(feed.id)
+    }
+
+    pub fn from_feed_and_entry(feed: &Feed, entry: atom_syndication::Entry) -> Option<Self> {
+        Self::from_atom_entry(entry, &feed.title, &feed.default_entry_type)
+            .map(|new_entry| new_entry.with_feed_id(feed.id))
+    }
+
+    pub fn with_feed_id(mut self, feed_id: i32) -> Self {
+        self.feed_id = feed_id;
+        self
+    }
+
+    pub fn from_rss_item(item: rss::Item, fallback_link: &str, entry_type: &str) -> Self {
         let mut media_content_url = None;
         let mut media_content_type = Some(String::from("image/png"));
         let mut thumbnail = None;
@@ -361,9 +412,9 @@ impl NewEntry {
         }
 
         NewEntry {
-            feed_id: feed.id,
+            feed_id: 0,
             title: item.title,
-            link: item.link.unwrap_or(feed.link.clone()),
+            link: item.link.unwrap_or_else(|| fallback_link.to_string()),
             thumbnail,
             pub_date: parse_rfc822_to_naive_datetime(item.pub_date),
             description: crate::core::common::remove_html_tags(item.description),
@@ -373,22 +424,27 @@ impl NewEntry {
             hide: 0,
             author: item.author,
             external_id: None,
-            entry_type: feed.default_entry_type.clone(),
+            entry_type: entry_type.to_string(),
             media_content_url,
             media_content_type,
         }
     }
 
-    pub fn from_feed_and_entry(feed: &Feed, entry: atom_syndication::Entry) -> Self {
+    pub fn from_atom_entry(
+        entry: atom_syndication::Entry,
+        author: &str,
+        entry_type: &str,
+    ) -> Option<Self> {
+        let link = entry.links.into_iter().next()?.href;
         let pub_date = entry
             .published
             .map(|dt| dt.naive_utc())
             .or(Some(entry.updated.naive_utc()));
 
-        NewEntry {
-            feed_id: feed.id,
+        Some(NewEntry {
+            feed_id: 0,
             title: Some(entry.title.value),
-            link: entry.links.into_iter().nth(0).unwrap().href,
+            link,
             thumbnail: None,
             pub_date,
             description: crate::core::common::remove_html_tags(
@@ -398,11 +454,11 @@ impl NewEntry {
             read_later: 0,
             read: 0,
             hide: 0,
-            author: Some(feed.title.clone()), // author: Some(entry.authors.into_iter().nth(0).unwrap().name),
+            author: Some(author.to_string()),
             external_id: None,
-            entry_type: feed.default_entry_type.clone(),
+            entry_type: entry_type.to_string(),
             media_content_url: None,
             media_content_type: None,
-        }
+        })
     }
 }

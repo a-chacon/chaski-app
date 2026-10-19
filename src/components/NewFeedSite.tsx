@@ -77,7 +77,7 @@ export default function App() {
         throw new Error("No current account selected");
       }
 
-      const message = await invoke<string>("fetch_site_feeds", {
+      const message = await invoke<string>("scrape_site_feeds", {
         siteUrl: siteUrl,
         accountId: currentAccount.id,
       });

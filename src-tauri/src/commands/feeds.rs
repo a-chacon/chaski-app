@@ -22,16 +22,20 @@ fn emit_sidebar_updated(
 }
 
 #[command]
-pub async fn fetch_site_feeds(site_url: String, account_id: i32) -> Result<String, ()> {
-    log::debug!(target: "chaski:commands","Command fetch_site_feeds. Params: site_url: {site_url:?}, account_id: {account_id}");
+pub async fn scrape_site_feeds(site_url: String, account_id: i32) -> Result<String, ()> {
+    log::debug!(target: "chaski:commands","Command scrape_site_feeds. Params: site_url: {site_url:?}, account_id: {account_id}");
 
     let result = crate::utils::scrape::scrape_site_feeds(site_url).await;
 
     match result {
-        Ok(mut feeds) => {
-            for feed in &mut feeds {
-                feed.account_id = Some(account_id);
-            }
+        Ok(scraped_feeds) => {
+            let feeds: Vec<NewFeed> = scraped_feeds
+                .into_iter()
+                .map(|scraped| NewFeed {
+                    account_id: Some(account_id),
+                    ..scraped.feed
+                })
+                .collect();
 
             match serde_json::to_string(&feeds) {
                 Ok(json_string) => Ok(json_string),

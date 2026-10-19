@@ -151,7 +151,7 @@ pub fn run() {
             let _ = (window, event);
         })
         .invoke_handler(tauri::generate_handler![
-            commands::feeds::fetch_site_feeds,
+            commands::feeds::scrape_site_feeds,
             commands::feeds::create_feed,
             commands::feeds::index_feeds,
             commands::feeds::destroy_feed,

@@ -48,7 +48,22 @@ pub fn run() {
     let _is_flatpak = false;
 
     let builder = {
-        let b = tauri::Builder::default()
+        let b = tauri::Builder::default();
+
+        #[cfg(desktop)]
+        let b = b.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(window) = app.get_webview_window("main") {
+                if window.is_minimized().unwrap_or(false) {
+                    let _ = window.unminimize();
+                }
+                if !window.is_visible().unwrap_or(true) {
+                    let _ = window.show();
+                }
+                let _ = window.set_focus();
+            }
+        }));
+
+        let b = b
             .plugin(tauri_plugin_os::init())
             .plugin(tauri_plugin_store::Builder::new().build())
             .plugin(tauri_plugin_process::init())
@@ -69,14 +84,6 @@ pub fn run() {
                     ])
                     .build(),
             );
-
-        #[cfg(desktop)]
-        let b = b.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            let _ = app
-                .get_webview_window("main")
-                .expect("no main window")
-                .set_focus();
-        }));
 
         #[cfg(desktop)]
         let b = {

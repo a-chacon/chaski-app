@@ -268,7 +268,7 @@ const WindowTitlebar: React.FC = () => {
               variant="light"
               isIconOnly
               size="sm"
-              onPress={() => appWindow.close()}
+              onPress={() => appWindow.hide()}
             >
               <RiCloseLine />
             </Button>

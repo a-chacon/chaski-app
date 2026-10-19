@@ -1,5 +1,6 @@
 use crate::core::jobs::collect_feed_content;
 use crate::db::establish_connection;
+use crate::entities::entries::{create_list as create_entries, limit_for_feed};
 use crate::integrations::greader::{greader_item_to_new_entry, GReaderClient};
 use crate::models::Account;
 use crate::models::{Feed, IndexFeed, NewFeed, ScrapedFeed};
@@ -44,9 +45,6 @@ pub fn get_folders(account_id_eq: i32, app_handle: tauri::AppHandle) -> Vec<Stri
     result.into_iter().flatten().collect()
 }
 
-// SQLite limits bind variables per statement (999 on older builds); entries have 15 columns.
-const ENTRIES_INSERT_BATCH_SIZE: usize = 50;
-
 fn normalize_new_feed(new_feed: &mut NewFeed) {
     if new_feed.folder.is_none() {
         new_feed.folder = Some(String::from("Quipu"));
@@ -55,22 +53,14 @@ fn normalize_new_feed(new_feed: &mut NewFeed) {
     new_feed.default_entry_type = String::from("entry");
 }
 
-pub fn create_feed(
-    mut new_feed: NewFeed,
-    should_collect_data: bool,
-    app_handle: tauri::AppHandle,
-) -> Result<Feed, String> {
+fn insert_feed(mut new_feed: NewFeed, app_handle: &tauri::AppHandle) -> Result<Feed, String> {
     use crate::schema::feeds;
 
-    let conn = &mut establish_connection(&app_handle);
+    let conn = &mut establish_connection(app_handle);
 
     normalize_new_feed(&mut new_feed);
 
-    if !should_collect_data {
-        new_feed.last_fetch = None;
-    }
-
-    let created_feed = crate::db::with_retry(|| {
+    crate::db::with_retry(|| {
         diesel::insert_into(feeds::table)
             .values(&new_feed)
             .returning(Feed::as_returning())
@@ -79,7 +69,19 @@ pub fn create_feed(
     .map_err(|e| {
         log::error!(target: "chaski:entities", "Failed to create feed: {}", e);
         e
-    })?;
+    })
+}
+
+pub fn create_feed(
+    mut new_feed: NewFeed,
+    should_collect_data: bool,
+    app_handle: tauri::AppHandle,
+) -> Result<Feed, String> {
+    if !should_collect_data {
+        new_feed.last_fetch = None;
+    }
+
+    let created_feed = insert_feed(new_feed, &app_handle)?;
 
     let created_feed_clone = created_feed.clone();
     let cloned_app_handle = app_handle.clone();
@@ -178,60 +180,30 @@ pub fn index(app_handle: tauri::AppHandle, filters: Option<FeedsFilters>) -> Vec
         .expect("Error loading feeds with unread count")
 }
 
-/// Inserts already scraped feeds and their entries in a single transaction, so SQLite
-/// syncs to disk once. Entries are inserted in batches; a feed that fails is skipped
-/// (rolled back to its savepoint) without affecting the others.
-pub fn create_scraped_list(
-    mut scraped_feeds: Vec<ScrapedFeed>,
+pub async fn create_scraped_list(
+    scraped_feeds: Vec<ScrapedFeed>,
     app_handle: tauri::AppHandle,
 ) -> Vec<Feed> {
-    use crate::schema::feeds as feeds_table;
+    let mut created_feeds = Vec::new();
 
-    let conn = &mut establish_connection(&app_handle);
-
-    let result = crate::db::with_retry(|| {
-        conn.transaction(|conn| {
-            let mut created_feeds = Vec::new();
-
-            for scraped in scraped_feeds.iter_mut() {
-                let mut new_feed = scraped.feed.clone();
-                normalize_new_feed(&mut new_feed);
-
-                let created = conn.transaction(|conn| {
-                    let feed = diesel::insert_into(feeds_table::table)
-                        .values(&new_feed)
-                        .returning(Feed::as_returning())
-                        .get_result::<Feed>(conn)?;
-
-                    scraped.entries.truncate(feed.entry_limit.max(0) as usize);
-                    for entry in scraped.entries.iter_mut() {
-                        entry.feed_id = feed.id;
-                    }
-                    for batch in scraped.entries.chunks(ENTRIES_INSERT_BATCH_SIZE) {
-                        diesel::insert_into(entries::table)
-                            .values(batch)
-                            .execute(conn)?;
-                    }
-
-                    Ok::<Feed, diesel::result::Error>(feed)
-                });
-
-                match created {
-                    Ok(feed) => created_feeds.push(feed),
-                    Err(e) => {
-                        log::error!(target: "chaski:entities", "Skipping feed {} in create_scraped_list: {}", new_feed.link, e);
-                    }
-                }
+    for scraped in scraped_feeds {
+        match insert_feed(scraped.feed, &app_handle) {
+            Ok(feed) => {
+                let feed_entries = scraped
+                    .entries
+                    .into_iter()
+                    .map(|entry| entry.with_feed_id(feed.id))
+                    .collect();
+                create_entries(limit_for_feed(&feed, feed_entries), app_handle.clone()).await;
+                created_feeds.push(feed);
             }
+            Err(e) => {
+                log::error!(target: "chaski:entities", "Skipping feed in create_scraped_list: {}", e);
+            }
+        }
+    }
 
-            Ok(created_feeds)
-        })
-    });
-
-    result.unwrap_or_else(|e| {
-        log::error!(target: "chaski:entities", "Failed to create scraped feeds: {}", e);
-        Vec::new()
-    })
+    created_feeds
 }
 
 pub fn delete_list(feed_ids: Vec<i32>, app_handle: tauri::AppHandle) {
@@ -397,7 +369,7 @@ async fn sync_feeds(
                 entries: Vec::new(),
             })
             .collect();
-        create_scraped_list(scraped_feeds, app_handle.clone());
+        create_scraped_list(scraped_feeds, app_handle.clone()).await;
     }
     if !to_delete.is_empty() {
         delete_list(to_delete, app_handle.clone());

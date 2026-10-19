@@ -48,8 +48,9 @@ pub async fn import_opml(
 ) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command import_opml. file_path: {file_path:?}");
 
-    let result =
-        crate::utils::opml_utils::opml_file_to_new_feeds(file_path.as_str(), &app_handle).await;
+    let result = crate::utils::opml_utils::opml_file_to_new_feeds(file_path.as_str(), &app_handle)
+        .await
+        .map_err(|e| e.to_string());
 
     match result {
         Ok(report) => {
@@ -67,7 +68,7 @@ pub async fn import_opml(
                 scraped.feed.account_id = Some(account_id);
             }
 
-            crate::entities::feeds::create_scraped_list(scraped_feeds, app_handle.clone());
+            crate::entities::feeds::create_scraped_list(scraped_feeds, app_handle.clone()).await;
             emit_sidebar_updated(&app_handle, account_id, "import");
         }
         Err(err) => {

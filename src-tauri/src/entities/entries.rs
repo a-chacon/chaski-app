@@ -248,34 +248,45 @@ pub fn trim_feed_history(feed: Feed, app_handle: tauri::AppHandle) {
     }
 }
 
+// SQLite limits bind variables per statement (999 on older builds); entries have 15 columns.
+const INSERT_BATCH_SIZE: usize = 50;
+
+/// Keeps at most `feed.entry_limit` entries (the list is expected newest first).
+pub fn limit_for_feed(feed: &Feed, mut list_entries: Vec<NewEntry>) -> Vec<NewEntry> {
+    list_entries.truncate(feed.entry_limit.max(0) as usize);
+    list_entries
+}
+
+/// Inserts the entries of a single feed (all must share the same `feed_id`), skipping
+/// links that already exist, in batches.
 pub async fn create_list(list_entries: Vec<NewEntry>, app_handle: tauri::AppHandle) -> Vec<Entry> {
-    let mut created_entries = Vec::new();
+    let Some(first) = list_entries.first() else {
+        return Vec::new();
+    };
     let conn = &mut establish_connection(&app_handle);
 
-    let existing_links: Vec<String> = entries
-        .filter(feed_id.eq(list_entries[0].feed_id))
+    let existing_links: std::collections::HashSet<String> = entries
+        .filter(feed_id.eq(first.feed_id))
         .select(entries::link)
-        .load(conn)
-        .unwrap_or_else(|_| Vec::new());
+        .load::<String>(conn)
+        .unwrap_or_default()
+        .into_iter()
+        .collect();
 
-    let filtered_entries: Vec<NewEntry> = list_entries
+    let new_entries: Vec<NewEntry> = list_entries
         .into_iter()
         .filter(|entry| !existing_links.contains(&entry.link))
         .collect();
 
-    for new_entry in filtered_entries {
-        let result = diesel::insert_into(entries)
-            .values(new_entry)
+    let mut created_entries = Vec::with_capacity(new_entries.len());
+    for batch in new_entries.chunks(INSERT_BATCH_SIZE) {
+        match diesel::insert_into(entries)
+            .values(batch)
             .returning(Entry::as_returning())
-            .get_result(conn);
-
-        match result {
-            Ok(created_entry) => {
-                created_entries.push(created_entry.clone());
-            }
-            Err(e) => {
-                log::error!("Error saving new entry: {}", e);
-            }
+            .get_results::<Entry>(conn)
+        {
+            Ok(created) => created_entries.extend(created),
+            Err(e) => log::error!(target: "chaski:entries", "Error saving new entries: {}", e),
         }
     }
 

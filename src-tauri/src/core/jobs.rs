@@ -44,8 +44,7 @@ pub async fn collect_feed_content(feed: &Feed, app_handle: tauri::AppHandle) {
             found_entries,
             filters::index(filter_filters, app_handle.clone()),
         );
-        let limit = feed.entry_limit.max(0) as usize;
-        let limited_entries = final_entries.into_iter().take(limit).collect::<Vec<_>>();
+        let limited_entries = entries::limit_for_feed(feed, final_entries);
 
         if let Some(first_entry) = limited_entries.first() {
             updated_feed.latest_entry = first_entry.pub_date;

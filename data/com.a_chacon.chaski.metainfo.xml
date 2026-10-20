@@ -32,6 +32,19 @@
   </provides>
 
   <releases>
+    <release version="0.8.2" date="2026-10-18">
+      <description>
+        <p>Added:</p>
+        <ul>
+          <li>Entries are now inserted at the moment of importing an OPML, so imported feeds are populated immediately and folder refresh shows content.</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Hide the window on close so a second launch (single instance) can show it again.</li>
+          <li>Catch errors in entries content to avoid failures when rendering malformed entries.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.8.1" date="2026-10-16">
       <description>
         <p>Added:</p>

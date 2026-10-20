@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.8.2 - 2026-10-18
+
+### Added
+
+- Entries are now inserted at the moment of importing an OPML, so imported feeds are populated immediately and folder refresh shows content.
+
+### Fixed
+
+- Hide the window on close so a second launch (single instance) can show it again.
+- Catch errors in entries content to avoid failures when rendering malformed entries.
+
 ## 0.8.1 - 2026-10-16
 
 ### Added

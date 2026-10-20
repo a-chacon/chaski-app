@@ -1,5 +1,9 @@
 {
   "save": "Guardar",
+  "errorTitle": "Algo salió mal",
+  "errorContentTitle": "No se pudo mostrar este contenido",
+  "showDetails": "Mostrar detalles",
+  "hideDetails": "Ocultar detalles",
   "cancel": "Cancelar",
   "close": "Cerrar",
   "delete": "Eliminar",

@@ -13,13 +13,19 @@ import { Button, Spinner, Tooltip } from "@heroui/react";
 import { getEntry, scrapeEntry, updateEntryAsRead } from "../helpers/entriesData";
 import { useAppContext } from "../AppContext";
 import { useTranslation } from 'react-i18next';
+import ErrorBoundary, { ErrorMessage } from "../components/ErrorBoundary";
 
 export const Route = createFileRoute("/entries/$entryId")({
   component: Entry,
+  errorComponent: ({ error }) => (
+    <MainSectionLayout>
+      <ErrorMessage error={error} />
+    </MainSectionLayout>
+  ),
 });
 
 function Entry() {
-  const { t } = useTranslation('entries');
+  const { t } = useTranslation(['entries', 'common']);
   const { entryId } = Route.useParams();
   const [entry, setEntry] = useState<EntryInterface>();
   const [isLoadingEntry, setIsLoadingEntry] = useState(true);
@@ -196,11 +202,13 @@ function Entry() {
 
 
               <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto w-full min-w-0 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:max-w-full [&_iframe]:max-w-full ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
-                <p className="py-6 line-clamp-3">
-                  {parse(entry.description || "", parseOptions)}
-                </p>
-                <hr />
-                {parse(entry.content || "", parseOptions)}
+                <ErrorBoundary resetKey={`${entry.id}-${entry.content}`} title={t('common:errorContentTitle')}>
+                  <p className="py-6 line-clamp-3">
+                    {parse(entry.description || "", parseOptions)}
+                  </p>
+                  <hr />
+                  {parse(entry.content || "", parseOptions)}
+                </ErrorBoundary>
               </div>
             </InfiniteScroll>
           </div>

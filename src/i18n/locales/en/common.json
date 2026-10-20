@@ -1,5 +1,9 @@
 {
   "save": "Save",
+  "errorTitle": "Something went wrong",
+  "errorContentTitle": "This content could not be displayed",
+  "showDetails": "Show details",
+  "hideDetails": "Hide details",
   "cancel": "Cancel",
   "close": "Close",
   "delete": "Delete",

@@ -4,6 +4,7 @@ import { AccountInterface, FeedInterface } from '../../interfaces';
 import FolderItem from './FolderItem';
 import { indexFeeds } from '../../helpers/feedsData';
 
+
 const SIDEBAR_UPDATED_EVENT = 'sidebar://updated';
 
 interface SidebarUpdatedPayload {
@@ -32,7 +33,6 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
       return;
     }
 
-    setLoading(true);
     const feeds = await indexFeeds(account.id);
     const grouped = groupBy(feeds, (f) => f.folder);
     setGroupedFeeds(grouped);
@@ -41,11 +41,15 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
 
   useEffect(() => {
     if (account.kind === 'local' || account.kind === 'greaderapi') {
+      // Show the loading state only on initial load / account change, not on
+      // refreshes, so folders keep their expanded state.
+      setLoading(true);
       fetchFeeds();
     } else {
       setLoading(false);
     }
   }, [account.kind, account.id]);
+
 
   useEffect(() => {
     if (account.kind !== 'local' && account.kind !== 'greaderapi') {
@@ -53,6 +57,7 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
     }
 
     let unlisten: (() => void) | undefined;
+
 
     const setupSidebarListener = async () => {
       unlisten = await listen<SidebarUpdatedPayload>(SIDEBAR_UPDATED_EVENT, (event) => {
@@ -67,6 +72,7 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
     setupSidebarListener();
 
     return () => {
+
       if (unlisten) {
         unlisten();
       }

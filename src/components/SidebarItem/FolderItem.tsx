@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AccountInterface, FeedInterface } from '../../interfaces';
 import { Link } from '@tanstack/react-router';
-import FolderActions from '../FolderActions';
+
 import { Button } from '@heroui/react';
 import { RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
 import { useAppContext } from '../../AppContext';
@@ -13,7 +13,7 @@ interface FolderItemProps {
 }
 
 const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) => {
-  const [folder, setFolder] = useState(folderName);
+  const folder = folderName;
   const [isOpen, setIsOpen] = useState(false);
   const { isMobile, setSideBarOpen } = useAppContext();
 
@@ -51,7 +51,6 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) =
           {folder}
         </Link>
 
-        <FolderActions folder={folder} account={account} setFolder={setFolder} />
       </div>
 
       <div className={`flex flex-col ml-8 pr-2 py-1 ${isOpen ? "flex" : "hidden"}`}>

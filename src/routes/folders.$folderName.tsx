@@ -1,6 +1,6 @@
 import { EntryInterface } from '../interfaces'
-import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import MainSectionLayout from '../components/layout/MainSectionLayout'
 
@@ -10,9 +10,9 @@ import { useNotification } from '../NotificationContext'
 import { useAppContext } from '../AppContext'
 import { updateEntriesAsReadByFolder } from '../helpers/feedsData'
 import { useTranslation } from 'react-i18next'
-import EntryListActionsModal from '../components/EntryListActionsModal'
-import { Button } from '@heroui/react'
-import { RiRefreshLine } from '@remixicon/react'
+import EntryListToolbar from '../components/EntryListToolbar'
+import FolderActions from '../components/FolderActions'
+import { RiEditLine, RiDeleteBinLine } from '@remixicon/react'
 
 export const Route = createFileRoute('/folders/$folderName')({
   component: Folder,
@@ -21,10 +21,15 @@ export const Route = createFileRoute('/folders/$folderName')({
 export default function Folder() {
   const { t } = useTranslation('entries')
   const { addNotification } = useNotification()
-  const { showReadEntries, showHiddenEntries, isMobile } = useAppContext()
+  const { showReadEntries, showHiddenEntries, entriesOrder } = useAppContext()
+  const navigate = useNavigate()
   const { folderName: folderParam } = Route.useParams()
-  const [accountIdStr, folderName] = folderParam.split('-')
-  const accountId = Number(accountIdStr)
+  // The param is "<accountId>-<folderName>"; folder names may contain hyphens.
+  const separatorIndex = folderParam.indexOf('-')
+  const accountId = Number(folderParam.slice(0, separatorIndex))
+  const folderName = folderParam.slice(separatorIndex + 1)
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries(folderName)
 
@@ -48,7 +53,7 @@ export default function Folder() {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page, entries.length, showReadEntries, showHiddenEntries])
+  }, [page, entries.length, showReadEntries, showHiddenEntries, entriesOrder])
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -57,7 +62,7 @@ export default function Folder() {
     }
     resetEntryList()
     setHasMore(true)
-  }, [folderParam, showReadEntries, showHiddenEntries])
+  }, [folderParam, showReadEntries, showHiddenEntries, entriesOrder])
 
   const fetchEntries = async () => {
     try {
@@ -67,6 +72,7 @@ export default function Folder() {
         filters: {
           folder_eq: folderName,
           account_id_eq: accountId,
+          order: entriesOrder,
           ...(showReadEntries ? {} : { read_eq: 0 }),
           ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         },
@@ -110,25 +116,26 @@ export default function Folder() {
         <div className="flex flex-col py-8 justify-between items-start">
           <div className="w-full flex flex-row justify-between">
             <h1 className="text-xl md:text-3xl font-bold">{folderName}</h1>
-            <div className="flex items-center gap-1">
-              {!isMobile && (
-                <Button
-                  isIconOnly
-                  variant="light"
-                  onPress={handleReloadButton}
-                  aria-label={t('reloadEntries')}
-                  className="text-foreground-500"
-                >
-                  <RiRefreshLine className="w-5 h-5" />
-                </Button>
-              )}
-              <EntryListActionsModal
-                actions={[
-                  { key: "markRead", label: t('updateFolderAsRead'), onPress: handleUpdateEntriesAsRead },
-                  { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
-                ]}
-              />
-            </div>
+            <EntryListToolbar
+              onReload={handleReloadButton}
+              onMarkAllAsRead={handleUpdateEntriesAsRead}
+              extraActions={[
+                { key: 'edit', label: t('editFolder'), icon: <RiEditLine className="w-4 h-4" />, onPress: () => setRenameOpen(true) },
+                { key: 'delete', label: t('removeFolder'), icon: <RiDeleteBinLine className="w-4 h-4" />, color: 'danger', onPress: () => setDeleteOpen(true) },
+              ]}
+            />
+            <FolderActions
+              accountId={accountId}
+              folder={folderName}
+              renameOpen={renameOpen}
+              onRenameOpenChange={setRenameOpen}
+              deleteOpen={deleteOpen}
+              onDeleteOpenChange={setDeleteOpen}
+              onRenamed={(newName) =>
+                navigate({ to: '/folders/$folderName', params: { folderName: accountId + '-' + newName } })
+              }
+              onDeleted={() => navigate({ to: '/' })}
+            />
           </div>
         </div>
         {entries.length > 0 || !hasMore ? (

@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import EntriesList from "../components/EntriesList";
-import FeedSiteActions from "../components/FeedSiteActions";
+import FeedPageActions from "../components/FeedPageActions";
 import { Snippet } from "@heroui/react";
 
 import { updateEntriesAsReadByFeedId, refreshEntries } from "../helpers/feedsData";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/feeds/$feedId")({
 export default function Feed() {
   const { t } = useTranslation('entries');
   const { addNotification } = useNotification();
-  const { showReadEntries, showHiddenEntries } = useAppContext();
+  const { showReadEntries, showHiddenEntries, entriesOrder } = useAppContext();
   const { feedId } = Route.useParams();
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries(feedId);
@@ -57,7 +57,7 @@ export default function Feed() {
     if (page === 1 && entries.length === 0) {
       fetchEntries();
     }
-  }, [page, entries.length, showReadEntries, showHiddenEntries, feedId]);
+  }, [page, entries.length, showReadEntries, showHiddenEntries, feedId, entriesOrder]);
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -66,7 +66,7 @@ export default function Feed() {
     }
     resetEntryList()
     setHasMore(true);
-  }, [feedId, showReadEntries, showHiddenEntries]);
+  }, [feedId, showReadEntries, showHiddenEntries, entriesOrder]);
 
   const fetchEntries = async () => {
     try {
@@ -75,6 +75,7 @@ export default function Feed() {
         items: 50,
         filters: {
           feed_id_eq: parseInt(feedId),
+          order: entriesOrder,
           ...(showReadEntries ? {} : { read_eq: 0 }),
           ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         },
@@ -142,7 +143,7 @@ export default function Feed() {
               <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
             </div>
             {feed && (
-              <FeedSiteActions
+              <FeedPageActions
                 feed={feed}
                 setFeed={setFeed}
                 onMarkAsRead={handleUpdateAllEntriesAsRead}

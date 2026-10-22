@@ -38,7 +38,8 @@ pub async fn update_entries_as_read_by_folder(
     app_handle: tauri::AppHandle,
 ) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command update_entries_as_read_by_folder. folder: {folder:?}");
-    crate::entities::entries::update_all_as_read_by_folder(folder, account_id, app_handle);
+    crate::entities::entries::update_all_as_read_by_folder(folder, account_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, account_id, "folder", "update");
     Ok(())
 }
 

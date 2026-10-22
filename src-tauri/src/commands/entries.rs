@@ -1,7 +1,19 @@
 use crate::core::jobs::complete_entry;
 use crate::entities::entries::EntriesFilters;
 use crate::models::{Entry, NewEntry};
-use tauri::command;
+use tauri::{command, Emitter};
+
+fn emit_sidebar_updated(app_handle: &tauri::AppHandle, account_id: Option<i32>) {
+    let payload = serde_json::json!({
+        "accountId": account_id,
+        "entity": "feed",
+        "action": "update",
+    });
+
+    if let Err(err) = app_handle.emit("sidebar://updated", payload) {
+        log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
+    }
+}
 
 #[command]
 pub async fn list_entries(
@@ -98,9 +110,24 @@ pub async fn update_entry(
 }
 
 #[command]
-pub async fn update_entries_as_read(app_handle: tauri::AppHandle) -> Result<(), ()> {
+pub async fn update_entries_as_read(
+    account_id: i32,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command update_entries_as_read.");
-    crate::entities::entries::update_all_as_read(app_handle);
+    crate::entities::entries::update_all_as_read(account_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, None);
+    Ok(())
+}
+
+#[command]
+pub async fn update_all_read_later_as_read(
+    account_id: i32,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
+    log::debug!(target: "chaski:commands","Command update_all_read_later_as_read. account_id: {account_id:?}");
+    crate::entities::entries::update_all_read_later_as_read(account_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, Some(account_id));
     Ok(())
 }
 
@@ -110,7 +137,8 @@ pub async fn update_entries_as_read_by_feed_id(
     app_handle: tauri::AppHandle,
 ) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command update_entries_as_read_by_feed. feed_id: {feed_id:?}");
-    crate::entities::entries::update_all_as_read_by_feed_id(feed_id, app_handle);
+    crate::entities::entries::update_all_as_read_by_feed_id(feed_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, None);
     Ok(())
 }
 

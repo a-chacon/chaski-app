@@ -36,5 +36,17 @@
   "updatedBody": "All entries were updated as read!",
   "reloadedTitle": "Reloaded",
   "lastFetch": "Last fetch:",
-  "latestEntry": "Latest entry:"
+  "latestEntry": "Latest entry:",
+  "markAllAsRead": "Mark all as read",
+  "reload": "Reload",
+  "listSettings": "List settings",
+  "layout": "Layout",
+  "sortOrder": "Order",
+  "newestFirst": "Newest",
+  "oldestFirst": "Oldest",
+  "editFolder": "Edit folder",
+  "removeFolder": "Remove folder",
+  "editFeed": "Edit feed",
+  "feedFilters": "Filters",
+  "removeFeed": "Remove feed"
 }

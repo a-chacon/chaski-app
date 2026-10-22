@@ -82,6 +82,7 @@ export const updateEntryAsUnRead = async (entry: EntryInterface) => {
 export const updateEntryReadLater = async (entry: EntryInterface) => {
   if (entry && entry.read_later !== 1) {
     // Check if already marked as read
+    // Check if already marked as read
     entry.read_later = 1;
     entry.read = 0;
 

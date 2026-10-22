@@ -110,11 +110,6 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
             </h3>
           </Link>
 
-          <EntryActions
-            className="invisible group-hover:visible shrink-0"
-            entry={entry}
-            setEntry={setEntry}
-          />
         </div>
       </div>
     );

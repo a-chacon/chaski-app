@@ -4,9 +4,11 @@ use crate::entities::entries::{create_list as create_entries, limit_for_feed};
 use crate::integrations::greader::{greader_item_to_new_entry, GReaderClient};
 use crate::models::Account;
 use crate::models::{Feed, IndexFeed, NewFeed, ScrapedFeed};
+use crate::schema::accounts;
 use crate::schema::entries;
 use crate::schema::feeds::dsl::*;
 use crate::schema::filters;
+
 use chrono::Utc;
 use diesel::dsl::{now, sql};
 use diesel::prelude::*;
@@ -250,9 +252,9 @@ async fn feeds_update_loop(app_handle: tauri::AppHandle) {
         sleep(Duration::from_millis(500)).await;
         let conn = &mut establish_connection(&app_handle);
 
-        // Skip feeds belonging to a GReader account — their entries come from
-        // the GReader sync loop, not direct RSS polling.
         let feeds_to_update: Vec<Feed> = feeds
+            .inner_join(accounts::table)
+            .filter(accounts::kind.eq("local"))
             .filter(
                 sql::<diesel::sql_types::Timestamp>(
                     "datetime(feeds.last_fetch, '+' || feeds.update_interval_minutes || ' minutes')",
@@ -260,7 +262,7 @@ async fn feeds_update_loop(app_handle: tauri::AppHandle) {
                 .lt(now)
                 .or(last_fetch.is_null()),
             )
-            .filter(account_id.is_null())
+            .select(Feed::as_select())
             .load::<Feed>(conn)
             .expect("Error loading feeds that need to be updated");
 

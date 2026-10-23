@@ -1,8 +1,10 @@
-import { RiBookmarkFill, RiFileListLine, RiCompassDiscoverLine, RiSettings4Line, RiInformationLine } from "@remixicon/react";
+import { RiBookmarkFill, RiFileListLine, RiCompassDiscoverLine, RiSettings4Line, RiInformationLine, RiAddCircleLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
 import { useTranslation } from "react-i18next";
+import { Tooltip } from "@heroui/react";
+import FeedMenu from "./FeedMenu";
 
 function SideBar() {
   const { currentAccount, isMobile, setSideBarOpen } = useAppContext();
@@ -67,8 +69,22 @@ function SideBar() {
           </Link>
         </div>
 
-        <div className="px-3 pt-2 pb-1">
+        <div className="px-3 pt-2 pb-1 flex items-center justify-between">
           <h5 className="font-semibold text-xs uppercase tracking-wide text-foreground-500">{t("feeds")}</h5>
+          <div className="flex items-center gap-1">
+            <FeedMenu iconSize={isMobile ? 20 : 16} />
+            <Tooltip content={t("addNewFeed")} delay={300}>
+              <Link
+                to="/new_feed"
+                aria-label={t("addNewFeed")}
+                onClick={handleLinkClick}
+                className="text-foreground-500 flex items-center justify-center rounded-xl w-10 h-10 hover:bg-default/40 transition-colors"
+                activeProps={{ className: "text-primary-500" }}
+              >
+                <RiAddCircleLine size={isMobile ? 20 : 16} />
+              </Link>
+            </Tooltip>
+          </div>
         </div>
 
         <div className="w-full relative flex flex-col gap-1 py-1">

@@ -105,11 +105,11 @@ export const importOPML = async (account_id: number, file_path: string) => {
   }
 };
 
-export const exportOPML = async (file_path: string, feed_ids: number[]) => {
+export const exportOPML = async (account_id: number, file_path: string) => {
   try {
     await invoke<string>("export_opml", {
+      accountId: account_id,
       filePath: file_path,
-      feedIds: feed_ids,
     });
   } catch (error) {
     console.error("Error exporting OPML :", error);

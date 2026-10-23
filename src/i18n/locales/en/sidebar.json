@@ -5,5 +5,9 @@
   "configurations": "Configurations",
   "about": "About",
   "feeds": "Feeds",
+  "addNewFeed": "Add new feed",
+  "feedMenu": "Feed options",
+  "importOpml": "Import OPML",
+  "exportOpml": "Export OPML",
   "noAccountSelected": "No account selected. Add an account from the titlebar."
 }

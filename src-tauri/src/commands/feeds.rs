@@ -1,25 +1,7 @@
 use crate::entities::feeds::FeedsFilters;
 use crate::models::{Feed, NewFeed};
-use tauri::{command, Emitter};
-
-const SIDEBAR_UPDATED_EVENT: &str = "sidebar://updated";
-
-fn emit_sidebar_updated(
-    app_handle: &tauri::AppHandle,
-    account_id: Option<i32>,
-    entity: &str,
-    action: &str,
-) {
-    let payload = serde_json::json!({
-        "accountId": account_id,
-        "entity": entity,
-        "action": action,
-    });
-
-    if let Err(err) = app_handle.emit(SIDEBAR_UPDATED_EVENT, payload) {
-        log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
-    }
-}
+use crate::utils::sidebar::emit_sidebar_updated;
+use tauri::command;
 
 #[command]
 pub async fn scrape_site_feeds(site_url: String, account_id: i32) -> Result<String, ()> {

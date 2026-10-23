@@ -17,6 +17,7 @@ mod utils {
     pub(crate) mod notifications;
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;
+    pub(crate) mod sidebar;
 }
 
 mod integrations {

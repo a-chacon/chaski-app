@@ -135,11 +135,13 @@ pub fn update_all_as_read(account_id_eq: i32, app_handle: tauri::AppHandle) {
 
     let result = diesel::update(
         entries.filter(
-            entries::feed_id.eq_any(
-                feeds::table
-                    .filter(feeds::account_id.eq(account_id_eq))
-                    .select(feeds::id),
-            ),
+            entries::feed_id
+                .eq_any(
+                    feeds::table
+                        .filter(feeds::account_id.eq(account_id_eq))
+                        .select(feeds::id),
+                )
+                .and(entries::read.eq(0)),
         ),
     )
     .set(read.eq(1))
@@ -160,11 +162,13 @@ pub fn update_all_read_later_as_read(account_id_eq: i32, app_handle: tauri::AppH
     let result = diesel::update(
         entries.filter(
             entries::read_later.eq(1).and(
-                entries::feed_id.eq_any(
-                    feeds::table
-                        .filter(feeds::account_id.eq(account_id_eq))
-                        .select(feeds::id),
-                ),
+                entries::feed_id
+                    .eq_any(
+                        feeds::table
+                            .filter(feeds::account_id.eq(account_id_eq))
+                            .select(feeds::id),
+                    )
+                    .and(entries::read.eq(0)),
             ),
         ),
     )
@@ -186,6 +190,7 @@ pub fn update_all_as_read_by_feed_id(feed_id_eq: i32, app_handle: tauri::AppHand
     let result = diesel::update(entries)
         .set(read.eq(1))
         .filter(entries::feed_id.eq(feed_id_eq))
+        .filter(read.eq(0))
         .execute(conn);
 
     match result {
@@ -205,7 +210,7 @@ pub fn update_all_as_read_by_folder(
 ) {
     let conn = &mut establish_connection(&app_handle);
     let query = format!(
-        "UPDATE entries SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?} AND account_id = {});",
+        "UPDATE entries SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?} AND account_id = {} AND read = 0);",
         folder_eq, account_id_eq
     );
 

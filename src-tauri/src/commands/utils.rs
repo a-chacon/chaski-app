@@ -1,20 +1,7 @@
 use crate::utils::notifications::send_notification;
+use crate::utils::sidebar::emit_sidebar_updated;
 use serde_json::json;
-use tauri::{command, Emitter};
-
-const SIDEBAR_UPDATED_EVENT: &str = "sidebar://updated";
-
-fn emit_sidebar_updated(app_handle: &tauri::AppHandle, account_id: i32, action: &str) {
-    let payload = serde_json::json!({
-        "accountId": account_id,
-        "entity": "feed",
-        "action": action,
-    });
-
-    if let Err(err) = app_handle.emit(SIDEBAR_UPDATED_EVENT, payload) {
-        log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
-    }
-}
+use tauri::command;
 
 #[command]
 pub async fn full_text_search(
@@ -69,7 +56,7 @@ pub async fn import_opml(
             }
 
             crate::entities::feeds::create_scraped_list(scraped_feeds, app_handle.clone()).await;
-            emit_sidebar_updated(&app_handle, account_id, "import");
+            emit_sidebar_updated(&app_handle, account_id, "feed", "import");
         }
         Err(err) => {
             send_notification(

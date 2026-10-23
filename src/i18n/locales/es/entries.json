@@ -36,5 +36,17 @@
   "updatedBody": "¡Todas las entradas fueron marcadas como leídas!",
   "reloadedTitle": "Recargado",
   "lastFetch": "Última obtención:",
-  "latestEntry": "Entrada más reciente:"
+  "latestEntry": "Entrada más reciente:",
+  "markAllAsRead": "Marcar todo como leído",
+  "reload": "Recargar",
+  "listSettings": "Ajustes de la lista",
+  "layout": "Diseño",
+  "sortOrder": "Orden",
+  "newestFirst": "Recientes",
+  "oldestFirst": "Antiguas",
+  "editFolder": "Editar carpeta",
+  "removeFolder": "Eliminar carpeta",
+  "editFeed": "Editar fuente",
+  "feedFilters": "Filtros",
+  "removeFeed": "Eliminar fuente"
 }

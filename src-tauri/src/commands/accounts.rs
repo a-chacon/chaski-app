@@ -1,8 +1,7 @@
 use crate::models::NewAccount;
+use crate::utils::sidebar::emit_sidebar_updated;
 use serde_json::json;
-use tauri::{command, Emitter};
-
-const SIDEBAR_UPDATED_EVENT: &str = "sidebar://updated";
+use tauri::command;
 
 #[command]
 pub async fn index_accounts(app_handle: tauri::AppHandle) -> Result<String, ()> {
@@ -214,15 +213,7 @@ pub async fn full_sync(account_id: i32, app_handle: tauri::AppHandle) -> Result<
         .await
     {
         Ok(_) => {
-            let payload = json!({
-                "accountId": account_id,
-                "entity": "feed",
-                "action": "sync"
-            });
-
-            if let Err(err) = app_handle.emit(SIDEBAR_UPDATED_EVENT, payload) {
-                log::warn!(target: "chaski:commands", "Failed to emit sidebar update event: {err:?}");
-            }
+            emit_sidebar_updated(&app_handle, account_id, "feed", "sync");
 
             let response = json!({
                 "success": true,

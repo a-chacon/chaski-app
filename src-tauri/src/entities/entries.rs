@@ -19,6 +19,8 @@ pub struct EntriesFilters {
     pub pub_date_eq: Option<String>,
     pub folder_eq: Option<String>,
     pub account_id_eq: Option<i32>,
+    /// "asc" for oldest first; anything else (or none) means newest first.
+    pub order: Option<String>,
 }
 
 pub fn get_entries_with_feed(
@@ -38,6 +40,10 @@ pub fn get_entries_with_feed(
         .into_boxed();
 
     if let Some(filter) = filters {
+        if filter.order.as_deref() == Some("asc") {
+            query = query.order(pub_date.asc());
+        }
+
         if let Some(feed_id_eq) = filter.feed_id_eq {
             query = query.filter(entries::feed_id.eq(feed_id_eq));
         }
@@ -124,10 +130,22 @@ pub fn update(entry_id: i32, entry: Entry, app_handle: tauri::AppHandle) -> Resu
     })
 }
 
-pub fn update_all_as_read(app_handle: tauri::AppHandle) {
+pub fn update_all_as_read(account_id_eq: i32, app_handle: tauri::AppHandle) {
     let conn = &mut establish_connection(&app_handle);
 
-    let result = diesel::update(entries).set(read.eq(1)).execute(conn);
+    let result = diesel::update(
+        entries.filter(
+            entries::feed_id
+                .eq_any(
+                    feeds::table
+                        .filter(feeds::account_id.eq(account_id_eq))
+                        .select(feeds::id),
+                )
+                .and(entries::read.eq(0)),
+        ),
+    )
+    .set(read.eq(1))
+    .execute(conn);
 
     match result {
         Ok(count) => {
@@ -139,11 +157,40 @@ pub fn update_all_as_read(app_handle: tauri::AppHandle) {
     }
 }
 
+pub fn update_all_read_later_as_read(account_id_eq: i32, app_handle: tauri::AppHandle) {
+    let conn = &mut establish_connection(&app_handle);
+    let result = diesel::update(
+        entries.filter(
+            entries::read_later.eq(1).and(
+                entries::feed_id
+                    .eq_any(
+                        feeds::table
+                            .filter(feeds::account_id.eq(account_id_eq))
+                            .select(feeds::id),
+                    )
+                    .and(entries::read.eq(0)),
+            ),
+        ),
+    )
+    .set(read.eq(1))
+    .execute(conn);
+
+    match result {
+        Ok(count) => {
+            log::info!(target: "chaski:entries","Read later entries updated as read, {:?}", count);
+        }
+        Err(e) => {
+            log::error!(target: "chaski:entries","Error updating read later entries as read: {:?}", e);
+        }
+    }
+}
+
 pub fn update_all_as_read_by_feed_id(feed_id_eq: i32, app_handle: tauri::AppHandle) {
     let conn = &mut establish_connection(&app_handle);
     let result = diesel::update(entries)
         .set(read.eq(1))
         .filter(entries::feed_id.eq(feed_id_eq))
+        .filter(read.eq(0))
         .execute(conn);
 
     match result {
@@ -163,7 +210,7 @@ pub fn update_all_as_read_by_folder(
 ) {
     let conn = &mut establish_connection(&app_handle);
     let query = format!(
-        "UPDATE entries SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?} AND account_id = {});",
+        "UPDATE entries SET read = 1 WHERE feed_id IN (SELECT id FROM feeds WHERE folder = {:?} AND account_id = {} AND read = 0);",
         folder_eq, account_id_eq
     );
 

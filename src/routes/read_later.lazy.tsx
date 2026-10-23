@@ -5,9 +5,9 @@ import { EntryInterface } from '../interfaces'
 import { invoke } from '@tauri-apps/api/core'
 import EntriesList from '../components/EntriesList'
 import { useEntries } from '../IndexEntriesContext'
-import EntryListActionsModal from '../components/EntryListActionsModal'
-import { Button } from '@heroui/react'
-import { RiRefreshLine } from '@remixicon/react'
+import EntryListToolbar from '../components/EntryListToolbar'
+import { useNotification } from '../NotificationContext'
+import { updateAllReadLaterAsRead } from '../helpers/feedsData'
 
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
@@ -18,8 +18,9 @@ export const Route = createLazyFileRoute('/read_later')({
 
 export default function ReadLater() {
   const { t } = useTranslation('entries')
+  const { addNotification } = useNotification()
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } = useEntries("/read_later");
-  const { currentAccount, showHiddenEntries, isMobile } = useAppContext();
+  const { currentAccount, showHiddenEntries, entriesOrder } = useAppContext();
   const isMounted = useRef(false)
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export default function ReadLater() {
     if (page === 1 && entries.length == 0) {
       fetchEntries()
     }
-  }, [page, entries.length, currentAccount?.id, showHiddenEntries])
+  }, [page, entries.length, currentAccount?.id, showHiddenEntries, entriesOrder])
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -49,7 +50,7 @@ export default function ReadLater() {
     }
     resetEntryList()
     setHasMore(true)
-  }, [currentAccount?.id, showHiddenEntries])
+  }, [currentAccount?.id, showHiddenEntries, entriesOrder])
 
   const fetchEntries = async () => {
     try {
@@ -64,6 +65,7 @@ export default function ReadLater() {
         filters: {
           read_later_eq: 1,
           account_id_eq: currentAccount.id,
+          order: entriesOrder,
           ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         }
       })
@@ -87,6 +89,15 @@ export default function ReadLater() {
     setHasMore(true);
   }
 
+  const handleUpdateEntriesAsRead = async () => {
+    if (!currentAccount?.id) return
+    await updateAllReadLaterAsRead(currentAccount.id)
+    resetEntryList()
+    setHasMore(true)
+
+    addNotification(t('updatedTitle'), t('updatedBody'), 'primary')
+  }
+
   const resetEntryList = () => {
     setEntries([])
     setPage(1)
@@ -100,24 +111,10 @@ export default function ReadLater() {
             <h1 className="text-3xl pt-2 font-bold">{t('readLater')}</h1>
             <h2 className="pt-1 pb-4">{t('readLaterSubtitle')}</h2>
           </div>
-          <div className="flex items-center gap-1">
-            {!isMobile && (
-              <Button
-                isIconOnly
-                variant="light"
-                onPress={handleReloadButton}
-                aria-label={t('reloadEntries')}
-                className="text-foreground-500"
-              >
-                <RiRefreshLine className="w-5 h-5" />
-              </Button>
-            )}
-            <EntryListActionsModal
-              actions={[
-                { key: "reload", label: t('reloadEntries'), onPress: handleReloadButton },
-              ]}
-            />
-          </div>
+          <EntryListToolbar
+            onReload={handleReloadButton}
+            onMarkAllAsRead={handleUpdateEntriesAsRead}
+          />
         </div>
         {entries.length > 0 || !hasMore ? (
           <EntriesList

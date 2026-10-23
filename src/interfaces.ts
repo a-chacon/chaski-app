@@ -83,6 +83,8 @@ export interface AppContextInterface {
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   entriesLayout: string;
   handleSetEntriesLayout: (layout: string) => void;
+  entriesOrder: "desc" | "asc";
+  handleSetEntriesOrder: (order: "desc" | "asc") => void;
   showReadEntries: boolean;
   handleSetShowReadEntries: (show: boolean) => void;
   showHiddenEntries: boolean;

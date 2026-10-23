@@ -17,6 +17,7 @@ mod utils {
     pub(crate) mod notifications;
     pub(crate) mod opml_utils;
     pub(crate) mod scrape;
+    pub(crate) mod sidebar;
 }
 
 mod integrations {
@@ -171,6 +172,7 @@ pub fn run() {
             commands::entries::update_entries_as_read,
             commands::folders::update_entries_as_read_by_folder,
             commands::entries::update_entries_as_read_by_feed_id,
+            commands::entries::update_all_read_later_as_read,
             commands::feeds::collect_feed_content,
             commands::utils::full_text_search,
             commands::utils::get_env,

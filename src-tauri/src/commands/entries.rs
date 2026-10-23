@@ -1,6 +1,7 @@
 use crate::core::jobs::complete_entry;
 use crate::entities::entries::EntriesFilters;
 use crate::models::{Entry, NewEntry};
+use crate::utils::sidebar::emit_sidebar_updated;
 use tauri::command;
 
 #[command]
@@ -98,9 +99,24 @@ pub async fn update_entry(
 }
 
 #[command]
-pub async fn update_entries_as_read(app_handle: tauri::AppHandle) -> Result<(), ()> {
+pub async fn update_entries_as_read(
+    account_id: i32,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command update_entries_as_read.");
-    crate::entities::entries::update_all_as_read(app_handle);
+    crate::entities::entries::update_all_as_read(account_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, None, "feed", "update");
+    Ok(())
+}
+
+#[command]
+pub async fn update_all_read_later_as_read(
+    account_id: i32,
+    app_handle: tauri::AppHandle,
+) -> Result<(), ()> {
+    log::debug!(target: "chaski:commands","Command update_all_read_later_as_read. account_id: {account_id:?}");
+    crate::entities::entries::update_all_read_later_as_read(account_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, account_id, "feed", "update");
     Ok(())
 }
 
@@ -110,7 +126,8 @@ pub async fn update_entries_as_read_by_feed_id(
     app_handle: tauri::AppHandle,
 ) -> Result<(), ()> {
     log::debug!(target: "chaski:commands","Command update_entries_as_read_by_feed. feed_id: {feed_id:?}");
-    crate::entities::entries::update_all_as_read_by_feed_id(feed_id, app_handle);
+    crate::entities::entries::update_all_as_read_by_feed_id(feed_id, app_handle.clone());
+    emit_sidebar_updated(&app_handle, None, "feed", "update");
     Ok(())
 }
 

@@ -2,9 +2,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { ApiResponse } from "../interfaces";
 import { FeedInterface } from "../interfaces";
 
-export const updateAllEntriesAsRead = async () => {
+export const updateAllEntriesAsRead = async (account_id_eq: number) => {
   try {
-    await invoke<string>("update_entries_as_read");
+    await invoke<string>("update_entries_as_read", { accountId: account_id_eq });
   } catch (error) {
     console.error("Error fetching entries:", error);
   }
@@ -18,6 +18,16 @@ export const updateEntriesAsReadByFolder = async (folder: string, account_id_eq:
     });
   } catch (error) {
     console.error("Error fetching entries:", error);
+  }
+};
+
+export const updateAllReadLaterAsRead = async (account_id: number) => {
+  try {
+    await invoke<string>("update_all_read_later_as_read", {
+      accountId: account_id,
+    });
+  } catch (error) {
+    console.error("Error updating read later entries:", error);
   }
 };
 

@@ -11,9 +11,7 @@ import { updateAllEntriesAsRead } from '../helpers/feedsData'
 import { fullSync } from '../helpers/accountsData'
 import { useAppContext } from '../AppContext'
 import { useTranslation } from 'react-i18next'
-import EntryListActionsModal from '../components/EntryListActionsModal'
-import { Button } from '@heroui/react'
-import { RiRefreshLine } from '@remixicon/react'
+import EntryListToolbar from '../components/EntryListToolbar'
 
 export const Route = createLazyFileRoute('/')({
   component: App,
@@ -22,7 +20,7 @@ export const Route = createLazyFileRoute('/')({
 export default function App() {
   const { t } = useTranslation('entries')
   const { addNotification } = useNotification()
-  const { currentAccount, showReadEntries, showHiddenEntries, isMobile } = useAppContext()
+  const { currentAccount, showReadEntries, showHiddenEntries, entriesOrder } = useAppContext()
   const { entries, setEntries, page, setPage, hasMore, setHasMore, scrollTop, setScrollTop } =
     useEntries('/')
 
@@ -50,13 +48,13 @@ export default function App() {
     }
     resetEntryList()
     setHasMore(true)
-  }, [currentAccount?.id, showReadEntries, showHiddenEntries])
+  }, [currentAccount?.id, showReadEntries, showHiddenEntries, entriesOrder])
 
   useEffect(() => {
     if (page === 1 && entries.length === 0 && currentAccount?.id) {
       fetchEntries()
     }
-  }, [page, currentAccount?.id, showReadEntries, showHiddenEntries])
+  }, [page, currentAccount?.id, showReadEntries, showHiddenEntries, entriesOrder])
 
   const fetchEntries = async () => {
     try {
@@ -70,6 +68,7 @@ export default function App() {
         items: 50,
         filters: {
           account_id_eq: currentAccount.id,
+          order: entriesOrder,
           ...(showReadEntries ? {} : { read_eq: 0 }),
           ...(showHiddenEntries ? {} : { hidden_eq: 0 }),
         }
@@ -106,7 +105,7 @@ export default function App() {
   }
 
   const handleUpdateEntriesAsRead = async () => {
-    await updateAllEntriesAsRead()
+    await updateAllEntriesAsRead(currentAccount?.id!)
     resetEntryList()
 
     addNotification(t('updatedTitle'), t('updatedBody'), 'primary')
@@ -122,25 +121,11 @@ export default function App() {
       <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
         <div className="flex flex-row justify-between items-center sm:flex-row py-8 sm:justify-between sm:items-start gap-2">
           <h1 className="text-3xl pt-2 font-bold">{t('allEntries')}</h1>
-          <div className="flex items-center gap-1">
-            {!isMobile && (
-              <Button
-                isIconOnly
-                variant="light"
-                onPress={handleReloadButton}
-                isLoading={refreshLoading}
-                aria-label={t('reloadEntries')}
-                className="text-foreground-500"
-              >
-                <RiRefreshLine className="w-5 h-5" />
-              </Button>
-            )}
-            <EntryListActionsModal
-              actions={[
-                { key: "markRead", label: t('updateAllAsRead'), onPress: handleUpdateEntriesAsRead },
-              ]}
-            />
-          </div>
+          <EntryListToolbar
+            onReload={handleReloadButton}
+            reloadLoading={refreshLoading}
+            onMarkAllAsRead={handleUpdateEntriesAsRead}
+          />
         </div>
         {entries.length > 0 || !hasMore ? (
           <EntriesList

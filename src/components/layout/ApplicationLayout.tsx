@@ -50,6 +50,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [sideBarOpen, setSideBarOpen] = useState(true);
   const [isSidebarHoverVisible, setIsSidebarHoverVisible] = useState(false);
   const [entriesLayout, setEntriesLayout] = useState<string>("list");
+  const [entriesOrder, setEntriesOrder] = useState<"desc" | "asc">("desc");
   const [showReadEntries, setShowReadEntries] = useState<boolean>(true);
   const [showHiddenEntries, setShowHiddenEntries] = useState<boolean>(false);
   const [currentTheme, setCurrentTheme] = useState<string>("AUTO");
@@ -162,6 +163,18 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setEntriesLayout(layout);
   };
 
+  const handleSetEntriesOrder = async (order: "desc" | "asc") => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('entries-order', { value: order });
+    setEntriesOrder(order);
+  };
+
+  const getPersistedEntriesOrder = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: "desc" | "asc" }>('entries-order');
+    setEntriesOrder(stored?.value === 'asc' ? 'asc' : 'desc');
+  };
+
   const handleSetShowReadEntries = async (show: boolean) => {
     const store = await load('settings.json', { autoSave: true });
     await store.set('show-read-entries', { value: show });
@@ -210,6 +223,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentAccounts();
     getPersistedCurrentAccountId();
     getPersistedEntriesLayout();
+    getPersistedEntriesOrder();
     getPersistedShowReadEntries();
     getPersistedShowHiddenEntries();
     getCurrentConfigLanguage().then((lang) => {
@@ -437,6 +451,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         setSideBarOpen,
         entriesLayout,
         handleSetEntriesLayout,
+        entriesOrder,
+        handleSetEntriesOrder,
         showReadEntries,
         handleSetShowReadEntries,
         showHiddenEntries,

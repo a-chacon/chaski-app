@@ -13,9 +13,9 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { RiHome2Line, RiAddCircleLine, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
+import { RiHome2Line, RiAddLine, RiCheckLine, RiCloseLine, RiEditLine, RiSidebarFoldLine, RiSidebarUnfoldLine, RiUserLine, RiSquareLine, RiSubtractLine } from "@remixicon/react";
 import { useEntries } from '../IndexEntriesContext'
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import NewAccountModal from "./NewAccountModal";
 import { AccountInterface } from "../interfaces";
@@ -140,16 +140,6 @@ const WindowTitlebar: React.FC = () => {
           </div>
         </Tooltip>
 
-        <Tooltip content={t("titlebar:addNewFeed")} delay={300}>
-          <Link
-            to="/new_feed"
-            aria-label={t("titlebar:addNewFeed")}
-            className={`flex items-center justify-center rounded-lg text-default-foreground hover:bg-default/40 transition-colors ${isMobile ? "w-10 h-10" : "w-8 h-8"}`}
-            activeProps={{ className: "text-primary-500" }}
-          >
-            <RiAddCircleLine size={isMobile ? 22 : 18} />
-          </Link>
-        </Tooltip>
 
         <Popover placement="bottom-end">
           <PopoverTrigger>

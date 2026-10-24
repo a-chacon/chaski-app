@@ -5,5 +5,9 @@
   "configurations": "Configuraciones",
   "about": "Acerca de",
   "feeds": "Fuentes",
+  "addNewFeed": "Agregar nueva fuente",
+  "feedMenu": "Opciones de fuentes",
+  "importOpml": "Importar OPML",
+  "exportOpml": "Exportar OPML",
   "noAccountSelected": "No hay cuenta seleccionada. Agrega una cuenta desde la barra de título."
 }

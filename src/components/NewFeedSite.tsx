@@ -7,8 +7,7 @@ import { FeedInterface } from "../interfaces";
 import { readText } from '@tauri-apps/plugin-clipboard-manager';
 import { useAppContext } from "../AppContext";
 import { useTranslation } from 'react-i18next';
-import { open } from "@tauri-apps/plugin-dialog";
-import { importOPML } from "../helpers/feedsData";
+
 
 export default function App() {
   const { t } = useTranslation(['feeds', 'common']);
@@ -20,7 +19,7 @@ export default function App() {
   const [isInvalidMessage, setIsInvalidMessage] = useState("");
   const [availableFeeds, setAvailableFeeds] = useState<any>([]);
   const [siteUrl, setSiteUrl] = useState("");
-  const [isImportLoading, setIsImportLoading] = useState(false);
+
 
   useEffect(() => {
     const fetchClipboardContent = async () => {
@@ -48,23 +47,6 @@ export default function App() {
     setAvailableFeeds([]);
   }, [currentAccount?.id]);
 
-  const handleImportButton = async () => {
-    if (!currentAccount?.id) {
-      return;
-    }
-
-    setIsImportLoading(true);
-    const file = await open({
-      multiple: false,
-      directory: false,
-      filters: [{ name: "Opml", extensions: ["opml"] }],
-    });
-    if (file) {
-      await importOPML(currentAccount.id, file);
-    }
-
-    setIsImportLoading(false);
-  };
 
   const previewNewBlogSite = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -163,18 +145,7 @@ export default function App() {
             <RiAddLine />
           </Button>
         </form>
-        <div className="flex justify-end">
-          {currentAccount.kind === "local" && (
-            <Button
-              size="sm"
-              variant="faded"
-              onPress={handleImportButton}
-              isLoading={isImportLoading}
-            >
-              {t('feeds:importOpml')}
-            </Button>
-          )}
-        </div>
+
       </div>
     );
   }

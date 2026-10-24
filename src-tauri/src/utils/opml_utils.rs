@@ -2,7 +2,7 @@ use crate::models::{Feed, ScrapedFeed};
 use diesel::prelude::*;
 use diesel::ExpressionMethods;
 use opml::{Outline, OPML};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs;
 use std::sync::Arc;
 use tauri::Emitter;
@@ -210,9 +210,9 @@ pub async fn opml_file_to_new_feeds(
     })
 }
 
-pub async fn feed_ids_to_opml(
+pub async fn account_feeds_to_opml(
     file_path: &str,
-    feed_ids: Vec<i32>,
+    account_id_eq: i32,
     app_handle: tauri::AppHandle,
 ) -> Result<(), Box<dyn std::error::Error>> {
     use crate::db::establish_connection;
@@ -220,48 +220,37 @@ pub async fn feed_ids_to_opml(
 
     let conn = &mut establish_connection(&app_handle);
 
-    let feeds_to_include: Vec<Feed> = match feed_ids.len() {
-        0 => feeds.load(conn).expect("Error loading feeds"),
-        _ => feeds
-            .filter(id.eq_any(feed_ids.as_slice()))
-            .load(conn)
-            .expect("Error loading feeds"),
-    };
+    let feeds_to_include: Vec<Feed> = feeds
+        .filter(account_id.eq(account_id_eq))
+        .order(title.asc())
+        .load(conn)?;
 
-    let mut grouped_feeds: HashMap<Option<String>, Vec<Feed>> = HashMap::new();
+    let mut grouped_feeds: BTreeMap<String, Vec<Feed>> = BTreeMap::new();
+    let mut root_feeds: Vec<Feed> = Vec::new();
     for feed in feeds_to_include {
-        grouped_feeds
-            .entry(feed.folder.clone())
-            .or_default()
-            .push(feed);
+        match feed.folder.clone().filter(|f| !f.trim().is_empty()) {
+            Some(f) => grouped_feeds.entry(f).or_default().push(feed),
+            None => root_feeds.push(feed),
+        }
     }
 
     let mut opml_file = OPML::default();
 
-    for (folder_key, feeds_in_folder) in grouped_feeds {
+    for (folder_name, feeds_in_folder) in grouped_feeds {
         let mut group = Outline::default();
-
-        match folder_key {
-            Some(f) => {
-                group.text = f.clone();
-                group.title = Some(f);
-            }
-            None => {
-                println!("Folder: None"); // Prints "Folder: None" for feeds with no folder
-            }
-        }
-
+        group.text = folder_name.clone();
+        group.title = Some(folder_name);
         for feed in feeds_in_folder {
-            println!("Feed ID: {}", feed.id);
             group.add_feed(feed.title.as_str(), feed.link.as_str());
         }
         opml_file.body.outlines.push(group);
     }
 
-    let _ = fs::write(
-        ensure_opml_extension(file_path),
-        opml_file.to_string().unwrap(),
-    );
+    for feed in root_feeds {
+        opml_file.add_feed(feed.title.as_str(), feed.link.as_str());
+    }
+
+    fs::write(ensure_opml_extension(file_path), opml_file.to_string()?)?;
 
     Ok(())
 }

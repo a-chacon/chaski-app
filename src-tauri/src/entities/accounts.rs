@@ -36,20 +36,29 @@ pub fn show(account_id: i32, app_handle: tauri::AppHandle) -> Option<Account> {
 
 pub fn destroy(account_id_eq: i32, app_handle: tauri::AppHandle) -> Result<(), String> {
     let conn = &mut establish_connection(&app_handle);
+    let start = std::time::Instant::now();
 
     conn.transaction::<_, diesel::result::Error, _>(|conn| {
-        let feed_ids: Vec<i32> = feeds::table
-            .select(feeds::id)
-            .filter(feeds::account_id.eq(account_id_eq))
-            .load(conn)?;
+        let feed_ids = || {
+            feeds::table
+                .select(feeds::id)
+                .filter(feeds::account_id.eq(account_id_eq))
+        };
 
-        diesel::delete(entries::table.filter(entries::feed_id.eq_any(&feed_ids))).execute(conn)?;
+        let n = diesel::delete(entries::table.filter(entries::feed_id.eq_any(feed_ids())))
+            .execute(conn)?;
+        log::info!(target: "chaski:accounts", "deleted {n} entries ({:?})", start.elapsed());
 
-        diesel::delete(filters::table.filter(filters::feed_id.eq_any(&feed_ids))).execute(conn)?;
+        let n = diesel::delete(filters::table.filter(filters::feed_id.eq_any(feed_ids())))
+            .execute(conn)?;
+        log::info!(target: "chaski:accounts", "deleted {n} filters ({:?})", start.elapsed());
 
-        diesel::delete(feeds::table.filter(feeds::account_id.eq(account_id_eq))).execute(conn)?;
+        let n = diesel::delete(feeds::table.filter(feeds::account_id.eq(account_id_eq)))
+            .execute(conn)?;
+        log::info!(target: "chaski:accounts", "deleted {n} feeds ({:?})", start.elapsed());
 
         diesel::delete(accounts.find(account_id_eq)).execute(conn)?;
+        log::info!(target: "chaski:accounts", "deleted account ({:?})", start.elapsed());
 
         Ok(())
     })

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.8.3 - 2026-10-24
+
+### Added
+
+- Export feeds to OPML from the new feed menu in the sidebar.
+
+### Changed
+
+- UI refactor: feed actions moved into a dedicated feed menu, and page actions for entry lists (index, feeds, folders, read later) are now normalized in a shared toolbar.
+
+### Fixed
+
+- Update feeds loop was not working; it now filters by account kind.
+- Added database indexes to improve performance.
+
 ## 0.8.2 - 2026-10-18
 
 ### Added

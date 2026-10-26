@@ -1,7 +1,9 @@
 {
-  "title": "Discover",
-  "subtitle": "Explore curated feeds from around the world and follow what interests you.",
-  "searchPlaceholder": "Search feeds...",
+  "title": "Find something to read",
+  "subtitle": "Search curated feeds by topic, or paste a website or feed link to add it.",
+  "searchPlaceholder": "Search topics or paste a feed URL...",
+  "findFeeds": "Find feeds",
+  "urlHint": "press Enter to look for feeds at this address",
   "languagePlaceholder": "Language",
   "filterByLanguage": "Filter by language",
   "topics": "Topics",

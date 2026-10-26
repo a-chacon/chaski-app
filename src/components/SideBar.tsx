@@ -1,4 +1,4 @@
-import { RiBookmarkFill, RiFileListLine, RiCompassDiscoverLine, RiSettings4Line, RiInformationLine, RiAddCircleLine } from "@remixicon/react";
+import { RiBookmarkFill, RiFileListLine, RiSettings4Line, RiInformationLine, RiAddCircleLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
@@ -40,15 +40,7 @@ function SideBar() {
             <RiBookmarkFill size={iconSize} className="opacity-90 shrink-0" />
             {t("readLater")}
           </Link>
-          <Link
-            to="/discover"
-            className={linkClass}
-            activeProps={{ className: "bg-default/40" }}
-            onClick={handleLinkClick}
-          >
-            <RiCompassDiscoverLine size={iconSize} className="opacity-90 shrink-0" />
-            {t("discover")}
-          </Link>
+
           <Link
             to="/configurations"
             className={linkClass}

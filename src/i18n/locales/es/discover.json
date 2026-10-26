@@ -1,7 +1,9 @@
 {
-  "title": "Descubrir",
-  "subtitle": "Explora fuentes curadas de todo el mundo y sigue lo que te interesa.",
-  "searchPlaceholder": "Buscar fuentes...",
+  "title": "Encuentra algo para leer",
+  "subtitle": "Busca fuentes curadas por tema, o pega el enlace de un sitio o feed para agregarlo.",
+  "searchPlaceholder": "Busca temas o pega una URL de feed...",
+  "findFeeds": "Buscar fuentes",
+  "urlHint": "presiona Enter para buscar fuentes en esta dirección",
   "languagePlaceholder": "Idioma",
   "filterByLanguage": "Filtrar por idioma",
   "topics": "Temas",

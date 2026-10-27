@@ -160,6 +160,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::feeds::scrape_site_feeds,
+            commands::feeds::preview_feed,
             commands::feeds::create_feed,
             commands::feeds::index_feeds,
             commands::feeds::destroy_feed,

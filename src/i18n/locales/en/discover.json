@@ -3,7 +3,7 @@
   "subtitle": "Search curated feeds by topic, or paste a website or feed link to add it.",
   "searchPlaceholder": "Search topics or paste a feed URL...",
   "findFeeds": "Find feeds",
-  "urlHint": "press Enter to look for feeds at this address",
+  "urlHint": "Press Enter to look for feeds at this address",
   "languagePlaceholder": "Language",
   "filterByLanguage": "Filter by language",
   "topics": "Topics",
@@ -15,6 +15,13 @@
   "noFeedsTitle": "No feeds found",
   "noFeedsDesc": "Try a different search term or remove some filters.",
   "loadMore": "Load more",
+  "back": "Back",
+  "preview": "Preview",
+  "previewErrorTitle": "Couldn't load this feed",
+  "previewError": "Something went wrong while fetching the feed.",
+  "previewEmpty": "This feed has no entries yet.",
+  "previewCtaTitle": "Like what you see?",
+  "previewCtaDesc": "Follow this feed to read the full entries and get new ones as they are published.",
   "showingResults_one": "Showing all {{count}} result",
   "showingResults_other": "Showing all {{count}} results"
 }

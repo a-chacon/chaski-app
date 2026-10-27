@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FeedInterface, EntryInterface } from "../interfaces";
-import moment from "moment";
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import EntriesList from "../components/EntriesList";
 import FeedPageActions from "../components/FeedPageActions";
-import { Snippet } from "@heroui/react";
-
+import FeedHeader from "../components/FeedHeader";
 import { updateEntriesAsReadByFeedId, refreshEntries } from "../helpers/feedsData";
 import { getFeed } from "../helpers/feedsData";
 import { useEntries } from "../IndexEntriesContext";
@@ -132,17 +130,10 @@ export default function Feed() {
   return (
     <MainSectionLayout>
       <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
-        <div className="flex flex-col py-8 justify-between items-start">
-          <div className="w-full flex flex-row justify-between">
-            <div className="flex flex-row">
-              <img
-                src={feed?.icon}
-                alt={feed?.title}
-                className="h-10 my-auto mr-4"
-              />
-              <h1 className="text-xl md:text-3xl font-bold">{feed?.title}</h1>
-            </div>
-            {feed && (
+        <FeedHeader
+          feed={feed}
+          actions={
+            feed && (
               <FeedPageActions
                 feed={feed}
                 setFeed={setFeed}
@@ -150,32 +141,9 @@ export default function Feed() {
                 onRefresh={handleRefreshEntries}
                 refreshLoading={refreshLoading}
               />
-            )}
-          </div>
-
-          <p className="my-4 line-clamp-3 opacity-80">{feed?.description}</p>
-
-          <div className="flex justify-between w-full items-center flex-wrap gap-2">
-            <Snippet
-              symbol=""
-              size="sm"
-              variant="bordered"
-              className="w-full truncate"
-            >
-              {feed?.link}
-            </Snippet>
-            <div className="flex flex-col">
-              <span className="text-sm">
-                <span className="font-semibold">{t('lastFetch')}: </span>
-                {moment.utc(feed?.last_fetch).fromNow()}
-              </span>
-              <span className="text-sm">
-                <span className="font-semibold">{t('latestEntry')}: </span>
-                {moment.utc(feed?.latest_entry).fromNow()}
-              </span>
-            </div>
-          </div>
-        </div>
+            )
+          }
+        />
         {entries.length > 0 || !hasMore ? (
           <EntriesList
             entries={entries}

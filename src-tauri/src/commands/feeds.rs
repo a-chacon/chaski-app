@@ -32,6 +32,32 @@ pub async fn scrape_site_feeds(site_url: String, account_id: i32) -> Result<Stri
 }
 
 #[command]
+pub async fn preview_feed(url: String, account_id: i32) -> Result<String, String> {
+    log::debug!(target: "chaski:commands","Command preview_feed. Params: url: {url:?}, account_id: {account_id}");
+
+    let scraped = crate::utils::scrape::scrape_site_feeds(url)
+        .await
+        .map_err(|e| {
+            log::error!(target: "chaski:commands","Error previewing feed. Error: {e:?}");
+            "Failed to fetch the feed".to_string()
+        })?
+        .into_iter()
+        .next()
+        .ok_or_else(|| "No feed found at this address".to_string())?;
+
+    let feed = NewFeed {
+        account_id: Some(account_id),
+        ..scraped.feed
+    };
+
+    serde_json::to_string(&serde_json::json!({
+        "feed": feed,
+        "entries": scraped.entries,
+    }))
+    .map_err(|e| e.to_string())
+}
+
+#[command]
 pub async fn create_feed(
     mut new_feed: NewFeed,
     app_handle: tauri::AppHandle,

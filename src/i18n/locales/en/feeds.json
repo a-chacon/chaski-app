@@ -8,7 +8,6 @@
   "noRssFound": "🫣 Sorry, we can't find any RSS in the given link.",
   "noAccountSelected": "No account selected",
   "noAccountSelectedDesc": "Create or select an account from the titlebar to add new feeds.",
-  "addingFeedsTo": "Adding feeds to: {{name}}",
   "feedUrl": "Feed Url",
   "feedUrlDesc": "It will try to discover the RSS feed if a direct link is not provided",
   "importOpml": "Import OPML",

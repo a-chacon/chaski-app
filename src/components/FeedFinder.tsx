@@ -1,6 +1,6 @@
 import { Input, Button, Chip, Spinner, Select, SelectItem } from "@heroui/react";
 import { RiSearchLine, RiRefreshLine, RiWifiOffLine } from "@remixicon/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import FeedSite from "./FeedSite";
@@ -57,7 +57,6 @@ export default function FeedFinder() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
 
-  // Directory search state
   const [feeds, setFeeds] = useState<FeedInterface[]>([]);
   const [pagination, setPagination] = useState<DiscoverPagination | null>(null);
   const [availableFilters, setAvailableFilters] = useState<DiscoverFilters | null>(null);
@@ -66,28 +65,23 @@ export default function FeedFinder() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<ErrorKind>(null);
 
-  // URL lookup state
   const [urlFeeds, setUrlFeeds] = useState<FeedInterface[] | null>(null);
   const [isScraping, setIsScraping] = useState(false);
 
-  const requestId = useRef(0);
 
   const isUrlMode = looksLikeUrl(input);
   const searchQuery = looksLikeUrl(debouncedInput) ? "" : debouncedInput.trim();
   const hasSearch = !isUrlMode && (searchQuery !== "" || selectedTags.length > 0 || selectedLanguage !== "");
 
-  // Debounce typing
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedInput(input), 400);
     return () => clearTimeout(timer);
   }, [input]);
 
-  // Any change to the input invalidates a previous URL lookup
   useEffect(() => {
     setUrlFeeds(null);
   }, [input, currentAccount?.id]);
 
-  // Load available topics/languages once so they can be shown by default
   useEffect(() => {
     fetchDiscoverFeeds({ page: 1 })
       .then((data) => setAvailableFilters(data.metadata.filters))
@@ -95,7 +89,6 @@ export default function FeedFinder() {
   }, []);
 
   const loadFeeds = async (page: number, reset: boolean) => {
-    const id = ++requestId.current;
     if (reset) setIsLoading(true);
     else setIsLoadingMore(true);
     setError(null);
@@ -107,7 +100,6 @@ export default function FeedFinder() {
         language: selectedLanguage || undefined,
         page,
       });
-      if (id !== requestId.current) return;
 
       const accountId = currentAccount!.id!;
       const mapped = data.feeds.map((f) => discoverFeedToFeedInterface(f, accountId));
@@ -115,13 +107,10 @@ export default function FeedFinder() {
       setPagination(data.metadata.pagination);
       setAvailableFilters(data.metadata.filters);
     } catch (err) {
-      if (id !== requestId.current) return;
       setError(!navigator.onLine || err instanceof TypeError ? "offline" : "server");
     } finally {
-      if (id === requestId.current) {
-        setIsLoading(false);
-        setIsLoadingMore(false);
-      }
+      setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -130,12 +119,6 @@ export default function FeedFinder() {
     setFeeds([]);
     setPagination(null);
     setCurrentPage(1);
-    if (!hasSearch || !currentAccount?.id) {
-      requestId.current++;
-      setIsLoading(false);
-      setError(null);
-      return;
-    }
     loadFeeds(1, true);
   }, [searchQuery, selectedTags, selectedLanguage, hasSearch, currentAccount?.id]);
 
@@ -212,7 +195,7 @@ export default function FeedFinder() {
           </Select>
         )}
         {isUrlMode && (
-          <Button type="submit" color="primary" isLoading={isScraping} className="shrink-0">
+          <Button color="primary" variant="flat" size="lg" isLoading={isScraping} >
             {t("discover:findFeeds")}
           </Button>
         )}
@@ -233,7 +216,7 @@ export default function FeedFinder() {
               className={`cursor-pointer ${selectedTags.includes(tag) ? "font-semibold" : ""}`}
               onClick={() => toggleTag(tag)}
             >
-              {tag}
+              #{tag}
             </Chip>
           ))}
         </div>
@@ -243,7 +226,7 @@ export default function FeedFinder() {
       {isUrlMode && (
         <>
           <p className="text-sm text-foreground-500 mb-4">
-            {t("feeds:addingFeedsTo", { name: currentAccount.name })} · {t("discover:urlHint")}
+            {t("discover:urlHint")}
           </p>
           {isScraping && (
             <div className="flex justify-center py-16">

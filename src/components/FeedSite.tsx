@@ -6,10 +6,14 @@ import {
   CardFooter,
   Tooltip,
   Chip,
+  Button,
+  useDisclosure,
 } from "@heroui/react";
+import { useTranslation } from "react-i18next";
 import { FeedInterface } from "../interfaces.ts";
 import FeedSiteActions from "./FeedSiteActions.tsx";
 import { Link } from "@tanstack/react-router";
+import FeedPreviewModal from "./FeedPreviewModal.tsx";
 import { AtomSvg, RSSSvg } from "../helpers/svg.tsx";
 import { RiFileCopyLine, RiCheckLine } from "@remixicon/react";
 
@@ -20,6 +24,8 @@ interface FeedSiteProps {
 const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
   const [currentFeed, setCurrentFeed] = useState(feed);
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation(["discover"]);
+  const previewModal = useDisclosure();
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -57,7 +63,16 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
         ) : (
           <div>{titleContent}</div>
         )}
-        <div>
+        <div className="flex items-center gap-2">
+          {!currentFeed.id && (
+            <Button
+              variant="light"
+              size="sm"
+              onPress={previewModal.onOpen}
+            >
+              {t("discover:preview")}
+            </Button>
+          )}
           <FeedSiteActions feed={currentFeed} setFeed={setCurrentFeed} />
         </div>
       </CardHeader>
@@ -113,6 +128,12 @@ const FeedSite: React.FC<FeedSiteProps> = ({ feed }) => {
           )}
         </div>
       </CardFooter>
+      <FeedPreviewModal
+        url={currentFeed.link}
+        isOpen={previewModal.isOpen}
+        onClose={previewModal.onClose}
+        onFollowed={setCurrentFeed}
+      />
     </Card>
   );
 };

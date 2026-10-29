@@ -143,7 +143,7 @@ pub struct Entry {
     pub media_content_type: Option<String>,
 }
 
-#[derive(Insertable, Debug, Clone)]
+#[derive(Insertable, Debug, Clone, Serialize)]
 #[diesel(table_name = entries)]
 pub struct NewEntry {
     pub title: Option<String>,

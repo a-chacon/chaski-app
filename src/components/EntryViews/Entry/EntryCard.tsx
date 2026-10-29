@@ -9,9 +9,11 @@ import { updateEntryAsRead } from "../../../helpers/entriesData";
 interface EntryCardProps {
   entry: EntryInterface;
   header: boolean;
+  /** Read-only rendering for unsaved entries: links out, no actions, no read tracking. */
+  preview?: boolean;
 }
 
-const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
+const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry, preview = false }) => {
   const [entry, setEntry] = useState(inputEntry);
   const {
     currentMarkAsReadOnHover,
@@ -28,8 +30,23 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
   const entryRef = useRef(entry);
   entryRef.current = entry;
 
+  const renderEntryLink = (className: string | undefined, children: React.ReactNode) =>
+    preview ? (
+      <a href={entry.link} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    ) : (
+      <Link
+        to="/entries/$entryId"
+        params={{ entryId: entry.id?.toString() || "" }}
+        className={className}
+      >
+        {children}
+      </Link>
+    );
+
   useEffect(() => {
-    if (!currentMarkAsReadOnHover || alreadyMarked.current || entry.read_later === 1) return;
+    if (preview || !currentMarkAsReadOnHover || alreadyMarked.current || entry.read_later === 1) return;
 
     // Collapses the observable area to a zero-height line at the top of the
     // scroll container. Fires when the card's top edge touches that line —
@@ -54,27 +71,26 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
     if (el) observer.observe(el);
 
     return () => observer.disconnect();
-  }, [currentMarkAsReadOnHover, entry.read_later]);
+  }, [preview, currentMarkAsReadOnHover, entry.read_later]);
 
   if (isCompact) {
     if (isMobile) {
       return (
-        <Link
-          to="/entries/$entryId"
-          params={{ entryId: entry.id?.toString() || "" }}
-          className={`flex items-center gap-2 py-3 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`}
-        >
-          {entry.feed && (
-            <img
-              alt={entry.feed.title}
-              className="h-4 w-4 object-cover rounded-sm shrink-0"
-              src={entry.feed.icon}
-            />
-          )}
-          <h3 className="text-sm font-medium truncate flex-1">
-            {entry.title?.trim() || entry.description?.trim() || "Untitled entry"}
-          </h3>
-        </Link>
+        renderEntryLink(
+          `flex items-center gap-2 py-3 border-b border-default-200 ${entry.read ? "opacity-75" : ""} ${!showHiddenEntries && entry.hide ? "hidden" : ""}`,
+          <>
+            {entry.feed && (
+              <img
+                alt={entry.feed.title}
+                className="h-4 w-4 object-cover rounded-sm shrink-0"
+                src={entry.feed.icon}
+              />
+            )}
+            <h3 className="text-sm font-medium truncate flex-1">
+              {entry.title?.trim() || entry.description?.trim() || "Untitled entry"}
+            </h3>
+          </>,
+        )
       );
     }
 
@@ -100,15 +116,12 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
             </Link>
           )}
 
-          <Link
-            to="/entries/$entryId"
-            params={{ entryId: entry.id?.toString() || "" }}
-            className="min-w-0 flex-1"
-          >
+          {renderEntryLink(
+            "min-w-0 flex-1",
             <h3 className="text-sm font-medium truncate">
               {entry.title?.trim() || entry.description?.trim() || "Untitled entry"}
-            </h3>
-          </Link>
+            </h3>,
+          )}
 
         </div>
       </div>
@@ -144,18 +157,18 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry }) => {
         </div>
       )}
 
-      <Link
-        to="/entries/$entryId"
-        params={{ entryId: entry.id?.toString() || "" }}
-      >
-        <h3 className="text-base md:text-lg line-clamp-2 font-semibold mb-1">
-          {entry.title}
-        </h3>
+      {renderEntryLink(
+        undefined,
+        <>
+          <h3 className="text-base md:text-lg line-clamp-2 font-semibold mb-1">
+            {entry.title}
+          </h3>
 
-        <p className={`opacity-75 text-sm ${isGrid ? "line-clamp-3" : "line-clamp-2"}`}>
-          {entry.description || ""}
-        </p>
-      </Link>
+          <p className={`opacity-75 text-sm ${isGrid ? "line-clamp-3" : "line-clamp-2"}`}>
+            {entry.description || ""}
+          </p>
+        </>,
+      )}
 
       <div className="flex justify-between items-center pt-1 mt-1">
         <p className="leading-6 text-sm opacity-80">

@@ -1,7 +1,9 @@
 {
-  "title": "Descubrir",
-  "subtitle": "Explora fuentes curadas de todo el mundo y sigue lo que te interesa.",
-  "searchPlaceholder": "Buscar fuentes...",
+  "title": "Encuentra algo para leer",
+  "subtitle": "Busca fuentes curadas por tema, o pega el enlace de un sitio o feed para agregarlo.",
+  "searchPlaceholder": "Busca temas o pega una URL de feed...",
+  "findFeeds": "Buscar fuentes",
+  "urlHint": "Presiona Enter para buscar fuentes en esta dirección",
   "languagePlaceholder": "Idioma",
   "filterByLanguage": "Filtrar por idioma",
   "topics": "Temas",
@@ -13,6 +15,13 @@
   "noFeedsTitle": "No se encontraron fuentes",
   "noFeedsDesc": "Prueba un término de búsqueda diferente o elimina algunos filtros.",
   "loadMore": "Cargar más",
+  "back": "Volver",
+  "preview": "Vista previa",
+  "previewErrorTitle": "No se pudo cargar esta fuente",
+  "previewError": "Ocurrió un error al obtener la fuente.",
+  "previewEmpty": "Esta fuente aún no tiene entradas.",
+  "previewCtaTitle": "¿Te gusta lo que ves?",
+  "previewCtaDesc": "Sigue esta fuente para leer las entradas completas y recibir las nuevas a medida que se publiquen.",
   "showingResults_one": "Mostrando {{count}} resultado",
   "showingResults_other": "Mostrando todos los {{count}} resultados"
 }

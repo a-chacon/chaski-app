@@ -1,9 +1,8 @@
-import { RiBookmarkFill, RiFileListLine, RiCompassDiscoverLine, RiSettings4Line, RiInformationLine, RiAddCircleLine } from "@remixicon/react";
+import { RiBookmarkFill, RiFileListLine, RiSettings4Line, RiInformationLine, RiRssLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
 import { useTranslation } from "react-i18next";
-import { Tooltip } from "@heroui/react";
 import FeedMenu from "./FeedMenu";
 
 function SideBar() {
@@ -32,6 +31,15 @@ function SideBar() {
             {t("entries")}
           </Link>
           <Link
+            to="/new_feed"
+            className={linkClass}
+            activeProps={{ className: "bg-default/40" }}
+            onClick={handleLinkClick}
+          >
+            <RiRssLine size={iconSize} className="opacity-90 shrink-0" />
+            {t("addNewFeed")}
+          </Link>
+          <Link
             to="/read_later"
             className={linkClass}
             activeProps={{ className: "bg-default/40" }}
@@ -40,15 +48,7 @@ function SideBar() {
             <RiBookmarkFill size={iconSize} className="opacity-90 shrink-0" />
             {t("readLater")}
           </Link>
-          <Link
-            to="/discover"
-            className={linkClass}
-            activeProps={{ className: "bg-default/40" }}
-            onClick={handleLinkClick}
-          >
-            <RiCompassDiscoverLine size={iconSize} className="opacity-90 shrink-0" />
-            {t("discover")}
-          </Link>
+
           <Link
             to="/configurations"
             className={linkClass}
@@ -73,17 +73,6 @@ function SideBar() {
           <h5 className="font-semibold text-xs uppercase tracking-wide text-foreground-500">{t("feeds")}</h5>
           <div className="flex items-center gap-1">
             <FeedMenu iconSize={isMobile ? 20 : 16} />
-            <Tooltip content={t("addNewFeed")} delay={300}>
-              <Link
-                to="/new_feed"
-                aria-label={t("addNewFeed")}
-                onClick={handleLinkClick}
-                className="text-foreground-500 flex items-center justify-center rounded-xl w-10 h-10 hover:bg-default/40 transition-colors"
-                activeProps={{ className: "text-primary-500" }}
-              >
-                <RiAddCircleLine size={isMobile ? 20 : 16} />
-              </Link>
-            </Tooltip>
           </div>
         </div>
 

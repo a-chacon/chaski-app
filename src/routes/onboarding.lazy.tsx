@@ -23,7 +23,7 @@ export default function Onboarding() {
   };
 
   const goNext = async () => {
-    if (step + 1 == 5) { await complete(); navigate({ to: '/' }); return; }
+    if (step + 1 == 5) { await complete(); navigate({ to: '/new_feed' }); return; }
     setStep((prevStep) => Math.min(prevStep + 1, 4));
   };
 

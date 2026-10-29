@@ -8,7 +8,6 @@
   "noRssFound": "🫣 Lo sentimos, no encontramos ningún RSS en el enlace proporcionado.",
   "noAccountSelected": "Ninguna cuenta seleccionada",
   "noAccountSelectedDesc": "Crea o selecciona una cuenta desde la barra de título para agregar nuevas fuentes.",
-  "addingFeedsTo": "Agregando fuentes a: {{name}}",
   "feedUrl": "URL de la fuente",
   "feedUrlDesc": "Intentará descubrir el feed RSS si no se proporciona un enlace directo",
   "importOpml": "Importar OPML",

@@ -9,10 +9,12 @@ import { RiArrowDownLine, RiRefreshLine } from "@remixicon/react";
 
 interface EntriesListProps {
   entries: EntryInterface[];
-  fetchEntries: () => Promise<void>;
-  hasMore: boolean;
+  fetchEntries?: () => Promise<void>;
+  hasMore?: boolean;
   header: boolean;
   onRefresh?: () => void;
+  /** Static, read-only list: no infinite scroll, no entry actions. */
+  preview?: boolean;
 }
 
 interface EndMessageProps {
@@ -35,9 +37,10 @@ const EndMessage = React.memo(({ display }: EndMessageProps) => {
 function EntriesList({
   entries,
   fetchEntries,
-  hasMore,
+  hasMore = false,
   header,
   onRefresh,
+  preview = false,
 }: EntriesListProps) {
   const { entriesLayout: display } = useAppContext();
   const { t } = useTranslation("entries");
@@ -54,11 +57,21 @@ function EntriesList({
     return "flex flex-col gap-4";
   }, [display]);
 
+  if (preview) {
+    return (
+      <div key="entries" className={listClass}>
+        {entries.map((entry) => (
+          <EntryCard key={entry.link} entry={entry} header={header} preview />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div key="entries">
       <InfiniteScroll
         dataLength={entries.length}
-        next={fetchEntries}
+        next={fetchEntries!}
         hasMore={hasMore}
         loader={
           <div className="flex justify-center p-6">

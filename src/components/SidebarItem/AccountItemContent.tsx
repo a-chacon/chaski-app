@@ -34,7 +34,9 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
     }
 
     const feeds = await indexFeeds(account.id);
-    const grouped = groupBy(feeds, (f) => f.folder);
+    const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
+    const sortedFeeds = [...feeds].sort((a, b) => collator.compare(a.title ?? '', b.title ?? ''));
+    const grouped = groupBy(sortedFeeds, (f) => f.folder);
     setGroupedFeeds(grouped);
     setLoading(false);
   }, [account.id]);
@@ -86,7 +88,9 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
   return (
     <div className="flex flex-col gap-1 px-1">
       {account.kind === 'local' || account.kind === 'greaderapi' ? (
-        Object.entries(groupedFeeds).map(([folder, feeds]) => (
+        Object.entries(groupedFeeds)
+          .sort(([a], [b]) => a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true }))
+          .map(([folder, feeds]) => (
           <FolderItem key={folder} account={account} folderName={folder} feeds={feeds} />
         ))
       ) : (

@@ -1,4 +1,5 @@
 import { RiBookmarkFill, RiFileListLine, RiSettings4Line, RiInformationLine, RiRssLine } from "@remixicon/react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useAppContext } from "../AppContext";
 import AccountItemContent from "./SidebarItem/AccountItemContent";
@@ -16,6 +17,10 @@ function SideBar() {
   const handleLinkClick = () => {
     if (isMobile) setSideBarOpen(false);
   };
+
+  const [foldSignal, setFoldSignal] = useState<{ open: boolean; id: number } | null>(null);
+  const handleFoldAll = () => setFoldSignal((s) => ({ open: false, id: (s?.id ?? 0) + 1 }));
+  const handleUnfoldAll = () => setFoldSignal((s) => ({ open: true, id: (s?.id ?? 0) + 1 }));
 
   return (
     <nav className={classes}>
@@ -72,13 +77,13 @@ function SideBar() {
         <div className="px-3 pt-2 pb-1 flex items-center justify-between">
           <h5 className="font-semibold text-xs uppercase tracking-wide text-foreground-500">{t("feeds")}</h5>
           <div className="flex items-center gap-1">
-            <FeedMenu iconSize={isMobile ? 20 : 16} />
+            <FeedMenu iconSize={isMobile ? 20 : 16} handleFoldAll={handleFoldAll} handleUnfoldAll={handleUnfoldAll} />
           </div>
         </div>
 
-        <div className="w-full relative flex flex-col gap-1 py-1">
+        <div className="w-full relative flex flex-col gap-1 pRiUpload2Liney-1">
           {currentAccount ? (
-            <AccountItemContent account={currentAccount} />
+            <AccountItemContent account={currentAccount} foldSignal={foldSignal} />
           ) : (
             <p className="px-3 text-sm text-foreground-500">{t("noAccountSelected")}</p>
           )}

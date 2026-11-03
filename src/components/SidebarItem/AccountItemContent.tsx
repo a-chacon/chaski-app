@@ -22,9 +22,10 @@ function groupBy<T>(arr: T[], fn: (item: T) => any) {
   }, {});
 }
 
-const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }) => {
+const AccountItemContent: React.FC<{ account: AccountInterface; foldSignal?: { open: boolean; id: number } | null }> = ({ account, foldSignal }) => {
   const [groupedFeeds, setGroupedFeeds] = useState<Record<string, FeedInterface[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [folderStatus, setFolderStatus] = useState<Map<string, boolean>>(new Map());
 
   const fetchFeeds = useCallback(async () => {
     if (!account.id) {
@@ -37,6 +38,8 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
     const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
     const sortedFeeds = [...feeds].sort((a, b) => collator.compare(a.title ?? '', b.title ?? ''));
     const grouped = groupBy(sortedFeeds, (f) => f.folder);
+
+    setFolderStatus((prev) => new Map(Object.keys(grouped).map(folder => [folder, prev.get(folder) ?? false])));
     setGroupedFeeds(grouped);
     setLoading(false);
   }, [account.id]);
@@ -81,9 +84,18 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
     };
   }, [account.id, account.kind]);
 
+  useEffect(() => {
+    if (!foldSignal) return;
+    setFolderStatus((prev) => new Map(Array.from(prev.keys()).map((folder) => [folder, foldSignal.open])));
+  }, [foldSignal]);
+
   if (loading) {
     return <div className="px-3 text-sm text-foreground-500">Loading feeds...</div>;
   }
+
+  const setIsOpen = (folder: string, value: boolean) => {
+    setFolderStatus((prev) => new Map(prev).set(folder, value));
+  };
 
   return (
     <div className="flex flex-col gap-1 px-1">
@@ -91,8 +103,8 @@ const AccountItemContent: React.FC<{ account: AccountInterface }> = ({ account }
         Object.entries(groupedFeeds)
           .sort(([a], [b]) => a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true }))
           .map(([folder, feeds]) => (
-          <FolderItem key={folder} account={account} folderName={folder} feeds={feeds} />
-        ))
+            <FolderItem key={folder} account={account} folderName={folder} feeds={feeds} isOpen={folderStatus.get(folder) ?? false} setIsOpen={setIsOpen} />
+          ))
       ) : (
         <div>
           <p>Account kind is not supported for displaying feeds.</p>

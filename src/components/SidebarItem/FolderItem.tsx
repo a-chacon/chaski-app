@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AccountInterface, FeedInterface } from '../../interfaces';
 import { Link } from '@tanstack/react-router';
 
@@ -10,14 +10,15 @@ interface FolderItemProps {
   account: AccountInterface;
   folderName: string;
   feeds: FeedInterface[];
+  isOpen: boolean;
+  setIsOpen: (folder: string, status: boolean) => void;
 }
 
-const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds }) => {
+const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds, isOpen, setIsOpen }) => {
   const folder = folderName;
-  const [isOpen, setIsOpen] = useState(false);
   const { isMobile, setSideBarOpen } = useAppContext();
 
-  const toggleFolder = () => setIsOpen(prev => !prev);
+  const toggleFolder = () => setIsOpen(folderName, !isOpen);
   const handleLinkClick = () => { if (isMobile) setSideBarOpen(false); };
 
   const rowPy = isMobile ? "py-3" : "py-1";

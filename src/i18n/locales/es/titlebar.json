@@ -16,7 +16,6 @@
   "deleteAccount": "Eliminar cuenta",
   "deleteAccountConfirm": "¿Estás seguro de que quieres eliminar {{name}}?",
   "thisActionCannotBeUndone": "Esta acción no se puede deshacer.",
-  "exportOpml": "Exportar OPML",
   "syncNow": "Sincronizar ahora",
   "editAccount": "Editar credenciales",
   "syncSuccess": "Sincronización completa",

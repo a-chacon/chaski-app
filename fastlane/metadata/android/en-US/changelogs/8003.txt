@@ -1,0 +1,3 @@
+* Export feeds to OPML from the new feed menu in the sidebar
+* UI refactor: feed actions moved into a dedicated menu and page actions normalized in a shared toolbar
+* Fixed the feed update loop and improved database performance

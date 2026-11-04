@@ -1,0 +1,1 @@
+A calmer way to read the web: private RSS/Atom reader

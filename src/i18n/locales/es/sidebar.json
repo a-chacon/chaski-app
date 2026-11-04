@@ -9,5 +9,7 @@
   "feedMenu": "Opciones de fuentes",
   "importOpml": "Importar OPML",
   "exportOpml": "Exportar OPML",
+  "foldAll": "Plegar todo",
+  "unfoldAll": "Desplegar todo",
   "noAccountSelected": "No hay cuenta seleccionada. Agrega una cuenta desde la barra de título."
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from "@heroui/react";
-import { RiDownload2Line, RiMore2Line, RiUpload2Line } from "@remixicon/react";
+import { RiDownload2Line, RiMore2Line, RiUpload2Line, RiExpandUpDownLine, RiContractUpDownLine } from "@remixicon/react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "../AppContext";
@@ -8,9 +8,11 @@ import { exportOPML, importOPML } from "../helpers/feedsData";
 
 interface FeedMenuProps {
   iconSize?: number;
+  handleFoldAll?: () => void;
+  handleUnfoldAll?: () => void;
 }
 
-export default function FeedMenu({ iconSize = 18 }: FeedMenuProps) {
+export default function FeedMenu({ iconSize = 18, handleFoldAll, handleUnfoldAll }: FeedMenuProps) {
   const { t } = useTranslation("sidebar");
   const { currentAccount } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -71,6 +73,22 @@ export default function FeedMenu({ iconSize = 18 }: FeedMenuProps) {
       </Tooltip>
       <PopoverContent>
         <div className="flex flex-col gap-1 p-1 w-44">
+          <Button
+            variant="light"
+            className="justify-start"
+            startContent={<RiContractUpDownLine size={16} />}
+            onPress={() => { handleFoldAll?.(); setIsOpen(false); }}
+          >
+            {t("foldAll")}
+          </Button>
+          <Button
+            variant="light"
+            className="justify-start"
+            startContent={<RiExpandUpDownLine size={16} />}
+            onPress={() => { handleUnfoldAll?.(); setIsOpen(false); }}
+          >
+            {t("unfoldAll")}
+          </Button>
           {currentAccount.kind === "local" && (
             <Button
               variant="light"

@@ -18,7 +18,7 @@ function SideBar() {
   };
 
   return (
-    <nav className={classes}>
+    <nav className={classes} data-nav-zone="sidebar">
       <div className="flex flex-col gap-1">
         <div className="px-1 flex flex-col py-2 gap-1">
           <Link

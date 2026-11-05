@@ -8,6 +8,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
+import KeybindingsSettings from "../components/KeybindingsSettings";
 
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
@@ -262,6 +263,12 @@ export default function Configurations() {
               />
             </div>
           </div>
+        </section>
+
+        {/* ── Keyboard ── */}
+        <section className="pb-10">
+          <SectionTitle title={t('keyboard.title')} />
+          <KeybindingsSettings />
         </section>
 
         {/* ── Language ── */}

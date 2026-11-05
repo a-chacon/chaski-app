@@ -51,10 +51,10 @@ function EntriesList({
     }
 
     if (display === "compact") {
-      return "flex flex-col";
+      return "flex flex-col px-1";
     }
 
-    return "flex flex-col gap-4";
+    return "flex flex-col gap-4 px-1";
   }, [display]);
 
   if (preview) {

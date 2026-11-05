@@ -30,6 +30,20 @@
     "showRead": "Show read entries",
     "showHidden": "Show hidden entries"
   },
+  "keyboard": {
+    "title": "Keyboard shortcuts",
+    "description": "Navigate the app with the keyboard. Enter opens the focused item.",
+    "add": "Add key",
+    "pressKey": "Press a key… (Esc to cancel)",
+    "reset": "Reset to defaults",
+    "actions": {
+      "nav": { "next": "Next item", "prev": "Previous item" },
+      "focus": { "sidebar": "Focus sidebar", "main": "Focus content" },
+      "scroll": { "down": "Scroll page down", "up": "Scroll page up" },
+      "back": "Go back",
+      "sidebar": { "toggle": "Toggle sidebar" }
+    }
+  },
   "language": {
     "title": "Language",
     "select": "Select your preferred language"

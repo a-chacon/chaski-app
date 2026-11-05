@@ -18,6 +18,7 @@ import {
 import { NotificationProvider, useNotification } from "../../NotificationContext";
 import { Alert, Button } from "@heroui/react";
 import updater from "../../helpers/updater";
+import { KeyboardProvider } from "../../keyboard/KeyboardProvider";
 
 interface ApplicationProps {
   children: React.ReactNode;
@@ -479,6 +480,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       }}
     >
       <NotificationProvider>
+        <KeyboardProvider>
         <UpdaterBootstrap />
         <div className="h-dvh">
           <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
@@ -590,6 +592,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
             </div>
           </div>
         </div>
+        </KeyboardProvider>
       </NotificationProvider>
     </AppContext.Provider>
   );

@@ -45,11 +45,17 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds, isO
         <Link
           to="/folders/$folderName"
           params={{ folderName: account.id + "-" + folder }}
-          className={`w-full h-full flex flex-row items-center hover:bg-default/40 rounded-md px-2 ${rowPy} ${textSize}`}
+          className={`w-full h-full justify-between flex flex-row items-center hover:bg-default/40 rounded-md px-2 ${rowPy} ${textSize}`}
           activeProps={{ className: "bg-default/40" }}
           onClick={handleLinkClick}
         >
           {folder}
+          {feeds.some((feed) => (feed.unread_count > 0)) && (
+            <span className="relative flex items-center pr-1">
+              <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500"></span>
+            </span>
+          )}
         </Link>
 
       </div>

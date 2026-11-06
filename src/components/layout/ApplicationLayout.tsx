@@ -19,6 +19,7 @@ import { NotificationProvider, useNotification } from "../../NotificationContext
 import { Alert, Button } from "@heroui/react";
 import updater from "../../helpers/updater";
 import { KeyboardProvider } from "../../keyboard/KeyboardProvider";
+import { type as osType } from "@tauri-apps/plugin-os";
 
 interface ApplicationProps {
   children: React.ReactNode;
@@ -146,10 +147,22 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     root.style.setProperty('--letter-spacing', font_space.toString() + "em");
   };
 
-  const checkViewport = () => {
-    const mobileViewport = window.innerWidth < 768;
-    setIsMobile(mobileViewport);
+  const isMobilePlatform = (): boolean => {
+    try {
+      const os = osType();
+      return os === "android" || os === "ios";
+    } catch {
+      return false;
+    }
+  }
+
+  const isMobileViewPort = () => {
+    return window.innerWidth < 768
   };
+
+  const updateIsMobileStatus = () => {
+    setIsMobile(isMobilePlatform() && isMobileViewPort());
+  }
 
   const handleSetCurrentLanguage = async (lang: string) => {
     const store = await load('settings.json', { autoSave: true });
@@ -232,17 +245,16 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
       setCurrentLanguage(lang);
     });
 
-    const mobileViewport = window.innerWidth < 768;
-    setIsMobile(mobileViewport);
-    setSideBarOpen(!mobileViewport);
+    updateIsMobileStatus()
+    setSideBarOpen(!isMobileViewPort());
 
     const feedbackTimer = setTimeout(() => {
       setShowFeedbackAlert(true);
     }, 30 * 60 * 1000); // 30 minutes
 
-    window.addEventListener("resize", checkViewport);
+    window.addEventListener("resize", updateIsMobileStatus);
     return () => {
-      window.removeEventListener("resize", checkViewport);
+      window.removeEventListener("resize", updateIsMobileStatus);
       clearTimeout(feedbackTimer);
     };
   }, []);
@@ -481,117 +493,117 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     >
       <NotificationProvider>
         <KeyboardProvider>
-        <UpdaterBootstrap />
-        <div className="h-dvh">
-          <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
-            {isTauriApp && <WindowResizeHandles />}
-            {isTauriApp && <WindowTitlebar />}
+          <UpdaterBootstrap />
+          <div className="h-dvh">
+            <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
+              {isTauriApp && <WindowResizeHandles />}
+              {isTauriApp && <WindowTitlebar />}
 
-            <div className="relative min-h-0 flex-1 flex gap-2">
-              {!sideBarOpen && !isMobile && (
-                <>
-                  <div
-                    className="absolute left-0 top-0 bottom-0 z-40 w-3"
-                    aria-hidden="true"
-                    onMouseEnter={() => setIsSidebarHoverVisible(true)}
-                  />
+              <div className="relative min-h-0 flex-1 flex gap-2">
+                {!sideBarOpen && !isMobile && (
+                  <>
+                    <div
+                      className="absolute left-0 top-0 bottom-0 z-40 w-3"
+                      aria-hidden="true"
+                      onMouseEnter={() => setIsSidebarHoverVisible(true)}
+                    />
 
-                  <div
-                    className={`absolute left-0 top-0 bottom-0 z-50 h-full w-72 max-w-[85vw] shadow-xl transition-all duration-200 ease-out ${isSidebarHoverVisible
-                      ? "translate-x-0 opacity-100 pointer-events-auto"
-                      : "-translate-x-full opacity-0 pointer-events-none"
-                      }`}
-                    onMouseEnter={() => setIsSidebarHoverVisible(true)}
-                    onMouseLeave={() => setIsSidebarHoverVisible(false)}
-                  >
+                    <div
+                      className={`absolute left-0 top-0 bottom-0 z-50 h-full w-72 max-w-[85vw] shadow-xl transition-all duration-200 ease-out ${isSidebarHoverVisible
+                        ? "translate-x-0 opacity-100 pointer-events-auto"
+                        : "-translate-x-full opacity-0 pointer-events-none"
+                        }`}
+                      onMouseEnter={() => setIsSidebarHoverVisible(true)}
+                      onMouseLeave={() => setIsSidebarHoverVisible(false)}
+                    >
+                      <SideBar />
+                    </div>
+                  </>
+                )}
+
+                {sideBarOpen && !isMobile && (
+                  <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5 transition-all duration-200 ease-out">
                     <SideBar />
                   </div>
-                </>
-              )}
+                )}
 
-              {sideBarOpen && !isMobile && (
-                <div className="relative h-full w-full md:w-3/5 lg:w-2/5 xl:w-1/5 transition-all duration-200 ease-out">
-                  <SideBar />
-                </div>
-              )}
+                {sideBarOpen && isMobile && (
+                  <>
+                    {/* Dark backdrop — tap to close */}
+                    <div
+                      className="absolute inset-0 z-40 bg-black/50 transition-opacity duration-200"
+                      onClick={() => setSideBarOpen(false)}
+                    />
+                    {/* Sidebar panel — 80% wide, slides in from left */}
+                    <div className="absolute left-0 top-0 bottom-0 z-50 h-full w-[80%] shadow-2xl transition-transform duration-200 ease-out">
+                      <SideBar />
+                    </div>
+                  </>
+                )}
 
-              {sideBarOpen && isMobile && (
-                <>
-                  {/* Dark backdrop — tap to close */}
-                  <div
-                    className="absolute inset-0 z-40 bg-black/50 transition-opacity duration-200"
-                    onClick={() => setSideBarOpen(false)}
-                  />
-                  {/* Sidebar panel — 80% wide, slides in from left */}
-                  <div className="absolute left-0 top-0 bottom-0 z-50 h-full w-[80%] shadow-2xl transition-transform duration-200 ease-out">
-                    <SideBar />
+                {children}
+                {showOpmlImportAlert && (
+                  <div className="fixed bottom-4 left-4 z-50 max-w-lg">
+                    <Alert
+                      color={isOpmlImportRunning ? "primary" : (opmlImportProgress.errors > 0 ? "warning" : "success")}
+                      description={`${isOpmlImportRunning ? t('alerts:opml.running') : t('alerts:opml.finished')}\n${t('alerts:opml.stats', { detected: opmlImportProgress.detected, processed: opmlImportProgress.processed, added: opmlImportProgress.added, errors: opmlImportProgress.errors })}`}
+                      endContent={
+                        !isOpmlImportRunning ? (
+                          <Button
+                            color="default"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => setShowOpmlImportAlert(false)}
+                          >
+                            {t('common:close')}
+                          </Button>
+                        ) : null
+                      }
+                      title={isOpmlImportRunning ? t('alerts:opml.importingTitle') : t('alerts:opml.completedTitle')}
+                      variant="faded"
+                    />
                   </div>
-                </>
-              )}
-
-              {children}
-              {showOpmlImportAlert && (
-                <div className="fixed bottom-4 left-4 z-50 max-w-lg">
-                  <Alert
-                    color={isOpmlImportRunning ? "primary" : (opmlImportProgress.errors > 0 ? "warning" : "success")}
-                    description={`${isOpmlImportRunning ? t('alerts:opml.running') : t('alerts:opml.finished')}\n${t('alerts:opml.stats', { detected: opmlImportProgress.detected, processed: opmlImportProgress.processed, added: opmlImportProgress.added, errors: opmlImportProgress.errors })}`}
-                    endContent={
-                      !isOpmlImportRunning ? (
-                        <Button
-                          color="default"
-                          size="sm"
-                          variant="flat"
-                          onPress={() => setShowOpmlImportAlert(false)}
-                        >
-                          {t('common:close')}
-                        </Button>
-                      ) : null
-                    }
-                    title={isOpmlImportRunning ? t('alerts:opml.importingTitle') : t('alerts:opml.completedTitle')}
-                    variant="faded"
-                  />
-                </div>
-              )}
-              {showFeedbackAlert && (
-                <div className="fixed bottom-4 right-4 z-50">
-                  <Alert
-                    color="warning"
-                    description={t('alerts:feedback.body')}
-                    endContent={
-                      <div className="flex gap-2">
-                        <Button
-                          color="warning"
-                          size="sm"
-                          variant="flat"
-                          onPress={() => {
-                            feedbackModalState.onOpen();
-                            setShowFeedbackAlert(false);
-                          }}
-                        >
-                          {t('alerts:feedback.give')}
-                        </Button>
-                        <Button
-                          color="default"
-                          size="sm"
-                          variant="flat"
-                          onPress={() => setShowFeedbackAlert(false)}
-                        >
-                          {t('common:close')}
-                        </Button>
-                      </div>
-                    }
-                    title={t('alerts:feedback.title')}
-                    variant="faded"
-                  />
-                </div>
-              )}
-              <FeedbackModal
-                isOpen={feedbackModalState.isOpen}
-                onOpenChange={feedbackModalState.onOpenChange}
-              />
+                )}
+                {showFeedbackAlert && (
+                  <div className="fixed bottom-4 right-4 z-50">
+                    <Alert
+                      color="warning"
+                      description={t('alerts:feedback.body')}
+                      endContent={
+                        <div className="flex gap-2">
+                          <Button
+                            color="warning"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              feedbackModalState.onOpen();
+                              setShowFeedbackAlert(false);
+                            }}
+                          >
+                            {t('alerts:feedback.give')}
+                          </Button>
+                          <Button
+                            color="default"
+                            size="sm"
+                            variant="flat"
+                            onPress={() => setShowFeedbackAlert(false)}
+                          >
+                            {t('common:close')}
+                          </Button>
+                        </div>
+                      }
+                      title={t('alerts:feedback.title')}
+                      variant="faded"
+                    />
+                  </div>
+                )}
+                <FeedbackModal
+                  isOpen={feedbackModalState.isOpen}
+                  onOpenChange={feedbackModalState.onOpenChange}
+                />
+              </div>
             </div>
           </div>
-        </div>
         </KeyboardProvider>
       </NotificationProvider>
     </AppContext.Provider>

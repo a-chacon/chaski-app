@@ -15,7 +15,6 @@ import {
 import { focusZone, getActiveDialog, moveFocus, restoreFocus, scrollPage } from "./navigation";
 import { hideHints, showHints } from "./hints";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { type as osType } from "@tauri-apps/plugin-os";
 
 interface KeyboardContextType {
   /** Whether the user turned keyboard navigation on. Off by default. */
@@ -36,15 +35,6 @@ export const useKeybindings = () => {
   if (!context) throw new Error("useKeybindings must be used within a KeyboardProvider");
   return context;
 };
-
-function isMobilePlatform(): boolean {
-  try {
-    const os = osType();
-    return os === "android" || os === "ios";
-  } catch {
-    return false;
-  }
-}
 
 function isTextField(target: HTMLElement | null): boolean {
   if (!target) return false;
@@ -69,10 +59,9 @@ export const KeyboardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const router = useRouter();
   const [bindings, setBindings] = useState<Bindings>(DEFAULT_BINDINGS);
   const [enabled, setEnabledState] = useState(false);
-  const [supported] = useState(() => !isMobilePlatform());
+  const [supported] = useState(() => !isMobile);
 
-  // Everything keyboard-related only runs when supported, opted in, and on a desktop-sized viewport.
-  const active = supported && enabled && !isMobile;
+  const active = supported && enabled;
 
   useEffect(() => {
     loadBindings().then(setBindings).catch(() => { });

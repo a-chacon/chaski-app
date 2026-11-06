@@ -14,6 +14,15 @@ val tauriProperties = Properties().apply {
     }
 }
 
+val keystoreProperties = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) {
+        FileInputStream(f).use { load(it) }
+    }
+}
+val releaseKeystoreAvailable: Boolean =
+    keystoreProperties["storeFile"]?.let { file(it as String).exists() } ?: false
+
 android {
     compileSdk = 36
     namespace = "com.chaski.app"
@@ -27,13 +36,7 @@ android {
     }
     signingConfigs {
         create("release") {
-            val keystorePropertiesFile = rootProject.file("keystore.properties")
-            val keystoreProperties = Properties()
-            if (keystorePropertiesFile.exists()) {
-                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-            }
-
-            if (keystorePropertiesFile.exists()) {
+            if (releaseKeystoreAvailable) {
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["password"] as String
                 storeFile = file(keystoreProperties["storeFile"] as String)
@@ -54,8 +57,8 @@ android {
             }
         }
         getByName("release") {
-            // Unsigned when keystore.properties is absent (e.g. F-Droid signs itself)
-            if (rootProject.file("keystore.properties").exists()) {
+            // Unsigned when the keystore is unavailable (e.g. F-Droid signs itself)
+            if (releaseKeystoreAvailable) {
                 signingConfig = signingConfigs.getByName("release")
             }
             isMinifyEnabled = true

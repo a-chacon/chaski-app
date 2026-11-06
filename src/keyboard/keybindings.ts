@@ -36,7 +36,7 @@ export const DEFAULT_BINDINGS: Bindings = {
   "scroll.down": ["Space"],
   "scroll.up": ["Shift+Space"],
   back: ["Backspace"],
-  "sidebar.toggle": ["$mod+b"],
+  "sidebar.toggle": ["$mod+s"],
   "hints.show": ["f"],
   // Space-separated keys are a sequence: press q, then q again.
   "window.close": ["q q"],

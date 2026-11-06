@@ -33,7 +33,7 @@ export default function Configurations() {
     handleSetMarkAsReadOnHover,
     currentLanguage, handleSetCurrentLanguage,
     handleSetEntriesLayout, entriesLayout, handleSetShowReadEntries, showReadEntries,
-    handleSetShowHiddenEntries, showHiddenEntries,
+    handleSetShowHiddenEntries, showHiddenEntries, isMobilePlatform,
   } = useAppContext();
 
   const { supported: keyboardSupported } = useKeybindings();
@@ -43,6 +43,7 @@ export default function Configurations() {
 
   useEffect(() => {
     const loadAutostartState = async () => {
+      if (isMobilePlatform) return;
       const flatpak = await invoke<boolean>("is_flatpak");
       setIsFlatpak(flatpak);
       if (!flatpak) {
@@ -50,7 +51,7 @@ export default function Configurations() {
       }
     };
     loadAutostartState();
-  }, []);
+  }, [isMobilePlatform]);
 
   const fonts = [
     { key: "font-garamond", label: "Garamond" },
@@ -186,6 +187,7 @@ export default function Configurations() {
               />
             </div>
 
+            {!isMobilePlatform && (<>
             <div className="h-px bg-divider" />
 
             <div className="flex items-center justify-between">
@@ -201,6 +203,7 @@ export default function Configurations() {
                 color="primary"
               />
             </div>
+            </>)}
           </div>
         </section>
 

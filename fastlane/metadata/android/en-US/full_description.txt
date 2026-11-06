@@ -1,0 +1,15 @@
+Chaski is a calm, modern RSS/Atom feed reader. No ads, no telemetry, and no data leaves your device.
+
+<ul>
+<li>Auto-discovery of RSS/Atom feeds from a website URL</li>
+<li>Clean, distraction-free interface with dark/light modes and multiple themes</li>
+<li>Import and export feeds in OPML format</li>
+<li>Organize feeds with accounts and folders</li>
+<li>Custom filters per feed</li>
+<li>Notifications for new entries</li>
+<li>Configurable reading fonts</li>
+<li>Local accounts, plus Google Reader API accounts such as FreshRSS, Miniflux and TinyTiny RSS</li>
+<li>Full-text search across your articles</li>
+<li>Read full articles inside the app</li>
+<li>Offline mode: save articles for later and they are downloaded for you</li>
+</ul>

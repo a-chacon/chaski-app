@@ -16,7 +16,10 @@
       "icons/icon.ico"
     ],
     "resources": [],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "android": {
+      "versionCode": 8003
+    }
   },
   "productName": "Chaski",
   "mainBinaryName": "chaski",

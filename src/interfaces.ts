@@ -98,6 +98,7 @@ export interface AppContextInterface {
   currentFontSpace: number;
   handleSetCurrentFontSpace: (font_size: number) => void;
   isMobile: boolean;
+  isMobilePlatform: boolean;
   handleSetMarkAsReadOnHover: (mark_as_read_on_hover: boolean) => void;
   currentMarkAsReadOnHover: boolean;
   currentLanguage: string;

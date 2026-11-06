@@ -37,12 +37,13 @@ interface OpmlImportProgressPayload {
   currentUrl?: string | null;
 }
 
-const UpdaterBootstrap: React.FC = () => {
+const UpdaterBootstrap: React.FC<{ isMobilePlatform: boolean }> = ({ isMobilePlatform }) => {
   const { addNotification } = useNotification();
 
   useEffect(() => {
+    if (isMobilePlatform) return;
     updater(addNotification);
-  }, [addNotification]);
+  }, [addNotification, isMobilePlatform]);
 
   return null;
 };
@@ -147,21 +148,21 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     root.style.setProperty('--letter-spacing', font_space.toString() + "em");
   };
 
-  const isMobilePlatform = (): boolean => {
+  const isMobilePlatform: boolean = (() => {
     try {
       const os = osType();
       return os === "android" || os === "ios";
     } catch {
       return false;
     }
-  }
+  })();
 
   const isMobileViewPort = () => {
     return window.innerWidth < 768
   };
 
   const updateIsMobileStatus = () => {
-    setIsMobile(isMobilePlatform() && isMobileViewPort());
+    setIsMobile(isMobilePlatform && isMobileViewPort());
   }
 
   const handleSetCurrentLanguage = async (lang: string) => {
@@ -473,6 +474,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         currentTheme,
         handleSetCurrentTheme,
         isMobile,
+        isMobilePlatform,
         configurations,
         setConfigurations,
         currentFont,
@@ -493,7 +495,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     >
       <NotificationProvider>
         <KeyboardProvider>
-          <UpdaterBootstrap />
+          <UpdaterBootstrap isMobilePlatform={isMobilePlatform} />
           <div className="h-dvh">
             <div className="relative h-full rounded-2xl bg-background overflow-hidden flex flex-col shadow-xl">
               {isTauriApp && <WindowResizeHandles />}

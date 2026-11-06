@@ -56,6 +56,13 @@ body {
   overflow: hidden;
 }
 
+[data-nav-zone="sidebar"] a:focus-visible,
+[data-nav-item]:focus-visible {
+  outline: 1px solid hsl(var(--heroui-primary));
+  outline-offset: 2px;
+  border-radius: 0.3rem;
+}
+
 *[data-tauri-drag-region] {
   app-region: drag;
 }

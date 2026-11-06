@@ -34,6 +34,7 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds, isO
           size={isMobile ? "md" : "sm"}
           variant="light"
           onPress={toggleFolder}
+          data-nav-item
           className={`rounded-md ${btnSize}`}
         >
           {isOpen

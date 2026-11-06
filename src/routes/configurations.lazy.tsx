@@ -8,6 +8,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
+import KeybindingsSettings from "../components/KeybindingsSettings";
+import { useKeybindings } from "../keyboard/KeyboardProvider";
 
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
@@ -33,6 +35,8 @@ export default function Configurations() {
     handleSetEntriesLayout, entriesLayout, handleSetShowReadEntries, showReadEntries,
     handleSetShowHiddenEntries, showHiddenEntries,
   } = useAppContext();
+
+  const { supported: keyboardSupported } = useKeybindings();
 
   const [autostartState, setAutostartState] = useState(false);
   const [isFlatpak, setIsFlatpak] = useState(false);
@@ -263,6 +267,14 @@ export default function Configurations() {
             </div>
           </div>
         </section>
+
+        {/* ── Keyboard ── */}
+        {keyboardSupported && (
+          <section className="pb-10">
+            <SectionTitle title={t('keyboard.title')} />
+            <KeybindingsSettings />
+          </section>
+        )}
 
         {/* ── Language ── */}
         <section className="pb-16">

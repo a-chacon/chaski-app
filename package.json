@@ -39,7 +39,8 @@
     "react-infinite-scroll-component": "^7.0.0",
     "react-player": "^2.16.0",
     "react-select": "^5.8.1",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "tinykeys": "^4.0.1"
   },
   "devDependencies": {
     "@tanstack/router-devtools": "^1.57.17",

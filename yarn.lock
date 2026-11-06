@@ -4551,6 +4551,11 @@ tinyglobby@^0.2.15, tinyglobby@^0.2.17:
     fdir "^6.5.0"
     picomatch "^4.0.4"
 
+tinykeys@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/tinykeys/-/tinykeys-4.0.1.tgz#4f1226c6b55c9146eebd18061b314f62f69c0149"
+  integrity sha512-rClxhLQl+I5UMB5Ny7sfnZqDNa51u7h7h4gJV2UWslwADHEw75IuVPCnWrpO/otM7jHrHpwcZdRHd+//SiI55A==
+
 tslib@^2.0.0, tslib@^2.4.0, tslib@^2.8.0, tslib@^2.8.1:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"

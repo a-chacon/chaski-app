@@ -32,7 +32,7 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry, preview = fals
 
   const renderEntryLink = (className: string | undefined, children: React.ReactNode) =>
     preview ? (
-      <a href={entry.link} target="_blank" rel="noopener noreferrer" className={className}>
+      <a href={entry.link} target="_blank" rel="noopener noreferrer" className={className} data-nav-item>
         {children}
       </a>
     ) : (
@@ -40,6 +40,7 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry, preview = fals
         to="/entries/$entryId"
         params={{ entryId: entry.id?.toString() || "" }}
         className={className}
+        data-nav-item
       >
         {children}
       </Link>

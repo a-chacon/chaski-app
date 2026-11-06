@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { Button, Chip } from "@heroui/react";
+import { Button, Chip, Switch } from "@heroui/react";
 import { useTranslation } from "react-i18next";
 import { useKeybindings } from "../keyboard/KeyboardProvider";
 import { ACTION_IDS, ActionId, eventToBinding, formatKey } from "../keyboard/keybindings";
 
 export default function KeybindingsSettings() {
   const { t } = useTranslation("configurations");
-  const { bindings, addBinding, removeBinding, resetBindings } = useKeybindings();
+  const { enabled, setEnabled, bindings, addBinding, removeBinding, resetBindings } = useKeybindings();
   const [capturing, setCapturing] = useState<ActionId | null>(null);
 
   useEffect(() => {
-    if (!capturing) return;
+    if (!capturing || !enabled) return;
 
     // Capture phase + stopPropagation keeps the global shortcuts from firing meanwhile.
     const onKeyDown = (event: KeyboardEvent) => {
@@ -30,13 +30,28 @@ export default function KeybindingsSettings() {
 
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [capturing, addBinding]);
+  }, [capturing, enabled, addBinding]);
 
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-foreground-500">{t("keyboard.description")}</p>
 
-      {ACTION_IDS.map((id) => (
+      <div className="flex items-center justify-between">
+        <p className="font-medium">{t("keyboard.enable")}</p>
+        <Switch
+          isSelected={enabled}
+          onValueChange={(value) => {
+            setCapturing(null);
+            setEnabled(value);
+          }}
+          color="primary"
+          aria-label={t("keyboard.enable")}
+        />
+      </div>
+
+      {enabled && <div className="h-px bg-divider" />}
+
+      {enabled && ACTION_IDS.map((id) => (
         <div key={id} className="flex items-center justify-between gap-4 flex-wrap">
           <p className="font-medium">{t(`keyboard.actions.${id}`)}</p>
           <div className="flex items-center gap-2 flex-wrap">
@@ -57,11 +72,13 @@ export default function KeybindingsSettings() {
         </div>
       ))}
 
-      <div>
-        <Button size="sm" variant="light" color="danger" onPress={resetBindings}>
-          {t("keyboard.reset")}
-        </Button>
-      </div>
+      {enabled && (
+        <div>
+          <Button size="sm" variant="light" color="danger" onPress={resetBindings}>
+            {t("keyboard.reset")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

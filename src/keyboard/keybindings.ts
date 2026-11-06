@@ -8,7 +8,9 @@ export type ActionId =
   | "scroll.down"
   | "scroll.up"
   | "back"
-  | "sidebar.toggle";
+  | "sidebar.toggle"
+  | "hints.show"
+  | "window.close";
 
 export type Bindings = Record<ActionId, string[]>;
 
@@ -21,6 +23,8 @@ export const ACTION_IDS: ActionId[] = [
   "scroll.up",
   "back",
   "sidebar.toggle",
+  "hints.show",
+  "window.close",
 ];
 
 // Key strings use the tinykeys syntax ("$mod" = Ctrl on Linux/Windows, Cmd on macOS).
@@ -33,9 +37,25 @@ export const DEFAULT_BINDINGS: Bindings = {
   "scroll.up": ["Shift+Space"],
   back: ["Backspace"],
   "sidebar.toggle": ["$mod+b"],
+  "hints.show": ["f"],
+  // Space-separated keys are a sequence: press q, then q again.
+  "window.close": ["q q"],
 };
 
 const STORE_KEY = "keybindings";
+const ENABLED_STORE_KEY = "keyboardEnabled";
+
+/** Keyboard navigation is opt-in: it is off until the user turns it on in the settings. */
+export async function loadKeyboardEnabled(): Promise<boolean> {
+  const store = await load("settings.json", { autoSave: true });
+  const stored = await store.get<{ value: boolean }>(ENABLED_STORE_KEY);
+  return stored?.value === true;
+}
+
+export async function saveKeyboardEnabled(enabled: boolean): Promise<void> {
+  const store = await load("settings.json", { autoSave: true });
+  await store.set(ENABLED_STORE_KEY, { value: enabled });
+}
 
 export async function loadBindings(): Promise<Bindings> {
   const store = await load("settings.json", { autoSave: true });
@@ -66,9 +86,14 @@ const KEY_LABELS: Record<string, string> = {
 
 export function formatKey(binding: string): string {
   return binding
-    .split("+")
-    .map((part) => KEY_LABELS[part] ?? (part.length === 1 ? part.toUpperCase() : part))
-    .join("+");
+    .split(" ")
+    .map((step) =>
+      step
+        .split("+")
+        .map((part) => KEY_LABELS[part] ?? (part.length === 1 ? part.toUpperCase() : part))
+        .join("+"),
+    )
+    .join(" ");
 }
 
 const MODIFIER_KEYS = ["Control", "Shift", "Alt", "Meta", "AltGraph", "CapsLock"];

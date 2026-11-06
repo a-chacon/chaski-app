@@ -8,11 +8,21 @@ import {
   Bindings,
   DEFAULT_BINDINGS,
   loadBindings,
+  loadKeyboardEnabled,
   saveBindings,
+  saveKeyboardEnabled,
 } from "./keybindings";
-import { focusZone, moveFocus, scrollPage } from "./navigation";
+import { focusZone, getActiveDialog, moveFocus, restoreFocus, scrollPage } from "./navigation";
+import { hideHints, showHints } from "./hints";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { type as osType } from "@tauri-apps/plugin-os";
 
 interface KeyboardContextType {
+  /** Whether the user turned keyboard navigation on. Off by default. */
+  enabled: boolean;
+  setEnabled: (enabled: boolean) => void;
+  /** False on mobile platforms, where keyboard navigation is not offered at all. */
+  supported: boolean;
   bindings: Bindings;
   addBinding: (action: ActionId, key: string) => void;
   removeBinding: (action: ActionId, key: string) => void;
@@ -27,29 +37,56 @@ export const useKeybindings = () => {
   return context;
 };
 
+function isMobilePlatform(): boolean {
+  try {
+    const os = osType();
+    return os === "android" || os === "ios";
+  } catch {
+    return false;
+  }
+}
+
+function isTextField(target: HTMLElement | null): boolean {
+  if (!target) return false;
+  const tag = target.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+}
+
 function shouldIgnore(event: KeyboardEvent): boolean {
   if (event.defaultPrevented) return true;
 
-  const target = event.target as HTMLElement | null;
-  if (target) {
-    const tag = target.tagName;
-    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) {
-      return true;
-    }
-  }
+  if (isTextField(event.target as HTMLElement | null)) return true;
 
-  // An open modal, menu or listbox owns the keyboard.
-  return !!document.querySelector('[role="dialog"], [role="menu"], [role="listbox"]');
+  // An open menu or listbox owns the keyboard.
+  return !!document.querySelector('[role="menu"], [role="listbox"]');
 }
+
+/** Actions that make sense inside an open dialog; the rest would act on the page behind it. */
+const DIALOG_ACTIONS: ActionId[] = ["nav.next", "nav.prev", "scroll.down", "scroll.up", "hints.show"];
 
 export const KeyboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { setSideBarOpen, isMobile } = useAppContext();
   const router = useRouter();
   const [bindings, setBindings] = useState<Bindings>(DEFAULT_BINDINGS);
+  const [enabled, setEnabledState] = useState(false);
+  const [supported] = useState(() => !isMobilePlatform());
+
+  // Everything keyboard-related only runs when supported, opted in, and on a desktop-sized viewport.
+  const active = supported && enabled && !isMobile;
 
   useEffect(() => {
     loadBindings().then(setBindings).catch(() => { });
+    loadKeyboardEnabled().then(setEnabledState).catch(() => { });
   }, []);
+
+  const setEnabled = (next: boolean) => {
+    setEnabledState(next);
+    saveKeyboardEnabled(next);
+  };
+
+  useEffect(() => {
+    if (!active) hideHints();
+  }, [active]);
 
   const update = (next: Bindings) => {
     setBindings(next);
@@ -73,7 +110,7 @@ export const KeyboardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const resetBindings = () => update({ ...DEFAULT_BINDINGS });
 
   useEffect(() => {
-    if (isMobile) return;
+    if (!active) return;
 
     const handlers: Record<ActionId, (event: KeyboardEvent) => void> = {
       "nav.next": () => moveFocus(1),
@@ -88,6 +125,11 @@ export const KeyboardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       "scroll.up": () => scrollPage(-1),
       back: () => router.history.back(),
       "sidebar.toggle": () => setSideBarOpen((prev) => !prev),
+      "hints.show": () => showHints(),
+      "window.close": () => {
+        // Same as the titlebar close button: hide the window, the app keeps running in the tray.
+        getCurrentWindow().hide().catch(() => { });
+      },
     };
 
     const map: Record<string, (event: KeyboardEvent) => void> = {};
@@ -95,6 +137,7 @@ export const KeyboardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       for (const key of bindings[id]) {
         map[key] = (event) => {
           if (shouldIgnore(event)) return;
+          if (getActiveDialog() && !DIALOG_ACTIONS.includes(id)) return;
           // Space/Enter on a focused button should keep pressing it.
           const target = event.target as HTMLElement | null;
           if (key.endsWith("Space") && target?.closest("button, [role='button']")) return;
@@ -105,9 +148,56 @@ export const KeyboardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     return tinykeys(window, map);
-  }, [bindings, isMobile, router]);
+  }, [bindings, active, router]);
 
-  const value = useMemo(() => ({ bindings, addBinding, removeBinding, resetBindings }), [bindings]);
+  // Escape leaves a focused text field so the navigation keys work again.
+  // Runs in the capture phase and stops the event so the field itself never
+  // sees it (clearable inputs would otherwise erase their value). While an
+  // overlay is open it is left alone so popups and modals can close first.
+  useEffect(() => {
+    if (!active) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      const target = event.target as HTMLElement | null;
+      if (!isTextField(target)) return;
+      if (document.querySelector('[role="dialog"], [role="menu"], [role="listbox"]')) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      target!.blur();
+    };
+
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [active]);
+
+  // After navigating (e.g. back from an entry) the list is re-created: put the
+  // focus back on the entry the user left, once it has rendered.
+  useEffect(() => {
+    if (!active) return;
+
+    let frame = 0;
+    const unsubscribe = router.subscribe("onResolved", () => {
+      cancelAnimationFrame(frame);
+      let attempts = 0;
+      const tryRestore = () => {
+        if (restoreFocus("main") || ++attempts > 30) return;
+        frame = requestAnimationFrame(tryRestore);
+      };
+      frame = requestAnimationFrame(tryRestore);
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+      unsubscribe();
+    };
+  }, [active, router]);
+
+  const value = useMemo(
+    () => ({ enabled, setEnabled, supported, bindings, addBinding, removeBinding, resetBindings }),
+    [enabled, supported, bindings],
+  );
 
   return <KeyboardContext.Provider value={value}>{children}</KeyboardContext.Provider>;
 };

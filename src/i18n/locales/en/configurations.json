@@ -33,6 +33,7 @@
   "keyboard": {
     "title": "Keyboard shortcuts",
     "description": "Navigate the app with the keyboard. Enter opens the focused item.",
+    "enable": "Enable keyboard shortcuts",
     "add": "Add key",
     "pressKey": "Press a key… (Esc to cancel)",
     "reset": "Reset to defaults",
@@ -41,7 +42,9 @@
       "focus": { "sidebar": "Focus sidebar", "main": "Focus content" },
       "scroll": { "down": "Scroll page down", "up": "Scroll page up" },
       "back": "Go back",
-      "sidebar": { "toggle": "Toggle sidebar" }
+      "sidebar": { "toggle": "Toggle sidebar" },
+      "hints": { "show": "Show link hints" },
+      "window": { "close": "Close the window" }
     }
   },
   "language": {

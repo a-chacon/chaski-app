@@ -33,6 +33,7 @@
   "keyboard": {
     "title": "Atajos de teclado",
     "description": "Navega la aplicación con el teclado. Enter abre el elemento enfocado.",
+    "enable": "Activar atajos de teclado",
     "add": "Añadir tecla",
     "pressKey": "Presiona una tecla… (Esc para cancelar)",
     "reset": "Restablecer valores",
@@ -41,7 +42,9 @@
       "focus": { "sidebar": "Enfocar barra lateral", "main": "Enfocar contenido" },
       "scroll": { "down": "Bajar página", "up": "Subir página" },
       "back": "Volver",
-      "sidebar": { "toggle": "Mostrar/ocultar barra lateral" }
+      "sidebar": { "toggle": "Mostrar/ocultar barra lateral" },
+      "hints": { "show": "Mostrar atajos de enlaces" },
+      "window": { "close": "Cerrar la ventana" }
     }
   },
   "language": {

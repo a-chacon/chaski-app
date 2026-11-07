@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.0 - 2026-11-06
+
+### Added
+
+- New feed and discover merged into a single page, with a preview page to see unfollowed sources.
+- Fold/unfold all folders in the sidebar feed list.
+- Indicator dot on folders that contain new entries.
+- Keyboard navigation.
+- Metadata to publish on F-Droid.
+
+### Fixed
+
+- Folders and feeds now use alphabetical order by default.
+
 ## 0.8.3 - 2026-10-24
 
 ### Added

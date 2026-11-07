@@ -1,0 +1,5 @@
+* New feed and discover merged into a single page, with a preview for unfollowed sources
+* Fold/unfold all folders in the sidebar
+* Dot indicator on folders with new entries
+* Keyboard navigation
+* Folders and feeds sorted alphabetically by default

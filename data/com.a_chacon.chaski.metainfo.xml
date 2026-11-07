@@ -32,6 +32,22 @@
   </provides>
 
   <releases>
+    <release version="0.9.0" date="2026-11-06">
+      <description>
+        <p>Added:</p>
+        <ul>
+          <li>New feed and discover merged into a single page, with a preview page to see unfollowed sources.</li>
+          <li>Fold/unfold all folders in the sidebar feed list.</li>
+          <li>Indicator dot on folders that contain new entries.</li>
+          <li>Keyboard navigation.</li>
+          <li>Metadata to publish on F-Droid.</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Folders and feeds now use alphabetical order by default.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.8.3" date="2026-10-24">
       <description>
         <p>Added:</p>

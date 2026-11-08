@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/a-chacon/chaski-app/main/src-tauri/icons/icon.png" alt="Chaski App Logo" width="200">
+![Chaski App on desktop and mobile](https://raw.githubusercontent.com/a-chacon/chaski-app/main/banner.png)
 
 ## Chaski App
 
@@ -23,9 +23,13 @@
 
 ## Screenshots
 
-![Screenshot of the main view of the app](https://raw.githubusercontent.com/a-chacon/chaski-app/main/screenshots/index.png)
+![Screenshot of the entries view](https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/entries.png)
 
-![Screenshot of the main view of the app with list view](https://raw.githubusercontent.com/a-chacon/chaski-app/main/screenshots/index-list.png)
+![Screenshot of the discovery page](https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/discovery.png)
+
+![Screenshot of an entry](https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/entry.png)
+
+![Screenshot of the compact list mode](https://raw.githubusercontent.com/a-chacon/chaski-app/main/data/list_mode.png)
 
 ## Support
 

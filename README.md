@@ -4,6 +4,8 @@
 
 **A calmer way to read the web.**
 
+<a href="https://mastodon.social/@chaskiapp" target="_blank" rel="me"><img src="https://img.shields.io/badge/Follow-%40chaskiapp-6364FF?style=for-the-badge&logo=mastodon&logoColor=white" alt="Follow @chaskiapp on Mastodon"></a>
+
 #### Key Features
 
 - **Privacy First**: No ads, telemetry, or any data leaving your device.

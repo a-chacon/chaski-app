@@ -5,7 +5,7 @@ import { getVersion } from '@tauri-apps/api/app';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, useDisclosure } from '@heroui/react';
-import { RiFeedbackLine, RiFileListLine } from '@remixicon/react';
+import { RiFeedbackLine, RiFileListLine, RiMastodonFill } from '@remixicon/react';
 
 export const Route = createLazyFileRoute('/about')({ component: RouteComponent });
 
@@ -91,6 +91,22 @@ function RouteComponent() {
               fullWidth
             >
               {t('feedback')}
+            </Button>
+
+            <div className="h-px bg-divider" />
+
+            <Button
+              as="a"
+              href="https://mastodon.social/@chaskiapp"
+              target="_blank"
+              rel="me noopener noreferrer"
+              variant="flat"
+              color="secondary"
+              startContent={<RiMastodonFill size={18} />}
+              className="justify-start"
+              fullWidth
+            >
+              {t('followMastodon')}
             </Button>
 
             <div className="h-px bg-divider" />

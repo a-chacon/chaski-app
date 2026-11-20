@@ -20,6 +20,8 @@ import { Alert, Button } from "@heroui/react";
 import updater from "../../helpers/updater";
 import { KeyboardProvider } from "../../keyboard/KeyboardProvider";
 import { type as osType } from "@tauri-apps/plugin-os";
+import { useRouterState } from "@tanstack/react-router";
+import EntryView from "../EntryView";
 
 interface ApplicationProps {
   children: React.ReactNode;
@@ -53,6 +55,9 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [sideBarOpen, setSideBarOpen] = useState(true);
   const [isSidebarHoverVisible, setIsSidebarHoverVisible] = useState(false);
   const [entriesLayout, setEntriesLayout] = useState<string>("list");
+  const [appLayout, setAppLayout] = useState<"classic" | "threePane">("classic");
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [entriesOrder, setEntriesOrder] = useState<"desc" | "asc">("desc");
   const [showReadEntries, setShowReadEntries] = useState<boolean>(true);
   const [showHiddenEntries, setShowHiddenEntries] = useState<boolean>(false);
@@ -178,6 +183,18 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setEntriesLayout(layout);
   };
 
+  const handleSetAppLayout = async (layout: "classic" | "threePane") => {
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('app-layout', { value: layout });
+    setAppLayout(layout);
+  };
+
+  const getPersistedAppLayout = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: string }>('app-layout');
+    setAppLayout(stored?.value === 'threePane' ? 'threePane' : 'classic');
+  };
+
   const handleSetEntriesOrder = async (order: "desc" | "asc") => {
     const store = await load('settings.json', { autoSave: true });
     await store.set('entries-order', { value: order });
@@ -238,6 +255,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentAccounts();
     getPersistedCurrentAccountId();
     getPersistedEntriesLayout();
+    getPersistedAppLayout();
     getPersistedEntriesOrder();
     getPersistedShowReadEntries();
     getPersistedShowHiddenEntries();
@@ -458,6 +476,12 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     }
   };
 
+  // Three-pane is a desktop-only option: it never applies on mobile.
+  const isThreePane = appLayout === "threePane" && !isMobile;
+  const showReaderPane =
+    isThreePane &&
+    (pathname === "/" || pathname.startsWith("/feeds/") || pathname.startsWith("/folders/"));
+
   return (
     <AppContext.Provider
       value={{
@@ -465,6 +489,11 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         setSideBarOpen,
         entriesLayout,
         handleSetEntriesLayout,
+        appLayout,
+        handleSetAppLayout,
+        isThreePane,
+        selectedEntryId,
+        setSelectedEntryId,
         entriesOrder,
         handleSetEntriesOrder,
         showReadEntries,
@@ -543,7 +572,27 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
                   </>
                 )}
 
-                {children}
+                {showReaderPane ? (
+                  <>
+                    <div className="h-full min-w-0 w-full md:w-2/5 xl:w-1/3 shrink-0">{children}</div>
+                    <div className="h-full min-w-0 flex-1">
+                      {selectedEntryId ? (
+                        <EntryView
+                          key={selectedEntryId}
+                          entryId={selectedEntryId}
+                          scrollId="readerDiv"
+                          embedded
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-sm opacity-60">
+                          {t('common:selectEntry')}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  children
+                )}
                 {showOpmlImportAlert && (
                   <div className="fixed bottom-4 left-4 z-50 max-w-lg">
                     <Alert

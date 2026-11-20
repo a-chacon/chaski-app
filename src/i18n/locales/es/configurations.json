@@ -23,6 +23,9 @@
   },
   "entries": {
     "title": "Entradas",
+    "appLayout": "Diseño de la aplicación",
+    "appLayoutClassic": "Clásico (lista y luego página de la entrada)",
+    "appLayoutThreePane": "Tres paneles (feeds, entradas, lector)",
     "layout": "Diseño predeterminado",
     "listView": "Vista de lista",
     "compactView": "Vista compacta",

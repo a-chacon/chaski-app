@@ -6,14 +6,16 @@ import { useAppContext } from "../../AppContext";
 
 interface ApplicationProps {
   children: React.ReactNode;
+  /** DOM id of the scroll container. Use a distinct id for secondary panes. */
+  id?: string;
 }
 
-const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
+const MainSectionLayout: React.FC<ApplicationProps> = ({ children, id = "mainDiv" }) => {
   const [showButton, setShowButton] = useState(false);
   const { isMobile, setSideBarOpen } = useAppContext();
 
   const handleScroll = () => {
-    const element = document.getElementById("mainDiv");
+    const element = document.getElementById(id);
     if (element) {
       const scrollY = element.scrollTop;
       const windowHeight = window.innerHeight;
@@ -31,7 +33,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
       setSideBarOpen(false);
     }
 
-    const element = document.getElementById("mainDiv");
+    const element = document.getElementById(id);
     if (element) {
       element.addEventListener("scroll", handleScroll);
     }
@@ -43,7 +45,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
   }, []);
 
   const scrollToTop = () => {
-    const element = document.getElementById("mainDiv");
+    const element = document.getElementById(id);
     if (element) {
       element.scrollTop = 0;
     }
@@ -51,7 +53,7 @@ const MainSectionLayout: React.FC<ApplicationProps> = ({ children }) => {
 
   return (
     <div
-      id="mainDiv"
+      id={id}
       className="rounded-3xl h-full w-full overflow-auto pb-safe"
     >
       {children}

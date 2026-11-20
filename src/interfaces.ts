@@ -83,6 +83,12 @@ export interface AppContextInterface {
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   entriesLayout: string;
   handleSetEntriesLayout: (layout: string) => void;
+  appLayout: "classic" | "threePane";
+  handleSetAppLayout: (layout: "classic" | "threePane") => void;
+  /** True only when appLayout is threePane AND the viewport is not mobile. */
+  isThreePane: boolean;
+  selectedEntryId: string | null;
+  setSelectedEntryId: (id: string | null) => void;
   entriesOrder: "desc" | "asc";
   handleSetEntriesOrder: (order: "desc" | "asc") => void;
   showReadEntries: boolean;

@@ -20,6 +20,9 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry, preview = fals
     entriesLayout: display,
     showHiddenEntries,
     isMobile,
+    isThreePane,
+    selectedEntryId,
+    setSelectedEntryId,
   } = useAppContext();
 
   const isCompact = display === "compact";
@@ -35,6 +38,15 @@ const EntryCard: React.FC<EntryCardProps> = ({ entry: inputEntry, preview = fals
       <a href={entry.link} target="_blank" rel="noopener noreferrer" className={className} data-nav-item>
         {children}
       </a>
+    ) : isThreePane ? (
+      <button
+        type="button"
+        onClick={() => setSelectedEntryId(entry.id?.toString() || null)}
+        className={`text-left w-full ${className ?? ""} ${selectedEntryId === entry.id?.toString() ? "font-bold" : ""}`}
+        data-nav-item
+      >
+        {children}
+      </button>
     ) : (
       <Link
         to="/entries/$entryId"

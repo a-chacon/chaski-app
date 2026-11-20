@@ -23,6 +23,9 @@
   },
   "entries": {
     "title": "Entries",
+    "appLayout": "App layout",
+    "appLayoutClassic": "Classic (list, then entry page)",
+    "appLayoutThreePane": "Three panes (feeds, entries, reader)",
     "layout": "Default layout",
     "listView": "List view",
     "compactView": "Compact view",

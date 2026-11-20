@@ -32,7 +32,8 @@ export default function Configurations() {
     currentFontSpace, handleSetCurrentFontSpace, currentMarkAsReadOnHover,
     handleSetMarkAsReadOnHover,
     currentLanguage, handleSetCurrentLanguage,
-    handleSetEntriesLayout, entriesLayout, handleSetShowReadEntries, showReadEntries,
+    handleSetEntriesLayout, entriesLayout, appLayout, handleSetAppLayout, isMobile,
+    handleSetShowReadEntries, showReadEntries,
     handleSetShowHiddenEntries, showHiddenEntries, isMobilePlatform,
   } = useAppContext();
 
@@ -212,6 +213,35 @@ export default function Configurations() {
           <SectionTitle title={t('entries.title')} />
 
           <div className="flex flex-col gap-5">
+            {/* App layout (desktop only, hidden entirely on mobile) */}
+            {!isMobile && (
+              <>
+                <div>
+                  <p className="font-medium pb-3">{t('entries.appLayout')}</p>
+                  <div className="flex flex-col items-start gap-2">
+                    <Button
+                      color="primary"
+                      size="sm"
+                      variant={appLayout === "classic" ? "flat" : "light"}
+                      onPress={() => handleSetAppLayout("classic")}
+                    >
+                      {t('entries.appLayoutClassic')}
+                    </Button>
+                    <Button
+                      color="primary"
+                      size="sm"
+                      variant={appLayout === "threePane" ? "flat" : "light"}
+                      onPress={() => handleSetAppLayout("threePane")}
+                    >
+                      {t('entries.appLayoutThreePane')}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="h-px bg-divider" />
+              </>
+            )}
+
             {/* Layout */}
             <div>
               <p className="font-medium pb-3">{t('entries.layout')}</p>

@@ -107,6 +107,18 @@ const WindowTitlebar: React.FC = () => {
     navigate({ to: '/' });
   }
 
+  const handleSelectAccount = async (account: AccountInterface) => {
+    if (currentAccount?.id === account.id) {
+      return;
+    }
+
+    setCurrentAccount(account);
+    // Drop the cache only after leaving the old page, otherwise it refetches
+    // its own entries (and re-caches them on unmount).
+    await navigate({ to: '/' });
+    dropCache();
+  }
+
   return (
     <div className={`border-b border-default-200/70 bg-background/90 backdrop-blur px-1.5 flex items-center select-none gap-1 ${isMobile ? "h-14 px-3" : "h-10"}`}>
       <div className={`flex items-center ${isMobile ? "w-full justify-between" : ""} text-primary-500`}>
@@ -175,7 +187,7 @@ const WindowTitlebar: React.FC = () => {
                     <button
                       type="button"
                       className="flex items-center gap-2 text-sm text-left flex-1 min-w-0"
-                      onClick={() => setCurrentAccount(account)}
+                      onClick={() => handleSelectAccount(account)}
                     >
                       {currentAccount?.id === account.id ? (
                         <RiCheckLine className="text-success shrink-0" />

@@ -50,6 +50,7 @@ export const EntriesProvider: React.FC<EntriesProviderProps> = ({ children }) =>
   const [cached, setCached] = useState<{ path: string; state: PathState } | null>(null);
   const [current, setCurrent] = useState<PathState>(DEFAULT_STATE);
 
+
   // Called when a list route activates with a new path.
   // If it matches the cache, restore it. Otherwise start fresh and drop the cache.
   const setPath = (newPath: string) => {

@@ -43,7 +43,7 @@ pub async fn opml_file_to_new_feeds(
     file_path: &str,
     app_handle: &tauri::AppHandle,
 ) -> Result<OmplImportStats, Box<dyn std::error::Error>> {
-    let contents = match fs::read_to_string(file_path) {
+    let contents = match read_to_string_any(file_path, app_handle) {
         Ok(contents) => contents,
         Err(e) => {
             let message = format!("Error reading OPML file: {e}");
@@ -250,12 +250,59 @@ pub async fn account_feeds_to_opml(
         opml_file.add_feed(feed.title.as_str(), feed.link.as_str());
     }
 
-    fs::write(ensure_opml_extension(file_path), opml_file.to_string()?)?;
+    write_any(
+        &ensure_opml_extension(file_path),
+        opml_file.to_string()?.as_bytes(),
+        &app_handle,
+    )?;
 
     Ok(())
 }
 
+fn is_content_uri(path: &str) -> bool {
+    path.starts_with("content://")
+}
+
+/// Reads a file from a regular path or an Android `content://` URI.
+fn read_to_string_any(path: &str, app_handle: &tauri::AppHandle) -> std::io::Result<String> {
+    use std::io::Read;
+    use std::str::FromStr;
+    use tauri_plugin_fs::{FilePath, FsExt, OpenOptions};
+
+    if !is_content_uri(path) {
+        return fs::read_to_string(path);
+    }
+    let file_path = FilePath::from_str(path)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e.to_string()))?;
+    let mut opts = OpenOptions::new();
+    opts.read(true);
+    let mut file = app_handle.fs().open(file_path, opts)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
+}
+
+/// Writes a file to a regular path or an Android `content://` URI.
+fn write_any(path: &str, data: &[u8], app_handle: &tauri::AppHandle) -> std::io::Result<()> {
+    use std::io::Write;
+    use std::str::FromStr;
+    use tauri_plugin_fs::{FilePath, FsExt, OpenOptions};
+
+    if !is_content_uri(path) {
+        return fs::write(path, data);
+    }
+    let file_path = FilePath::from_str(path)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e.to_string()))?;
+    let mut opts = OpenOptions::new();
+    opts.write(true).truncate(true).create(true);
+    let mut file = app_handle.fs().open(file_path, opts)?;
+    file.write_all(data)
+}
+
 pub fn ensure_opml_extension(file_path: &str) -> String {
+    if is_content_uri(file_path) {
+        return file_path.to_string();
+    }
     if !file_path.ends_with(".opml") {
         format!("{}.opml", file_path)
     } else {

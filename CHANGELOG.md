@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.1 - 2026-11-21
+
+### Added
+
+- Mastodon links. You can follow Chaski at mastodon now! <https://mastodon.social/@chaskiapp>
+
+### Fixed
+
+- OPML import now supports both regular file paths and Android content paths.
+- Cache is now dropped when switching accounts.
+
 ## 0.9.0 - 2026-11-06
 
 ### Added

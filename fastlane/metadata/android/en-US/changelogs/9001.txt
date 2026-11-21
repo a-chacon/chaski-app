@@ -1,0 +1,3 @@
+* Added Mastodon links
+* Fixed OPML import to support regular paths and Android content paths
+* Fixed cache not being dropped when switching accounts

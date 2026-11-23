@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import KeybindingsSettings from "../components/KeybindingsSettings";
 import { useKeybindings } from "../keyboard/KeyboardProvider";
+import { indexConfigurations, updateConfiguration } from "../helpers/configurationsData";
+import { ConfigurationInterface } from "../interfaces";
 
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
@@ -40,6 +42,42 @@ export default function Configurations() {
 
   const [autostartState, setAutostartState] = useState(false);
   const [isFlatpak, setIsFlatpak] = useState(false);
+  const [maxSizeConfig, setMaxSizeConfig] = useState<ConfigurationInterface | null>(null);
+  const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
+  const [purging, setPurging] = useState(false);
+
+  useEffect(() => {
+    indexConfigurations()
+      .then((configs) =>
+        setMaxSizeConfig(configs.find((c) => c.name === "MAX_DATABASE_SIZE_MB") ?? null),
+      )
+      .catch(() => {});
+  }, []);
+
+  const sizeOptions = [
+    { key: "0", label: t('storage.unlimited') },
+    { key: "100", label: "100 MB" },
+    { key: "250", label: "250 MB" },
+    { key: "500", label: "500 MB" },
+    { key: "1024", label: "1 GB" },
+    { key: "2048", label: "2 GB" },
+  ];
+
+  async function handleMaxSizeChange(value: string) {
+    if (!maxSizeConfig || !value) return;
+    const updated = await updateConfiguration({ ...maxSizeConfig, value });
+    setMaxSizeConfig(updated);
+  }
+
+  async function handlePurgeNow() {
+    setPurging(true);
+    try {
+      const count = await invoke<number>("run_purge_now");
+      setPurgeMessage(t('storage.cleaned', { count }));
+    } finally {
+      setPurging(false);
+    }
+  }
 
   useEffect(() => {
     const loadAutostartState = async () => {
@@ -270,6 +308,34 @@ export default function Configurations() {
             </div>
           </div>
         </section>
+
+        {/* ── Storage ── */}
+        {maxSizeConfig && (
+          <section className="pb-10">
+            <SectionTitle title={t('storage.title')} />
+            <div className="flex flex-col gap-3 max-w-xs">
+              <Select
+                label={t('storage.maxSize')}
+                variant="bordered"
+                color="primary"
+                disallowEmptySelection
+                selectedKeys={[maxSizeConfig.value]}
+                onChange={(e) => handleMaxSizeChange(e.target.value)}
+              >
+                {sizeOptions.map((o) => (
+                  <SelectItem key={o.key}>{o.label}</SelectItem>
+                ))}
+              </Select>
+              <p className="text-sm text-foreground-500">{t('storage.maxSizeHelp')}</p>
+              <div className="flex items-center gap-3">
+                <Button size="sm" color="primary" variant="flat" isLoading={purging} onPress={handlePurgeNow}>
+                  {t('storage.cleanNow')}
+                </Button>
+                {purgeMessage && <span className="text-sm text-foreground-500">{purgeMessage}</span>}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── Keyboard ── */}
         {keyboardSupported && (

@@ -8,5 +8,11 @@
   "buyMeCoffee": "Buy me a coffee",
   "feedback": "Send Feedback",
   "followMastodon": "Follow on Mastodon",
-  "viewLogs": "View Logs"
+  "viewLogs": "View Logs",
+  "storage": {
+    "title": "Storage",
+    "database": "Database",
+    "reclaimable": "{{size}} reclaimable",
+    "entries": "{{count}} entries"
+  }
 }

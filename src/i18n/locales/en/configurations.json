@@ -38,17 +38,40 @@
     "pressKey": "Press a key… (Esc to cancel)",
     "reset": "Reset to defaults",
     "actions": {
-      "nav": { "next": "Next item", "prev": "Previous item" },
-      "focus": { "sidebar": "Focus sidebar", "main": "Focus content" },
-      "scroll": { "down": "Scroll page down", "up": "Scroll page up" },
+      "nav": {
+        "next": "Next item",
+        "prev": "Previous item"
+      },
+      "focus": {
+        "sidebar": "Focus sidebar",
+        "main": "Focus content"
+      },
+      "scroll": {
+        "down": "Scroll page down",
+        "up": "Scroll page up"
+      },
       "back": "Go back",
-      "sidebar": { "toggle": "Toggle sidebar" },
-      "hints": { "show": "Show link hints" },
-      "window": { "close": "Close the window" }
+      "sidebar": {
+        "toggle": "Toggle sidebar"
+      },
+      "hints": {
+        "show": "Show link hints"
+      },
+      "window": {
+        "close": "Close the window"
+      }
     }
   },
   "language": {
     "title": "Language",
     "select": "Select your preferred language"
+  },
+  "storage": {
+    "title": "Storage",
+    "maxSize": "Maximum database size",
+    "maxSizeHelp": "Approximate limit. Oldest entries (read first) are removed periodically; read-later and recent entries are kept.",
+    "unlimited": "Unlimited",
+    "cleanNow": "Clean now",
+    "cleaned": "{{count}} entries removed"
   }
 }

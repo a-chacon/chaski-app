@@ -11,6 +11,7 @@ mod entities {
     pub(crate) mod feeds;
     pub(crate) mod filters;
     pub(crate) mod folders;
+    pub(crate) mod maintenance;
 }
 
 mod utils {
@@ -148,6 +149,8 @@ pub fn run() {
 
             let handler_clone_for_accounts = app.handle().clone();
             accounts::spawn_greaderapi_accounts_sync_loop(handler_clone_for_accounts);
+
+            entities::maintenance::spawn_maintenance_loop(app.handle().clone());
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -196,7 +199,9 @@ pub fn run() {
             commands::accounts::show_account,
             commands::accounts::destroy_account,
             commands::accounts::update_account,
-            commands::logs::get_log_content
+            commands::logs::get_log_content,
+            commands::storage::get_storage_usage,
+            commands::storage::run_purge_now
         ])
         .run(ctx)
         .expect("error while building tauri application");

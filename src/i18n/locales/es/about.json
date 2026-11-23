@@ -8,5 +8,11 @@
   "buyMeCoffee": "Invítame un café",
   "feedback": "Enviar comentarios",
   "followMastodon": "Seguir en Mastodon",
-  "viewLogs": "Ver registros"
+  "viewLogs": "Ver registros",
+  "storage": {
+    "title": "Almacenamiento",
+    "database": "Base de datos",
+    "reclaimable": "{{size}} recuperables",
+    "entries": "{{count}} entradas"
+  }
 }

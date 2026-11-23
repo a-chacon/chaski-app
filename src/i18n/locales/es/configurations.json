@@ -38,17 +38,40 @@
     "pressKey": "Presiona una tecla… (Esc para cancelar)",
     "reset": "Restablecer valores",
     "actions": {
-      "nav": { "next": "Elemento siguiente", "prev": "Elemento anterior" },
-      "focus": { "sidebar": "Enfocar barra lateral", "main": "Enfocar contenido" },
-      "scroll": { "down": "Bajar página", "up": "Subir página" },
+      "nav": {
+        "next": "Elemento siguiente",
+        "prev": "Elemento anterior"
+      },
+      "focus": {
+        "sidebar": "Enfocar barra lateral",
+        "main": "Enfocar contenido"
+      },
+      "scroll": {
+        "down": "Bajar página",
+        "up": "Subir página"
+      },
       "back": "Volver",
-      "sidebar": { "toggle": "Mostrar/ocultar barra lateral" },
-      "hints": { "show": "Mostrar atajos de enlaces" },
-      "window": { "close": "Cerrar la ventana" }
+      "sidebar": {
+        "toggle": "Mostrar/ocultar barra lateral"
+      },
+      "hints": {
+        "show": "Mostrar atajos de enlaces"
+      },
+      "window": {
+        "close": "Cerrar la ventana"
+      }
     }
   },
   "language": {
     "title": "Idioma",
     "select": "Selecciona tu idioma preferido"
+  },
+  "storage": {
+    "title": "Almacenamiento",
+    "maxSize": "Tamaño máximo de la base de datos",
+    "maxSizeHelp": "Límite aproximado. Las entradas más antiguas (primero las leídas) se eliminan periódicamente; se conservan las de leer más tarde y las recientes.",
+    "unlimited": "Sin límite",
+    "cleanNow": "Limpiar ahora",
+    "cleaned": "{{count}} entradas eliminadas"
   }
 }

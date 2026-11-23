@@ -2,6 +2,7 @@ import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import MainSectionLayout from '../components/layout/MainSectionLayout';
 import FeedbackModal from '../components/FeedbackModal';
 import { getVersion } from '@tauri-apps/api/app';
+import { invoke } from '@tauri-apps/api/core';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, useDisclosure } from '@heroui/react';
@@ -14,6 +15,23 @@ function RouteComponent() {
   const [appVersion, setAppVersion] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const navigate = useNavigate();
+  const [storage, setStorage] = useState<{
+    database_bytes: number;
+    free_bytes: number;
+    entries_count: number;
+  } | null>(null);
+
+  useEffect(() => {
+    invoke<typeof storage>('get_storage_usage')
+      .then(setStorage)
+      .catch((e) => console.error('Error fetching storage usage:', e));
+  }, []);
+
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+    return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
+  };
 
   useEffect(() => {
     const fetchAppVersion = async () => {
@@ -79,6 +97,21 @@ function RouteComponent() {
               .
             </p>
           </div>
+
+          {/* ── Storage ── */}
+          {storage && (
+            <div className="rounded-2xl border border-divider bg-content1 px-6 py-5 flex flex-col gap-1 text-sm">
+              <h2 className="font-semibold">{t('storage.title')}</h2>
+              <p className="text-foreground-600">
+                {t('storage.database')}: {formatBytes(storage.database_bytes)}
+                {storage.free_bytes > 0 &&
+                  ` (${t('storage.reclaimable', { size: formatBytes(storage.free_bytes) })})`}
+              </p>
+              <p className="text-foreground-600">
+                {t('storage.entries', { count: storage.entries_count })}
+              </p>
+            </div>
+          )}
 
           {/* ── Actions ── */}
           <div className="rounded-2xl border border-divider bg-content1 px-6 py-5 flex flex-col gap-3">

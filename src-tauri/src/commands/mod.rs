@@ -5,4 +5,5 @@ pub mod feeds;
 pub mod filters;
 pub mod folders;
 pub mod logs;
+pub mod storage;
 pub mod utils;

@@ -75,6 +75,16 @@ where
     }
 }
 
+/// Total size on disk of the database including its WAL and shared-memory files.
+pub fn database_file_size(app_handle: &tauri::AppHandle) -> u64 {
+    let base = get_db_path(app_handle);
+    ["", "-wal", "-shm"]
+        .iter()
+        .filter_map(|suffix| fs::metadata(format!("{base}{suffix}")).ok())
+        .map(|m| m.len())
+        .sum()
+}
+
 fn get_db_path(app_handle: &tauri::AppHandle) -> String {
     match app_handle.path().app_data_dir() {
         Ok(base_dir) => base_dir.to_str().unwrap().to_string() + "/database.sqlite",

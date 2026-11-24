@@ -18,12 +18,12 @@
     "resources": [],
     "createUpdaterArtifacts": true,
     "android": {
-      "versionCode": 9001
+      "versionCode": 9002
     }
   },
   "productName": "Chaski",
   "mainBinaryName": "chaski",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "identifier": "com.chaski.app",
   "plugins": {
     "updater": {

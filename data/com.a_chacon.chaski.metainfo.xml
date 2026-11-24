@@ -33,6 +33,19 @@
   </provides>
 
   <releases>
+    <release version="0.9.2" date="2026-11-24">
+      <description>
+        <p>Fixed:</p>
+        <ul>
+          <li>The final message now uses the screen height, so it is possible to mark the last entries as read.</li>
+          <li>Last fetch and latest entry are now updated correctly.</li>
+        </ul>
+        <p>CI:</p>
+        <ul>
+          <li>F-Droid reproducible build.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.1" date="2026-11-21">
       <description>
         <p>Added:</p>

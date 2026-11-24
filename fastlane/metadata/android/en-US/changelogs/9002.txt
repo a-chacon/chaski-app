@@ -1,0 +1,2 @@
+* Fixed last entries not being markable as read by sizing the final message to the screen height
+* Fixed last fetch and latest entry not being updated

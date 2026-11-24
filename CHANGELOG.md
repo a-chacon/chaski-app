@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.2 - 2026-11-24
+
+### Fixed
+
+- The final message now uses the screen height, so it is possible to mark the last entries as read.
+- Last fetch and latest entry are now updated correctly.
+
+### CI
+
+- F-Droid reproducible build.
+
 ## 0.9.1 - 2026-11-21
 
 ### Added

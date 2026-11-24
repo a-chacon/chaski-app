@@ -1,4 +1,4 @@
-name: 'ci'
+name: "ci"
 
 on:
   push:
@@ -14,12 +14,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
-            args: '--no-bundle'
-          - platform: 'ubuntu-22.04'
-            args: '--no-bundle'
-          - platform: 'windows-latest'
-            args: '--no-bundle'
+          - platform: "macos-latest"
+            args: "--no-bundle"
+          - platform: "ubuntu-22.04"
+            args: "--no-bundle"
+          - platform: "windows-latest"
+            args: "--no-bundle"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -51,25 +51,36 @@ jobs:
 
   build-android:
     runs-on: ubuntu-22.04
+    env:
+      # Secrets are unavailable on PRs from forks; without them a debug APK is built instead.
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEY_BASE64 != '' }}
+      RUSTFLAGS: >-
+        --remap-path-prefix=${{ github.workspace }}=/build
+        --remap-path-prefix=/home/runner/.cargo=/cargo
+        --remap-path-prefix=/home/runner/.rustup=/rustup
+      CFLAGS: >-
+        -ffile-prefix-map=${{ github.workspace }}=/build
+        -ffile-prefix-map=/home/runner/.cargo=/cargo
     steps:
       - uses: actions/checkout@v4
 
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
-          cache: 'yarn'
+          node-version: "20"
+          cache: "yarn"
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install Rust 1.96.0
+        uses: dtolnay/rust-toolchain@master
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          toolchain: 1.96.0
+          targets: aarch64-linux-android
 
       - name: setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: "temurin"
+          java-version: "21"
 
       - name: setup Android SDK
         uses: android-actions/setup-android@v4
@@ -78,9 +89,10 @@ jobs:
         run: sdkmanager "ndk;30.0.16138531"
 
       - name: install frontend dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile --ignore-engines
 
       - name: setup Android signing
+        if: env.HAS_KEYSTORE == 'true'
         run: |
           cd src-tauri/gen/android
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
@@ -93,5 +105,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/30.0.16138531
         with:
-          mobile: 'android'
-          args: '--apk'
+          mobile: "android"
+          args: ${{ env.HAS_KEYSTORE == 'true' && '--apk --target aarch64' || '--apk --debug --target aarch64' }}
+
+      - name: upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaski-android-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14

@@ -69,19 +69,31 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-22.04
+    # Reproducible build: these must stay in sync with the F-Droid recipe
+    # (fdroiddata/metadata/com.chaski.app.yml). Absolute paths are remapped to
+    # constants so the runner and the F-Droid buildserver produce identical binaries.
+    env:
+      RUSTFLAGS: >-
+        --remap-path-prefix=${{ github.workspace }}=/build
+        --remap-path-prefix=/home/runner/.cargo=/cargo
+        --remap-path-prefix=/home/runner/.rustup=/rustup
+      CFLAGS: >-
+        -ffile-prefix-map=${{ github.workspace }}=/build
+        -ffile-prefix-map=/home/runner/.cargo=/cargo
     steps:
       - uses: actions/checkout@v4
 
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: '20'
           cache: 'yarn'
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install Rust 1.96.0
+        uses: dtolnay/rust-toolchain@master
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          toolchain: 1.96.0
+          targets: aarch64-linux-android
 
       - name: setup Java
         uses: actions/setup-java@v4
@@ -96,7 +108,7 @@ jobs:
         run: sdkmanager "ndk;30.0.16138531"
 
       - name: install frontend dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile --ignore-engines
 
       - name: setup Android signing
         run: |
@@ -117,4 +129,15 @@ jobs:
           releaseDraft: true
           prerelease: false
           mobile: 'android'
-          args: '--apk'
+          args: '--apk --target aarch64'
+
+      # F-Droid fetches this exact file (`Binaries:` in its metadata) and compares it
+      # against its own build. The name must be chaski_<version>.apk.
+      - name: upload APK for F-Droid reproducible build
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          cp src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk "chaski_${VERSION}.apk"
+          gh release upload "app-v${VERSION}" "chaski_${VERSION}.apk" --clobber

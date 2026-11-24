@@ -69,6 +69,10 @@ android {
             )
         }
     }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
     kotlinOptions {
         jvmTarget = "1.8"
     }

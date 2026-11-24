@@ -380,6 +380,15 @@ async fn sync_feeds(
         update_list(to_update, app_handle.clone());
     }
 
+    diesel::update(feeds)
+        .filter(account_id.eq(account.id))
+        .set((
+            last_fetch.eq(Utc::now().naive_utc()),
+            updated_at.eq(Utc::now().naive_utc()),
+        ))
+        .execute(conn)
+        .expect("Error updating feed");
+
     Ok(())
 }
 
@@ -556,6 +565,16 @@ async fn sync_entries(
                             diesel::insert_into(entries::table)
                                 .values(&new_entry)
                                 .execute(conn)
+                                .and_then(|_| {
+                                    diesel::update(feeds.find(feed_id))
+                                        .filter(
+                                            latest_entry
+                                                .is_null()
+                                                .or(latest_entry.lt(new_entry.pub_date)),
+                                        )
+                                        .set(latest_entry.eq(new_entry.pub_date))
+                                        .execute(conn)
+                                })
                         });
 
                         match result {

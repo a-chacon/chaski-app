@@ -25,8 +25,8 @@ const EndMessage = React.memo(({ display }: EndMessageProps) => {
   const { t } = useTranslation("entries");
 
   return (
-    <div className={`${display === "grid" ? "col-span-full" : ""} mx-auto`}>
-      <div className="p-6 text-center">
+    <div className={`${display === "grid" ? "col-span-full" : ""} flex h-screen`}>
+      <div className="p-6 text-center m-auto">
         <h5 className="text-2xl font-semibold pb-2">{t("endTitle")}</h5>
         <p>{t("endSubtitle")}</p>
       </div>

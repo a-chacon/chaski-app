@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.3 - 2026-11-25
+
+### Chore
+
+- Update Dependencies.
+
 ## 0.9.2 - 2026-11-24
 
 ### Fixed

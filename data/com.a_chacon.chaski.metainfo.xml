@@ -33,6 +33,14 @@
   </provides>
 
   <releases>
+    <release version="0.9.3" date="2026-11-25">
+      <description>
+        <p>Chore:</p>
+        <ul>
+          <li>Update dependencies.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.2" date="2026-11-24">
       <description>
         <p>Fixed:</p>

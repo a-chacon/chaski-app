@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import KeybindingsSettings from "../components/KeybindingsSettings";
 import { useKeybindings } from "../keyboard/KeyboardProvider";
+import ContentWidthControl from "../components/ContentWidthControl";
+import { fonts } from "../helpers/fonts";
 
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
@@ -53,13 +55,6 @@ export default function Configurations() {
     loadAutostartState();
   }, [isMobilePlatform]);
 
-  const fonts = [
-    { key: "font-garamond", label: "Garamond" },
-    { key: "font-arial", label: "Arial" },
-    { key: "font-tisa", label: "Tisa" },
-    { key: "font-roboto", label: "Roboto" },
-    { key: "font-opensans", label: "Open Sans" },
-  ];
 
   async function handleAutostartChange() {
     if (isFlatpak) return;
@@ -74,7 +69,7 @@ export default function Configurations() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
+      <div className="flex flex-col max-w-(--content-width) mx-auto px-4">
 
         {/* Page header */}
         <div className="py-8">
@@ -160,6 +155,9 @@ export default function Configurations() {
                 />
               </div>
             </div>
+
+            {/* Content width */}
+            <ContentWidthControl className="max-w-xs" />
 
             {/* Preview */}
             <div className="border rounded-2xl p-4 max-w-prose">

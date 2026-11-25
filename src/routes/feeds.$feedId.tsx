@@ -129,7 +129,7 @@ export default function Feed() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
+      <div className="flex flex-col max-w-(--content-width) mx-auto px-4">
         <FeedHeader
           feed={feed}
           actions={

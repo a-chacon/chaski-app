@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AccountInterface, FeedInterface } from '../../interfaces';
-import { Link } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 
 import { Button } from '@heroui/react';
 import { RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react";
@@ -17,6 +17,13 @@ interface FolderItemProps {
 const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds, isOpen, setIsOpen }) => {
   const folder = folderName;
   const { isMobile, setSideBarOpen } = useAppContext();
+
+  const { feedId: activeFeedId } = useParams({ strict: false }) as { feedId?: string };
+  const containsActiveFeed = activeFeedId !== undefined && feeds.some((feed) => feed.id?.toString() === activeFeedId);
+
+  useEffect(() => {
+    if (containsActiveFeed) setIsOpen(folderName, true);
+  }, [containsActiveFeed, activeFeedId]);
 
   const toggleFolder = () => setIsOpen(folderName, !isOpen);
   const handleLinkClick = () => { if (isMobile) setSideBarOpen(false); };
@@ -93,4 +100,3 @@ const FolderItem: React.FC<FolderItemProps> = ({ account, folderName, feeds, isO
 };
 
 export default FolderItem;
-

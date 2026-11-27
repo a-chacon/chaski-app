@@ -1,0 +1,3 @@
+* Auto select a feed in sidebar when visiting feed page.
+* Font settings directly in the entry view. Also share actions where refactored.
+* Content width customizable.

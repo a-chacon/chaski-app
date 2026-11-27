@@ -33,6 +33,19 @@
   </provides>
 
   <releases>
+    <release version="0.9.4" date="2026-11-27">
+      <description>
+        <p>Added:</p>
+        <ul>
+          <li>Font settings directly in the entry view. Also share actions where refactored.</li>
+          <li>Content width customizable.</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Auto select a feed in sidebar when visiting feed page.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.3" date="2026-11-25">
       <description>
         <p>Chore:</p>

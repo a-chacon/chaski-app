@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.4 - 2026-11-27
+
+### Fixed
+
+- Auto select a feed in sidebar when visiting feed page.
+
+### Added
+
+- Font settings directly in the entry view. Also share actions where refactored.
+- Content width customizable.
+
 ## 0.9.3 - 2026-11-25
 
 ### Chore

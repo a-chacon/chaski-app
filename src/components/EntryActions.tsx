@@ -28,6 +28,8 @@ interface EntryActionsProps {
   className?: String;
   children?: React.ReactNode;
   backAfterAction?: boolean;
+  buttonSize?: "sm" | "md";
+  iconSize?: number;
 }
 
 const EntryActions: React.FC<EntryActionsProps> = ({
@@ -36,6 +38,8 @@ const EntryActions: React.FC<EntryActionsProps> = ({
   className,
   children,
   backAfterAction = false,
+  buttonSize = "sm",
+  iconSize = 24,
 }) => {
   const { history } = useRouter();
   const { t } = useTranslation("entries");
@@ -173,10 +177,10 @@ const EntryActions: React.FC<EntryActionsProps> = ({
             color="default"
             variant="light"
             isIconOnly
-            size="sm"
+            size={buttonSize}
             onPress={() => handleUnhideEntry(entry)}
           >
-            <RiEyeLine className="w-6" />
+            <RiEyeLine size={iconSize} />
           </Button>
         </Tooltip>
       );
@@ -188,10 +192,10 @@ const EntryActions: React.FC<EntryActionsProps> = ({
           color="default"
           variant="light"
           isIconOnly
-          size="sm"
+          size={buttonSize}
           onPress={() => handleHideEntry(entry)}
         >
-          <RiCloseLine className="w-6" />
+          <RiCloseLine size={iconSize} />
         </Button>
       </Tooltip>
     );
@@ -207,10 +211,10 @@ const EntryActions: React.FC<EntryActionsProps> = ({
             color="default"
             variant="light"
             isIconOnly
-            size="sm"
+            size={buttonSize}
             onPress={() => handleMarkReadLater(entry)}
           >
-            <RiBookmarkLine className="w-6" />
+            <RiBookmarkLine size={iconSize} />
           </Button>
         </Tooltip>
       ) : (
@@ -219,10 +223,10 @@ const EntryActions: React.FC<EntryActionsProps> = ({
             color="default"
             variant="light"
             isIconOnly
-            size="sm"
+            size={buttonSize}
             onPress={() => handleUnMarkReadLater(entry)}
           >
-            <RiBookmarkFill className="w-6" />
+            <RiBookmarkFill size={iconSize} />
           </Button>
         </Tooltip>
       )}
@@ -233,10 +237,10 @@ const EntryActions: React.FC<EntryActionsProps> = ({
             color="default"
             variant="light"
             isIconOnly
-            size="sm"
+            size={buttonSize}
             onPress={() => handleMarkAsUnread(entry)}
           >
-            <RiCheckDoubleLine className="w-6" />
+            <RiCheckDoubleLine size={iconSize} />
           </Button>
         </Tooltip>
       ) : (
@@ -245,10 +249,10 @@ const EntryActions: React.FC<EntryActionsProps> = ({
             color="default"
             variant="light"
             isIconOnly
-            size="sm"
+            size={buttonSize}
             onPress={() => handleMarkAsRead(entry)}
           >
-            <RiCheckLine className="w-6" />
+            <RiCheckLine size={iconSize} />
           </Button>
         </Tooltip>
       )}
@@ -260,11 +264,11 @@ const EntryActions: React.FC<EntryActionsProps> = ({
           color="default"
           variant="light"
           isIconOnly
-          size="sm"
+          size={buttonSize}
           onPress={() => handleOpenInBrowser(entry)}
           aria-label="Open entry in browser"
         >
-          <RiExternalLinkLine className="w-6" />
+          <RiExternalLinkLine size={iconSize} />
         </Button>
       </Tooltip>
     </div>

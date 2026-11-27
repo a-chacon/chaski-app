@@ -5,6 +5,7 @@ import {
   RiRedditLine,
   RiLinkedinBoxFill,
   RiLinkUnlink,
+  RiShareLine,
 } from "@remixicon/react";
 import { EntryInterface } from "../interfaces";
 import {
@@ -16,26 +17,34 @@ import {
   Button,
   useDisclosure,
   Input,
-  Tooltip,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@heroui/react";
 import { useState } from "react";
-import { type } from "@tauri-apps/plugin-os";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { useNotification } from "../NotificationContext";
+import { useAppContext } from "../AppContext";
 import { useTranslation } from "react-i18next";
 
 interface EntryShareProps {
   entry: EntryInterface;
   className?: string;
+  buttonSize?: "sm" | "md";
+  iconSize?: number;
 }
 
 const EntryShare: React.FC<EntryShareProps> = ({
   entry,
   className,
+  buttonSize = "sm",
+  iconSize = 18,
 }) => {
   const { t } = useTranslation(["share", "common"]);
   const { addNotification } = useNotification();
+  const { isMobilePlatform } = useAppContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { title, link, description } = entry;
   const [mastodonUrl, setMastodonUrl] = useState("");
 
@@ -64,42 +73,92 @@ const EntryShare: React.FC<EntryShareProps> = ({
     onOpenChange();
   };
 
-  const isMobile = type() === "android" || type() === "ios";
-
-  if (isMobile) {
+  // On mobile the only alternative is copying the link, so skip the popover.
+  if (isMobilePlatform) {
     return (
-      <div className={`flex gap-2 items-center ${className}`}>
-        <Tooltip content={t("share:copyToClipboard")}>
-          <button onClick={copyLinkToClipboard} className="flex items-center">
-            <RiLinkUnlink className="w-6" />
-          </button>
-        </Tooltip>
-      </div>
+      <Button
+        color="default"
+        variant="light"
+        isIconOnly
+        size={buttonSize}
+        className={className}
+        aria-label={t("share:copyToClipboard")}
+        onPress={copyLinkToClipboard}
+      >
+        <RiLinkUnlink size={iconSize} />
+      </Button>
     );
   }
 
+  const socialLinks = [
+    { key: "facebook", label: "Facebook", href: facebookShareUrl, icon: <RiFacebookBoxFill className="w-5 h-5" /> },
+    { key: "twitter", label: "X", href: twitterShareUrl, icon: <RiTwitterXLine className="w-5 h-5" /> },
+    { key: "reddit", label: "Reddit", href: redditShareUrl, icon: <RiRedditLine className="w-5 h-5" /> },
+    { key: "linkedin", label: "LinkedIn", href: linkedinShareUrl, icon: <RiLinkedinBoxFill className="w-5 h-5" /> },
+  ];
+
   return (
-    <div className={`flex gap-2 items-center ${className}`}>
-      <button onClick={onOpen}>
-        <RiMastodonFill className="w-6" />
-      </button>
-      <a href={facebookShareUrl} target="_blank" rel="noopener noreferrer">
-        <RiFacebookBoxFill className="w-6" />
-      </a>
-      <a href={twitterShareUrl} target="_blank" rel="noopener noreferrer">
-        <RiTwitterXLine className="w-6" />
-      </a>
-      <a href={redditShareUrl} target="_blank" rel="noopener noreferrer">
-        <RiRedditLine className="w-6" />
-      </a>
-      <a href={linkedinShareUrl} target="_blank" rel="noopener noreferrer">
-        <RiLinkedinBoxFill className="w-6" />
-      </a>
-      <Tooltip content={t("share:copyToClipboard")}>
-        <button onClick={copyLinkToClipboard} className="flex items-center">
-          <RiLinkUnlink className="w-6" />
-        </button>
-      </Tooltip>
+    <>
+      <Popover placement="bottom-end" isOpen={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger>
+          <Button
+            color="default"
+            variant="light"
+            isIconOnly
+            size={buttonSize}
+            className={className}
+            aria-label={t("share:shareEntry")}
+            title={t("share:shareEntry")}
+          >
+            <RiShareLine size={iconSize} />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-2 items-stretch gap-1 w-56">
+          <Button
+            size="sm"
+            variant="light"
+            className="justify-start"
+            startContent={<RiMastodonFill className="w-5 h-5" />}
+            fullWidth
+            onPress={() => {
+              setIsPopoverOpen(false);
+              onOpen();
+            }}
+          >
+            Mastodon
+          </Button>
+          {socialLinks.map((s) => (
+            <Button
+              key={s.key}
+              as="a"
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="sm"
+              variant="light"
+              className="justify-start"
+              startContent={s.icon}
+              fullWidth
+              onPress={() => setIsPopoverOpen(false)}
+            >
+              {s.label}
+            </Button>
+          ))}
+          <Button
+            size="sm"
+            variant="light"
+            className="justify-start"
+            startContent={<RiLinkUnlink className="w-5 h-5" />}
+            fullWidth
+            onPress={() => {
+              setIsPopoverOpen(false);
+              copyLinkToClipboard();
+            }}
+          >
+            {t("share:copyToClipboard")}
+          </Button>
+        </PopoverContent>
+      </Popover>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
@@ -129,7 +188,7 @@ const EntryShare: React.FC<EntryShareProps> = ({
           )}
         </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 };
 

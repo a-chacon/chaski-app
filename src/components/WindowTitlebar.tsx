@@ -173,7 +173,7 @@ const WindowTitlebar: React.FC = () => {
             <div className="w-64 py-2">
               <div className="px-2 pb-2 border-b border-default-200">
                 <Button size="sm" variant="flat" color="primary" className="w-full" onPress={newAccountModal.onOpen}>
-                  <RiAddLine />
+                  <RiAddLine size={16} />
                   {t("titlebar:addAccount")}
                 </Button>
               </div>
@@ -190,7 +190,7 @@ const WindowTitlebar: React.FC = () => {
                       onClick={() => handleSelectAccount(account)}
                     >
                       {currentAccount?.id === account.id ? (
-                        <RiCheckLine className="text-success shrink-0" />
+                        <RiCheckLine size={16} className="text-success shrink-0" />
                       ) : (
                         <span className="w-4 shrink-0" />
                       )}
@@ -208,7 +208,7 @@ const WindowTitlebar: React.FC = () => {
                               isIconOnly
                               onPress={() => openEditModal(account)}
                             >
-                              <RiEditLine />
+                              <RiEditLine size={16} />
                             </Button>
                           </Tooltip>
                         </>
@@ -221,7 +221,7 @@ const WindowTitlebar: React.FC = () => {
                           isIconOnly
                           onPress={() => openDeleteModal(account)}
                         >
-                          <RiCloseLine />
+                          <RiCloseLine size={16} />
                         </Button>
                       </Tooltip>
                     </div>
@@ -254,7 +254,7 @@ const WindowTitlebar: React.FC = () => {
               size="sm"
               onPress={() => appWindow.minimize()}
             >
-              <RiSubtractLine />
+              <RiSubtractLine size={16} />
             </Button>
             <Button
               color="default"
@@ -263,16 +263,16 @@ const WindowTitlebar: React.FC = () => {
               size="sm"
               onPress={() => appWindow.toggleMaximize()}
             >
-              <RiSquareLine />
+              <RiSquareLine size={16} />
             </Button>
             <Button
-              color="primary"
+              color="default"
               variant="light"
               isIconOnly
               size="sm"
               onPress={() => appWindow.hide()}
             >
-              <RiCloseLine />
+              <RiCloseLine size={16} />
             </Button>
           </>
         )}

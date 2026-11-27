@@ -69,6 +69,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
   const [currentFont, setCurrentFont] = useState<string>("font-opensans");
   const [currentFontSize, setCurrentFontSize] = useState<number>(16);
   const [currentFontSpace, setCurrentFontSpace] = useState<number>(0);
+  const [contentWidth, setContentWidth] = useState<number>(768);
   const [currentMarkAsReadOnHover, setCurrentMarkAsReadOnHover] = useState<boolean>(false);
   const [currentLanguage, setCurrentLanguage] = useState<string>("en");
   const [showFeedbackAlert, setShowFeedbackAlert] = useState<boolean>(false);
@@ -172,6 +173,29 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     setCurrentLanguage(lang);
   };
 
+  const applyContentWidth = (width: number) => {
+    setContentWidth(width);
+  };
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--content-width',
+      isMobile ? "100%" : contentWidth.toString() + "px"
+    );
+  }, [contentWidth, isMobile]);
+
+  const handleSetContentWidth = async (width: number) => {
+    applyContentWidth(width);
+    const store = await load('settings.json', { autoSave: true });
+    await store.set('content-width', { value: width });
+  };
+
+  const getPersistedContentWidth = async () => {
+    const store = await load('settings.json', { autoSave: true });
+    const stored = await store.get<{ value: number }>('content-width');
+    applyContentWidth(stored?.value ?? 768);
+  };
+
   const handleSetEntriesLayout = async (layout: string) => {
     const store = await load('settings.json', { autoSave: true });
     await store.set('entries-layout', { value: layout });
@@ -238,6 +262,7 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
     getCurrentAccounts();
     getPersistedCurrentAccountId();
     getPersistedEntriesLayout();
+    getPersistedContentWidth();
     getPersistedEntriesOrder();
     getPersistedShowReadEntries();
     getPersistedShowHiddenEntries();
@@ -483,6 +508,8 @@ const ApplicationLayout: React.FC<ApplicationProps> = ({ children }) => {
         handleSetCurrentFontSize,
         currentFontSpace,
         handleSetCurrentFontSpace,
+        contentWidth,
+        handleSetContentWidth,
         currentMarkAsReadOnHover,
         handleSetMarkAsReadOnHover,
         currentLanguage,

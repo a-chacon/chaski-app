@@ -30,7 +30,7 @@ function RouteComponent() {
   return (
     <MainSectionLayout>
       <div className="flex flex-col min-h-screen items-center justify-center px-4 py-12">
-        <div className="w-full max-w-lg flex flex-col gap-6">
+        <div className="w-full max-w-(--content-width) flex flex-col gap-6">
 
           {/* ── Hero ── */}
           <div className="flex flex-col items-center text-center gap-3 pb-2">

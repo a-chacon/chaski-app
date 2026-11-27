@@ -97,6 +97,8 @@ export interface AppContextInterface {
   handleSetCurrentFontSize: (font_size: number) => void;
   currentFontSpace: number;
   handleSetCurrentFontSpace: (font_size: number) => void;
+  contentWidth: number;
+  handleSetContentWidth: (width: number) => void;
   isMobile: boolean;
   isMobilePlatform: boolean;
   handleSetMarkAsReadOnHover: (mark_as_read_on_hover: boolean) => void;

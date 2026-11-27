@@ -7,6 +7,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import EntryActions from "../components/EntryActions";
 import ThumbnailOrMedia from "../components/ThumbnailOrMedia";
 import EntryShare from "../components/EntryShare";
+import EntryFontSettings from "../components/EntryFontSettings";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { RiArrowDownLine, RiArrowLeftLine, RiDownloadCloud2Line } from "@remixicon/react";
 import { Button, Spinner, Tooltip } from "@heroui/react";
@@ -30,7 +31,9 @@ function Entry() {
   const [entry, setEntry] = useState<EntryInterface>();
   const [isLoadingEntry, setIsLoadingEntry] = useState(true);
   const [isScrapingEntry, setIsScrapingEntry] = useState(false);
-  const { currentTheme } = useAppContext();
+  const { currentTheme, isMobile } = useAppContext();
+  const buttonSize = isMobile ? "md" : "sm";
+  const iconSize = isMobile ? 22 : 18;
 
   useEffect(() => {
     const loadEntry = async () => {
@@ -108,44 +111,47 @@ function Entry() {
   return (
     entry && (
       <MainSectionLayout>
-        <div className="flex flex-col p-4 mx-auto max-w-prose w-full min-w-0">
-          <div className="mx-2 flex justify-between bg-primary-100 border border-primary-500 sticky top-3 z-10 p-1.5 rounded-xl shadow-xl">
+        <div className="flex flex-col md:p-4 mx-auto max-w-(--content-width) w-full min-w-0">
+          <div className="flex justify-between bg-primary-100 border-primary-500 md:border sticky top-0 md:top-3 z-10 p-1.5 md:rounded-xl shadow-md md:shadow-xl [&_button[data-hover=true]]:bg-primary-200! [&_button[data-hover=true]]:text-primary-600!">
             <div className="flex flex-row">
               <EntryActions
                 entry={entry}
                 setEntry={setEntry}
                 backAfterAction={true}
+                buttonSize={buttonSize}
+                iconSize={iconSize}
               >
                 <Button
-                  color="primary"
-                  variant="flat"
+                  color="default"
+                  variant="light"
                   isIconOnly
-                  size="sm"
+                  size={buttonSize}
+                  aria-label={t('common:back')}
                   onPress={() => history.back()}
                 >
-                  <RiArrowLeftLine className="text-primary-500" />
+                  <RiArrowLeftLine size={iconSize} />
                 </Button>
-
-
               </EntryActions>
             </div>
             <div className="flex items-center gap-1">
               <Tooltip content={t('fetchFullContent')}>
                 <Button
-                  color="primary"
-                  variant="flat"
+                  color="default"
+                  variant="light"
                   isIconOnly
-                  size="sm"
+                  size={buttonSize}
+                  aria-label={t('fetchFullContent')}
                   isLoading={isScrapingEntry}
                   onPress={handleScrapeEntry}
                 >
-                  {!isScrapingEntry && <RiDownloadCloud2Line className="text-primary-500" />}
+                  {!isScrapingEntry && <RiDownloadCloud2Line size={iconSize} />}
                 </Button>
               </Tooltip>
-              <EntryShare entry={entry} />
+              <EntryFontSettings buttonSize={buttonSize} iconSize={iconSize} />
+              <EntryShare entry={entry} buttonSize={buttonSize} iconSize={iconSize} />
             </div>
           </div>
-          <div className="mt-10 md:mt-0">
+          <div className="px-4 md:px-0 mt-8 md:mt-0">
             <InfiniteScroll
               loader={
                 <div className="flex justify-center p-6">
@@ -161,7 +167,7 @@ function Entry() {
               refreshFunction={handleScrapeEntry}
               pullDownToRefreshThreshold={80}
               pullDownToRefreshContent={
-                <div className="flex md:hidden items-center justify-center gap-2 py-3 text-sm text-foreground-500">
+                <div className="flex md:hidden items-center justify-center gap-2 text-sm text-foreground-500">
                   <RiArrowDownLine size={16} />
                   {t("pullDownToFetchContent")}
                 </div>
@@ -201,7 +207,7 @@ function Entry() {
               </div>
 
 
-              <div className={`prose md:prose-lg text-foreground prose-a:text-foreground mx-auto w-full min-w-0 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:max-w-full [&_iframe]:max-w-full ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
+              <div className={`prose md:prose-lg max-w-none text-foreground prose-a:text-foreground mx-auto w-full min-w-0 overflow-hidden [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:max-w-full [&_iframe]:max-w-full ${isDarkTheme(currentTheme) ? 'prose-invert' : ''}`}>
                 <ErrorBoundary resetKey={`${entry.id}-${entry.content}`} title={t('common:errorContentTitle')}>
                   <p className="py-6 line-clamp-3">
                     {parse(entry.description || "", parseOptions)}

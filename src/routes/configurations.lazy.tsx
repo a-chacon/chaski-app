@@ -2,7 +2,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import MainSectionLayout from "../components/layout/MainSectionLayout";
 import { Button, Select, SelectItem, Slider, Switch } from "@heroui/react";
 import { useAppContext } from "../AppContext";
-import { RiListUnordered, RiLayoutHorizontalLine, RiLayoutGridLine } from "@remixicon/react";
+import { RiListUnordered, RiLayoutHorizontalLine, RiLayoutGridLine, RiAddLine, RiSubtractLine } from "@remixicon/react";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,11 @@ import { useEffect, useState } from "react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import KeybindingsSettings from "../components/KeybindingsSettings";
 import { useKeybindings } from "../keyboard/KeyboardProvider";
+import ContentWidthControl from "../components/ContentWidthControl";
+import { fonts } from "../helpers/fonts";
+
+const MIN_FONT_SIZE = 12;
+const MAX_FONT_SIZE = 28;
 
 export const Route = createLazyFileRoute("/configurations")({
   component: Configurations,
@@ -53,13 +58,6 @@ export default function Configurations() {
     loadAutostartState();
   }, [isMobilePlatform]);
 
-  const fonts = [
-    { key: "font-garamond", label: "Garamond" },
-    { key: "font-arial", label: "Arial" },
-    { key: "font-tisa", label: "Tisa" },
-    { key: "font-roboto", label: "Roboto" },
-    { key: "font-opensans", label: "Open Sans" },
-  ];
 
   async function handleAutostartChange() {
     if (isFlatpak) return;
@@ -74,7 +72,7 @@ export default function Configurations() {
 
   return (
     <MainSectionLayout>
-      <div className="flex flex-col max-w-(--breakpoint-md) mx-auto px-4">
+      <div className="flex flex-col max-w-(--content-width) mx-auto px-4">
 
         {/* Page header */}
         <div className="py-8">
@@ -115,30 +113,27 @@ export default function Configurations() {
                 </Select>
 
                 {/* Font size */}
-                <div className="flex gap-2">
+                <div className="flex items-center justify-between gap-2">
                   <Button
-                    color="primary"
+                    isIconOnly
                     size="sm"
-                    variant={currentFontSize === 14 ? "flat" : "light"}
-                    onClick={() => handleSetCurrentFontSize(14)}
+                    variant="flat"
+                    aria-label="Decrease font size"
+                    isDisabled={currentFontSize <= MIN_FONT_SIZE}
+                    onPress={() => handleSetCurrentFontSize(Math.max(MIN_FONT_SIZE, currentFontSize - 1))}
                   >
-                    {t('look.fontSizeSmall')}
+                    <RiSubtractLine size={16} />
                   </Button>
+                  <span className="text-sm font-medium tabular-nums">{currentFontSize}px</span>
                   <Button
-                    color="primary"
+                    isIconOnly
                     size="sm"
-                    variant={currentFontSize === 16 ? "flat" : "light"}
-                    onClick={() => handleSetCurrentFontSize(16)}
+                    variant="flat"
+                    aria-label="Increase font size"
+                    isDisabled={currentFontSize >= MAX_FONT_SIZE}
+                    onPress={() => handleSetCurrentFontSize(Math.min(MAX_FONT_SIZE, currentFontSize + 1))}
                   >
-                    {t('look.fontSizeMedium')}
-                  </Button>
-                  <Button
-                    color="primary"
-                    size="sm"
-                    variant={currentFontSize === 18 ? "flat" : "light"}
-                    onClick={() => handleSetCurrentFontSize(18)}
-                  >
-                    {t('look.fontSizeBig')}
+                    <RiAddLine size={16} />
                   </Button>
                 </div>
 
@@ -160,6 +155,9 @@ export default function Configurations() {
                 />
               </div>
             </div>
+
+            {/* Content width */}
+            <ContentWidthControl className="max-w-xs" />
 
             {/* Preview */}
             <div className="border rounded-2xl p-4 max-w-prose">
